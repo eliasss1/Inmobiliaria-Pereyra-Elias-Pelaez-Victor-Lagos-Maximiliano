@@ -5,173 +5,164 @@ using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+
 
 namespace Inmobiliaria.Controllers
 {
     public class InquilinosController : Controller
     {
-        public IConfiguration Configuration { get; }
+		// Sin inyección de dependencias (crear dentro del ctor)
+		//private readonly RepositorioPropietario repositorio;
 
-        
-        public InquilinosController(IConfiguration configuration)
+		// Con inyección de dependencias (pedir en el ctor como parámetro)
+		private readonly IRepositorioInquilino repositorio;
+		private readonly IConfiguration config;
+		private readonly ILogger<InquilinosController> logger;
+
+		public InquilinosController(IRepositorioInquilino repo, IConfiguration config, ILogger<InquilinosController> logger)
+		{
+			this.repositorio = repo;
+			this.config = config;
+			this.logger = logger;
+		}     
+        [Route("[controller]/Index")]
+        public ActionResult Index(int pagina=1)
         {
-            Configuration = configuration;
+            try
+			{
+				var tamaño = 5;
+				var lista = repositorio.ObtenerLista(Math.Max(pagina, 1), tamaño);
+				ViewBag.Pagina = pagina;
+				var total = repositorio.ObtenerCantidad();
+				ViewBag.TotalPaginas = total % tamaño == 0 ? total / tamaño : total / tamaño + 1;
+				ViewBag.Id = TempData["Id"];
+
+				if (TempData.ContainsKey("Mensaje"))
+					ViewBag.Mensaje = TempData["Mensaje"];
+				return View(lista);
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Index");
+				throw;
+			}
         }
 
-        private string GetConnectionString()
+		public ActionResult Create()
+		{
+			try
+			{
+				return View();
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Create");
+				throw;
+			}
+		}
+
+		// POST: Inquilino/Create
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public ActionResult Create(Inquilino inquilino)
         {
-            return Configuration["ConnectionStrings:DefaultConnection"];
-        }
-        public IActionResult Index()
-        {
-            List<Inquilino> listaInquilinos = new List<Inquilino>();
-            string connectionString = GetConnectionString();
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                string sql = "SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email FROM Inquilino";
-                SqlCommand command = new SqlCommand(sql, connection);
-                
-                connection.Open();
-                using (SqlDataReader dataReader = command.ExecuteReader())
-                {
-                    while (dataReader.Read())
-                    {
-                        Inquilino inquilino = new Inquilino();
-                        inquilino.IdInquilino = Convert.ToInt32(dataReader["IdInquilino"]);
-                        inquilino.Nombre = Convert.ToString(dataReader["Nombre"]);
-                        inquilino.Apellido = Convert.ToString(dataReader["Apellido"]);
-                        inquilino.Dni = Convert.ToString(dataReader["Dni"]);
-                        inquilino.Telefono = Convert.ToString(dataReader["Telefono"]) ?? "";
-                        inquilino.Email = Convert.ToString(dataReader["Email"]);
-                        
-                        listaInquilinos.Add(inquilino);
-                    }
-                }
-                connection.Close();
-            }
-            return View(listaInquilinos);
+            try
+			{
+				if (ModelState.IsValid)
+				{
+					inquilino.Clave = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+							password: inquilino.Clave,
+							salt: System.Text.Encoding.ASCII.GetBytes(config["Salt"]),
+							prf: KeyDerivationPrf.HMACSHA1,
+							iterationCount: 1000,
+							numBytesRequested: 256 / 8));
+					repositorio.Alta(inquilino);
+					TempData["Id"] = inquilino.IdInquilino;
+					return RedirectToAction(nameof(Index));
+				}
+				else
+					return View(inquilino);
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Create");
+				throw;
+			}
         }
 
 
-        public IActionResult Create()
-        {
-            return View();
-        }
+		public ActionResult Edit(int id)
+		{
+			try
+			{
+				var entidad = repositorio.ObtenerPorId(id);
+				return View(entidad);
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Edit");
+				throw;
+			}
+		}
 
+		// POST: Inquilino/Edit/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]		
+		public ActionResult Edit(int id, Inquilino entidad)
+		{			
+			try
+			{
+				var p = repositorio.ObtenerPorId(id);
+				if (p == null)
+					return NotFound();
+				p.Nombre = entidad.Nombre;
+				p.Apellido = entidad.Apellido;
+				p.Dni = entidad.Dni;
+				p.Email = entidad.Email;
+				p.Telefono = entidad.Telefono;
+				repositorio.Modificacion(p);
+				TempData["Mensaje"] = "Datos guardados correctamente";
+				return RedirectToAction(nameof(Index));
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Edit");
+				throw;
+			}
+		}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Inquilino inquilino)
-        {
-            if (ModelState.IsValid)
-            {
-                string connectionString = GetConnectionString();
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
+		public ActionResult Eliminar(int id)
+		{
+			try
+			{
+				var entidad = repositorio.ObtenerPorId(id);
+				return View(entidad);
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Eliminar");
+				throw;
+			}
+		}
 
-                    string sql = $"INSERT INTO Inquilino (Nombre, Apellido, Dni, Telefono, Email) " +
-                                 $"VALUES ('{inquilino.Nombre}', '{inquilino.Apellido}', '{inquilino.Dni}', '{inquilino.Telefono}', '{inquilino.Email}')";
-                    
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        command.CommandType = CommandType.Text;
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                        connection.Close();
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(inquilino);
-        }
-
-
-        public IActionResult Edit(int id)
-        {
-            Inquilino inquilino = null;
-            string connectionString = GetConnectionString();
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                string sql = $"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email FROM Inquilino WHERE IdInquilino = {id}";
-                SqlCommand command = new SqlCommand(sql, connection);
-                
-                connection.Open();
-                using (SqlDataReader dataReader = command.ExecuteReader())
-                {
-                    if (dataReader.Read())
-                    {
-                        inquilino = new Inquilino
-                        {
-                            IdInquilino = Convert.ToInt32(dataReader["IdInquilino"]),
-                            Nombre = Convert.ToString(dataReader["Nombre"]),
-                            Apellido = Convert.ToString(dataReader["Apellido"]),
-                            Dni = Convert.ToString(dataReader["Dni"]),
-                            Telefono = Convert.ToString(dataReader["Telefono"]) ?? "",
-                            Email = Convert.ToString(dataReader["Email"])
-                        };
-                    }
-                }
-                connection.Close();
-            }
-
-            if (inquilino == null) return NotFound();
-
-            return View(inquilino);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Inquilino inquilino)
-        {
-            if (ModelState.IsValid)
-            {
-                string connectionString = GetConnectionString();
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    string sql = $"UPDATE Inquilino SET " +
-                                 $"Nombre='{inquilino.Nombre}', " +
-                                 $"Apellido='{inquilino.Apellido}', " +
-                                 $"Dni='{inquilino.Dni}', " +
-                                 $"Telefono='{inquilino.Telefono}', " +
-                                 $"Email='{inquilino.Email}' " +
-                                 $"WHERE IdInquilino={inquilino.IdInquilino}";
-                    
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                        connection.Close();
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(inquilino);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
-        {
-            string connectionString = GetConnectionString();
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                string sql = $"DELETE FROM Inquilino WHERE IdInquilino = {id}";
-                using (SqlCommand command = new SqlCommand(sql, connection))
-                {
-                    connection.Open();
-                    try
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                    catch (SqlException ex)
-                    {
-                        TempData["Error"] = "Error al intentar eliminar el inquilino: " + ex.Message;
-                    }
-                    connection.Close();
-                }
-            }
-            return RedirectToAction(nameof(Index));
-        }
-    }
+		// POST: Inquilino/Delete/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public ActionResult Eliminar(int id, Inquilino entidad)
+		{
+			try
+			{
+				repositorio.Baja(id);
+				TempData["Mensaje"] = "Eliminación realizada correctamente";
+				return RedirectToAction(nameof(Index));
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Eliminar");
+				throw;
+			}
+		}
+	}
 }
