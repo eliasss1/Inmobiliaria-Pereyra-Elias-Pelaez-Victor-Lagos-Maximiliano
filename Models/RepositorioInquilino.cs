@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
+using MySqlConnector;
 using Inmobiliaria.Models;
+
 
 namespace Inmobiliaria.Models
 {
@@ -16,27 +15,27 @@ namespace Inmobiliaria.Models
 
 		}
 
-		public int Alta(Inquilino p)
+		public int Alta(Inquilino i)
 		{
 			int res = -1;
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"INSERT INTO Inquilinos 
 					(Nombre, Apellido, Dni, Telefono, Email, Clave)
 					VALUES (@nombre, @apellido, @dni, @telefono, @email, @clave);
-					SELECT SCOPE_IDENTITY();";//devuelve el id insertado (LAST_INSERT_ID para mysql)
-				using (SqlCommand command = new SqlCommand(sql, connection))
+					SELECT LAST_INSERT_ID();";//devuelve el id insertado (LAST_INSERT_ID para mysql)
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
-					command.Parameters.AddWithValue("@nombre", p.Nombre);
-					command.Parameters.AddWithValue("@apellido", p.Apellido);
-					command.Parameters.AddWithValue("@dni", p.Dni);
-					command.Parameters.AddWithValue("@telefono", p.Telefono);
-					command.Parameters.AddWithValue("@email", p.Email);
-					command.Parameters.AddWithValue("@clave", p.Clave);
+					command.Parameters.AddWithValue("@nombre", i.Nombre);
+					command.Parameters.AddWithValue("@apellido", i.Apellido);
+					command.Parameters.AddWithValue("@dni", i.Dni);
+					command.Parameters.AddWithValue("@telefono", i.Telefono);
+					command.Parameters.AddWithValue("@email", i.Email);
+					command.Parameters.AddWithValue("@clave", i.Clave);
 					connection.Open();
 					res = Convert.ToInt32(command.ExecuteScalar());
-					p.IdPropietario = res;
+					i.IdInquilino = res;
 					connection.Close();
 				}
 			}
@@ -45,10 +44,10 @@ namespace Inmobiliaria.Models
 		public int Baja(int id)
 		{
 			int res = -1;
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = "DELETE FROM Inquilinos WHERE IdInquilino = @id";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
 					command.Parameters.AddWithValue("@id", id);
@@ -59,24 +58,24 @@ namespace Inmobiliaria.Models
 			}
 			return res;
 		}
-		public int Modificacion(Inquilino p)
+		public int Modificacion(Inquilino i)
 		{
 			int res = -1;
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"UPDATE Inquilinos 
 					SET Nombre=@nombre, Apellido=@apellido, Dni=@dni, Telefono=@telefono, Email=@email, Clave=@clave
-					WHERE IdPropietario = @id";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+					WHERE IdInquilino = @id";
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
-					command.Parameters.AddWithValue("@nombre", p.Nombre);
-					command.Parameters.AddWithValue("@apellido", p.Apellido);
-					command.Parameters.AddWithValue("@dni", p.Dni);
-					command.Parameters.AddWithValue("@telefono", p.Telefono);
-					command.Parameters.AddWithValue("@email", p.Email);
-					command.Parameters.AddWithValue("@clave", p.Clave);
-					command.Parameters.AddWithValue("@id", p.IdPropietario);
+					command.Parameters.AddWithValue("@nombre", i.Nombre);
+					command.Parameters.AddWithValue("@apellido", i.Apellido);
+					command.Parameters.AddWithValue("@dni", i.Dni);
+					command.Parameters.AddWithValue("@telefono", i.Telefono);
+					command.Parameters.AddWithValue("@email", i.Email);
+					command.Parameters.AddWithValue("@clave", i.Clave);
+					command.Parameters.AddWithValue("@id", i.IdInquilino);
 					connection.Open();
 					res = command.ExecuteNonQuery();
 					connection.Close();
@@ -88,7 +87,7 @@ namespace Inmobiliaria.Models
 		public IList<Inquilino> ObtenerLista(int paginaNro = 1, int tamPagina = 10)
 		{
 			IList<Inquilino> res = new List<Inquilino>();
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @$"
 					SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email, Clave
@@ -97,16 +96,16 @@ namespace Inmobiliaria.Models
 					OFFSET {(paginaNro - 1) * tamPagina} ROW
 					FETCH NEXT {tamPagina} ROWS ONLY
 				";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
 					connection.Open();
 					var reader = command.ExecuteReader();
 					while (reader.Read())
 					{
-						Inquilino p = new Inquilino
+						Inquilino i = new Inquilino
 						{
-							IdPropietario = reader.GetInt32(nameof(Inquilino.IdPropietario)),//más seguro
+							IdInquilino = reader.GetInt32(nameof(Inquilino.IdInquilino)),//más seguro
 							Nombre = reader.GetString(nameof(Inquilino.Nombre)),
 							Apellido = reader.GetString(nameof(Inquilino.Apellido)),
 							Dni = reader.GetString(nameof(Inquilino.Dni)),
@@ -114,7 +113,7 @@ namespace Inmobiliaria.Models
 							Email = reader.GetString(nameof(Inquilino.Email)),
 							Clave = reader.GetString(nameof(Inquilino.Clave)),
 						};
-						res.Add(p);
+						res.Add(i);
 					}
 					connection.Close();
 				}
@@ -125,13 +124,13 @@ namespace Inmobiliaria.Models
 		public int ObtenerCantidad()
 		{
 			int res = 0;
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @$"
 					SELECT COUNT(IdInquilino)
 					FROM Inquilinos
 				";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
 					connection.Open();
@@ -148,21 +147,21 @@ namespace Inmobiliaria.Models
 
 		public Inquilino? ObtenerPorId(int id)
 		{
-			Inquilino? p = null;
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			Inquilino? i = null;
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email, Clave 
 					FROM Inquilinos
 					WHERE IdInquilino=@id";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
-					command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+					command.Parameters.Add("@id", MySqlDbType.Int32).Value = id;
 					command.CommandType = CommandType.Text;
 					connection.Open();
 					var reader = command.ExecuteReader();
 					if (reader.Read())
 					{
-						p = new Inquilino
+						i = new Inquilino
 						{
 							IdInquilino = reader.GetInt32(nameof(Inquilino.IdInquilino)),
 							Nombre = reader.GetString("Nombre"),
@@ -176,26 +175,26 @@ namespace Inmobiliaria.Models
 					connection.Close();
 				}
 			}
-			return p;
+			return i;
 		}
 
 		public Inquilino? ObtenerPorEmail(string email)
 		{
-			Inquilino? p = null;
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			Inquilino? i = null;
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email, Clave 
 					FROM Inquilinos
 					WHERE Email=@email";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
-					command.Parameters.Add("@email", SqlDbType.VarChar).Value = email;
+					command.Parameters.Add("@email", MySqlDbType.VarChar).Value = email;
 					connection.Open();
 					var reader = command.ExecuteReader();
 					if (reader.Read())
 					{
-						p = new Inquilino
+						i = new Inquilino
 						{
 							IdInquilino = reader.GetInt32(nameof(Inquilino.IdInquilino)),
 							Nombre = reader.GetString("Nombre"),
@@ -209,27 +208,27 @@ namespace Inmobiliaria.Models
 					connection.Close();
 				}
 			}
-			return p;
+			return i;
 		}
 
 		public IList<Inquilino> BuscarPorNombre(string nombre)
 		{
 			List<Inquilino> res = new List<Inquilino>();
 			nombre = "%" + nombre + "%";
-			using (SqlConnection connection = new SqlConnection(connectionString))
+			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email, Clave 
 					FROM Inquilinos
 					WHERE Nombre LIKE @nombre OR Apellido LIKE @nombre";
-				using (SqlCommand command = new SqlCommand(sql, connection))
+				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
-					command.Parameters.Add("@nombre", SqlDbType.VarChar).Value = nombre;
+					command.Parameters.Add("@nombre", MySqlDbType.VarChar).Value = nombre;
 					command.CommandType = CommandType.Text;
 					connection.Open();
 					var reader = command.ExecuteReader();
 					while (reader.Read())
 					{
-						var p = new Inquilino
+						var i = new Inquilino
 						{
 							IdInquilino = reader.GetInt32(nameof(Inquilino.IdInquilino)),
 							Nombre = reader.GetString("Nombre"),
@@ -239,7 +238,7 @@ namespace Inmobiliaria.Models
 							Email = reader.GetString("Email"),
 							Clave = reader.GetString("Clave"),
 						};
-						res.Add(p);
+						res.Add(i);
 					}
 					connection.Close();
 				}
