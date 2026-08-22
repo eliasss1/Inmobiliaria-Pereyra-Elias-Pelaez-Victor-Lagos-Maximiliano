@@ -1,20 +1,23 @@
-using System.componentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Inmobilaria.Models;
 
 public class Usuario {
 
-    [key]
+    [Key]
     public int idUsuario { get; set; }
 
+    [Required]
+    public string nombre { get; set; } = "";
+
     [Required, EmailAddress]
-    public string Email { get; set; } = "";
+    public string email { get; set; } = "";
 
     [Required]
-    public string Contraseña { get; set; } = "";
+    public string contraseña { get; set; } = "";
 
-    public string? AvatarUrl { get; set; }
+    public string? avatarUrl { get; set; }
 
     [Required]
-    public string Rol { get; set; } = "";
+    public string rol { get; set; } = "";
 }
