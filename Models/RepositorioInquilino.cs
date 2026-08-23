@@ -93,8 +93,7 @@ namespace Inmobiliaria.Models
 					SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email, Clave
 					FROM Inquilinos
 					ORDER BY IdInquilino
-					OFFSET {(paginaNro - 1) * tamPagina} ROW
-					FETCH NEXT {tamPagina} ROWS ONLY
+					LIMIT {tamPagina} OFFSET {(paginaNro - 1) * tamPagina}
 				";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{

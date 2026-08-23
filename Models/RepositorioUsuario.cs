@@ -1,6 +1,7 @@
+using System;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using Inmobiliaria.Models;
+using MySqlConnector;
 
 
 namespace Inmobilaria.Models;
@@ -17,15 +18,15 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
     {
         int res = -1;
 
-        using (SqlConnection conexion = new SqlConnection (connectionString))
+        using (MySqlConnection conexion = new MySqlConnection (connectionString))
         {
             try {
                 string query = @"INSERT INTO Usuario 
                                 (email, nombre, contraseña, avatarUrl, rol)
                                 VALUES (@email, @nombre, @contraseña, @avatarUrl, @rol); 
-                                SELECT SCOPE_IDENTITY()";
+                                SELECT LAST_INSERT_ID()";
                 
-                using (SqlCommand comando = new SqlCommand(query, conexion))
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
                     comando.Parameters.AddWithValue("@email", p.email);
@@ -54,11 +55,11 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
     {
         int res = -1;
 
-        using (SqlConnection conexion = new SqlConnection (connectionString))
+        using (MySqlConnection conexion = new MySqlConnection (connectionString))
         {
             try {
                 string query = @"DELETE FROM Usuario WHERE idUsuario = @idUsuario";
-                using (SqlCommand comando = new SqlCommand(query, conexion))
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
                     comando.Parameters.AddWithValue("@idUsuario", id);
@@ -79,14 +80,15 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
     public int Modificacion(Usuario p)
     {
         int res = -1;
-        using (SqlConnection conexion = new SqlConnection(connectionString))
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try
             {
-                string query = @"UPDATE Usuario SET email = @email, nombre = @nombre, contraseña = @contraseña, avatar
-                Url = @avatarUrl, rol = @rol WHERE idUsuario = @idUsuario";
+                string query = @"UPDATE Usuario 
+                SET email = @email, nombre = @nombre, contraseña = @contraseña, avatar Url = @avatarUrl, rol = @rol 
+                WHERE idUsuario = @idUsuario";
                 
-                using (SqlCommand comando = new SqlCommand(query, conexion))
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
                     comando.Parameters.AddWithValue("@idUsuario", p.idUsuario);
@@ -114,13 +116,13 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
     public int ObtenerCantidad()
     {
         int res = -1;
-        using(SqlConnection conexion = new SqlConnection(connectionString))
+        using(MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try
             {
                 string query = "SELECT COUNT(idUsuario) FROM Usuario";
 
-                using (SqlCommand comando = new SqlCommand(query, conexion))
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
                     conexion.Open();
@@ -147,7 +149,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
     public IList<Usuario> ObtenerLista(int paginaNro = 1, int tamPagina = 10)
     {
         IList<Usuario> res = new List<Usuario>();
-        using (SqlConnection conexion = new SqlConnection(connectionString))
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try
             {
@@ -158,7 +160,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
                                 OFFSET {(paginaNro - 1) * tamPagina} ROW 
                                 FETCH NEXT {tamPagina} ROWS ONLY
                 ";
-                using (SqlCommand comando = new SqlCommand(query, conexion))
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
                     conexion.Open();
@@ -191,15 +193,17 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
     public Usuario? ObtenerPorId(int id)
     {
         Usuario? p = null;
-        using (SqlConnection conexion = new SqlConnection(connectionString))
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try
             {
-                string query = @$"SELECT idUsuario, nombre, email, avatarUrl, rol FROM Usuario WHERE idUsuario = @idUsuario";
-                using (SqlCommand comando = new SqlCommand(query, conexion))
+                string query = @$"SELECT idUsuario, nombre, email, avatarUrl, rol 
+                FROM Usuario 
+                WHERE idUsuario = @idUsuario";
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.Add("@idUsuario", SqlDbType.Int).Value = id;
+                    comando.Parameters.Add("@idUsuario", MySqlDbType.Int32).Value = id;
                     conexion.Open();
                     var reader = comando.ExecuteReader();
                     if(reader.Read())
