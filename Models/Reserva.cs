@@ -7,37 +7,37 @@ namespace Inmobiliaria.Models;
 public class Reserva {
 
     [Key]
-    public int idReserva { get; set; }
+    public int IdReserva { get; set; }
 
     [Required]
-    public DateTime fechaInicio { get; set; }
+    public DateTime FechaInicio { get; set; }
 
     [Required]
-    public DateTime fechaFin { get; set; } 
+    public DateTime FechaFin { get; set; } 
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
-    public decimal montoDiario { get;set; }
+    public decimal MontoDiario { get;set; }
 
-    public DateTime? fechaEfectivaTerminacion { get; set; }
+    public DateTime? FechaEfectivaTerminacion { get; set; }
 
     [Column(TypeName = " decimal(18,2)")]
-    public decimal? multa { get; set; }
+    public decimal? Multa { get; set; }
 
 
     [Required]
     public int IdInquilino { get; set; }
     [ForeignKey("idInquilino")]
-    public Inquilino? inquilinoAsociado { get; set; }
+    public Inquilino? InquilinoAsociado { get; set; }
 
     [Required]
-    public int idInmueble { get; set; }
+    public int IdInmueble { get; set; }
     [ForeignKey("idInmueble")]
-    public Inquilino? inmuebleAsociado { get; set; }
+    public Inmueble? InmuebleAsociado { get; set; }
 
     [Required]
-    public int creadoPorUsuarioId { get;set; }
+    public int CreadoPorUsuarioId { get;set; }
 
-    public int? terminadoPorUsuarioId { get;set;}
+    public int? TerminadoPorUsuarioId { get;set;}
 
 }

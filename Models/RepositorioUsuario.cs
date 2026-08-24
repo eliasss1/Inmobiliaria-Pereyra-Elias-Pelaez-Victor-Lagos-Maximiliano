@@ -28,14 +28,14 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@email", p.email);
-                    comando.Parameters.AddWithValue("@nombre", p.nombre);
-                    comando.Parameters.AddWithValue("@contraseña", p.contraseña);
-                    comando.Parameters.AddWithValue("@avatarUrl", p.avatarUrl);
-                    comando.Parameters.AddWithValue("@rol", p.rol);
+                    comando.Parameters.AddWithValue("@email", p.Email);
+                    comando.Parameters.AddWithValue("@nombre", p.Nombre);
+                    comando.Parameters.AddWithValue("@contraseña", p.Contraseña);
+                    comando.Parameters.AddWithValue("@avatarUrl", p.AvatarUrl);
+                    comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
                     res = Convert.ToInt32(comando.ExecuteScalar());
-                    p.idUsuario = res;
+                    p.IdUsuario = res;
                     
                 }
             } catch (Exception ex) {
@@ -90,12 +90,12 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@idUsuario", p.idUsuario);
-                    comando.Parameters.AddWithValue("@email", p.email);
-                    comando.Parameters.AddWithValue("@nombre", p.nombre);
-                    comando.Parameters.AddWithValue("@contraseña", p.contraseña);
-                    comando.Parameters.AddWithValue("@avatarUrl", p.avatarUrl);
-                    comando.Parameters.AddWithValue("@rol", p.rol);
+                    comando.Parameters.AddWithValue("@idUsuario", p.IdUsuario);
+                    comando.Parameters.AddWithValue("@email", p.Email);
+                    comando.Parameters.AddWithValue("@nombre", p.Nombre);
+                    comando.Parameters.AddWithValue("@contraseña", p.Contraseña);
+                    comando.Parameters.AddWithValue("@avatarUrl", p.AvatarUrl);
+                    comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
                     res = comando.ExecuteNonQuery();
                 }
@@ -168,10 +168,10 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
                     {
                         Usuario p = new Usuario
                         {
-                            idUsuario = reader.GetInt32(nameof(Usuario.idUsuario)),
-                            email = reader.GetString(nameof(Usuario.email)),
-                            avatarUrl = reader.IsDBNull(nameof(Usuario.avatarUrl)) ? null: reader.GetString(nameof(Usuario.avatarUrl)),
-                            rol = reader.GetString(nameof(Usuario.rol))
+                            IdUsuario = reader.GetInt32(nameof(Usuario.IdUsuario)),
+                            Email = reader.GetString(nameof(Usuario.Email)),
+                            AvatarUrl = reader.IsDBNull(nameof(Usuario.AvatarUrl)) ? null : reader.GetString(nameof(Usuario.AvatarUrl)),
+                            Rol = reader.GetString(nameof(Usuario.Rol))
                         };
                         res.Add(p);
                     }
@@ -209,11 +209,11 @@ public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
                     {
                         p = new Usuario
                         {
-                            idUsuario = reader.GetInt32(nameof(Usuario.idUsuario)),
-                            email = reader.GetString(nameof(Usuario.email)),
-                            nombre = reader.GetString(nameof(Usuario.nombre)),                            
-                            avatarUrl = reader.IsDBNull(nameof(Usuario.avatarUrl)) ? null: reader.GetString(nameof(Usuario.avatarUrl)),
-                            rol = reader.GetString(nameof(Usuario.rol)),                            
+                            IdUsuario = reader.GetInt32(nameof(Usuario.IdUsuario)),
+                            Email = reader.GetString(nameof(Usuario.Email)),
+                            Nombre = reader.GetString(nameof(Usuario.Nombre)),
+                            AvatarUrl = reader.IsDBNull(nameof(Usuario.AvatarUrl)) ? null : reader.GetString(nameof(Usuario.AvatarUrl)),
+                            Rol = reader.GetString(nameof(Usuario.Rol)),
                         };
                         
                     }

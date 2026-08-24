@@ -5,19 +5,19 @@ namespace Inmobiliaria.Models;
 public class Usuario {
 
     [Key]
-    public int idUsuario { get; set; }
+    public int IdUsuario { get; set; }
 
     [Required]
-    public string nombre { get; set; } = "";
+    public string Nombre { get; set; } = "";
 
     [Required, EmailAddress]
-    public string email { get; set; } = "";
+    public string Email { get; set; } = "";
 
     [Required]
-    public string contraseña { get; set; } = "";
+    public string Contraseña { get; set; } = "";
 
-    public string? avatarUrl { get; set; }
+    public string? AvatarUrl { get; set; }
 
     [Required]
-    public string rol { get; set; } = "";
+    public string Rol { get; set; } = "";
 }
