@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Inmobilaria.Models;
+namespace Inmobiliaria.Models;
 
 public class Usuario {
 

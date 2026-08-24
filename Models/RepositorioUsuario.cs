@@ -1,10 +1,9 @@
 using System;
 using System.Data;
-using Inmobiliaria.Models;
 using MySqlConnector;
 
 
-namespace Inmobilaria.Models;
+namespace Inmobiliaria.Models;
 
 public class RepositorioUsuario : RepositorioBase, IRepositorio<Usuario>
 

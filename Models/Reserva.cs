@@ -1,43 +1,43 @@
-using System.componentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace Inmobilaria.Models;
+namespace Inmobiliaria.Models;
 
 public class Reserva {
 
-    [key]
+    [Key]
     public int idReserva { get; set; }
 
     [Required]
-    public DateTime fechaInicio { get; set; } = "";
+    public DateTime fechaInicio { get; set; }
 
     [Required]
-    public DateTime FechaFin { get; set; } = "";
+    public DateTime fechaFin { get; set; } 
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
-    public decimal MontoDiario { get;set; }
+    public decimal montoDiario { get;set; }
 
-    public DateTime? FechaEfectivaTerminacion { get; set; }
+    public DateTime? fechaEfectivaTerminacion { get; set; }
 
     [Column(TypeName = " decimal(18,2)")]
-    public decimal? Multa { get; set; }
+    public decimal? multa { get; set; }
 
 
     [Required]
     public int IdInquilino { get; set; }
-    [ForeignKey("IdInquilino")]
-    public Inquilino? InquilinoAsociado { get; set; }
+    [ForeignKey("idInquilino")]
+    public Inquilino? inquilinoAsociado { get; set; }
 
     [Required]
-    public int IdInmueble { get; set; }
-    [ForeignKey("IdInquilino")]
-    public Inquilino? InmuebleAsociado { get; set; }
+    public int idInmueble { get; set; }
+    [ForeignKey("idInmueble")]
+    public Inquilino? inmuebleAsociado { get; set; }
 
     [Required]
-    public int CreadoPorUsuarioId { get;set; }
+    public int creadoPorUsuarioId { get;set; }
 
-    public int? TerminadoPorUsuarioId { get;set;}
+    public int? terminadoPorUsuarioId { get;set;}
 
 }

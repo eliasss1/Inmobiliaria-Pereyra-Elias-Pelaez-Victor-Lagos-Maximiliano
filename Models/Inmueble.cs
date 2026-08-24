@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Inmobiliaria.Models;
 
-namespace Inmobilaria.Models;
+
+namespace Inmobiliaria.Models;
 
 public class Inmueble {
 
