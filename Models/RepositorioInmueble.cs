@@ -1,4 +1,4 @@
-using System;
+
 using System.Data;
 using System.Runtime.InteropServices.Marshalling;
 using MySqlConnector;
@@ -27,14 +27,14 @@ public class RepositorioInmueble : RepositorioBase, IRepositorio<Inmueble>
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue(@"Direccion", p.Direccion);
-                    comando.Parameters.AddWithValue(@"Cupo", p.Cupo);
-                    comando.Parameters.AddWithValue(@"Tipo", p.Tipo);
-                    comando.Parameters.AddWithValue(@"Latitud", p.Latitud);
-                    comando.Parameters.AddWithValue(@"Longitud", p.Longitud);
-                    comando.Parameters.AddWithValue(@"PrecioPorDia", p.PrecioPorDia);
-                    comando.Parameters.AddWithValue(@"Estado", p.Estado);
-                    comando.Parameters.AddWithValue(@"IdPropietario", p.IdPropietario);
+                    comando.Parameters.AddWithValue("@Direccion", p.Direccion);
+                    comando.Parameters.AddWithValue("@Cupo", p.Cupo);
+                    comando.Parameters.AddWithValue("@Tipo", p.Tipo);
+                    comando.Parameters.AddWithValue("@Latitud", p.Latitud);
+                    comando.Parameters.AddWithValue("@Longitud", p.Longitud);
+                    comando.Parameters.AddWithValue("@PrecioPorDia", p.PrecioPorDia);
+                    comando.Parameters.AddWithValue("@Estado", p.Estado);
+                    comando.Parameters.AddWithValue("@IdPropietario", p.IdPropietario);
                     conexion.Open();
                     res = Convert.ToInt32(comando.ExecuteScalar());
                     p.IdInmueble = res;
@@ -98,15 +98,15 @@ public class RepositorioInmueble : RepositorioBase, IRepositorio<Inmueble>
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue(@"Direccion", p.Direccion);
-                    comando.Parameters.AddWithValue(@"Cupo", p.Cupo);
-                    comando.Parameters.AddWithValue(@"Tipo", p.Tipo);
-                    comando.Parameters.AddWithValue(@"Latitud", p.Latitud);
-                    comando.Parameters.AddWithValue(@"Longitud", p.Longitud);
-                    comando.Parameters.AddWithValue(@"PrecioPorDia", p.PrecioPorDia);
-                    comando.Parameters.AddWithValue(@"Estado", p.Estado);
-                    comando.Parameters.AddWithValue(@"IdPropietario", p.IdPropietario);
-                    comando.Parameters.AddWithValue(@"IdInmueble", p.IdInmueble);
+                    comando.Parameters.AddWithValue("@Direccion", p.Direccion);
+                    comando.Parameters.AddWithValue("@Cupo", p.Cupo);
+                    comando.Parameters.AddWithValue("@Tipo", p.Tipo);
+                    comando.Parameters.AddWithValue("@Latitud", p.Latitud);
+                    comando.Parameters.AddWithValue("@Longitud", p.Longitud);
+                    comando.Parameters.AddWithValue("@PrecioPorDia", p.PrecioPorDia);
+                    comando.Parameters.AddWithValue("@Estado", p.Estado);
+                    comando.Parameters.AddWithValue("@IdPropietario", p.IdPropietario);
+                    comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
                     conexion.Open();
                     res = comando.ExecuteNonQuery();
 
@@ -173,8 +173,8 @@ public class RepositorioInmueble : RepositorioBase, IRepositorio<Inmueble>
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue(@"tamPagina", tamPagina);
-                    comando.Parameters.AddWithValue(@"offset", offset);
+                    comando.Parameters.AddWithValue("@tamPagina", tamPagina);
+                    comando.Parameters.AddWithValue("@offset", offset);
                     conexion.Open();
                     var reader = comando.ExecuteReader();
                     while (reader.Read())
@@ -196,7 +196,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorio<Inmueble>
                 }
             }catch(Exception ex)
             {
-                Console.WriteLine($"Error al obtener la cantidad de la tabla inmueble {ex.Message}");
+                Console.WriteLine($"Error al obtener la lista de la tabla inmueble {ex.Message}");
             }
             finally
             {
@@ -214,14 +214,14 @@ public class RepositorioInmueble : RepositorioBase, IRepositorio<Inmueble>
         {
             try
             {
-                string query = @"SELECT IdInmueble, Direccion, Cupo, Tipo, Latitud, Longitud, PrecioPorDia, Estado, IdPropietario
+                string query = @"SELECT *
                 FROM Inmueble
                 WHERE IdInmueble = @IdInmueble";
 
                 using(MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue(@"IdInmueble", id);
+                    comando.Parameters.AddWithValue("@IdInmueble", id);
                     conexion.Open();
                     var reader = comando.ExecuteReader();
                     res = new Inmueble {
