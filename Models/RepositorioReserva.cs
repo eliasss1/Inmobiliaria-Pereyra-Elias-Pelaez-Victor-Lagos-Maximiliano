@@ -20,7 +20,8 @@ public class RepositorioReserva : RepositorioBase, IRepositorio<Reserva>
         {
             try {
             string query = @"INSERT INTO Reserva (fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId)
-            VALUES (@fechaInicio, @fechaFin, @montoDiario, @fechaEfectivaTerminacion, @multa, @idInquilino, @idInmueble, @creadoPorUsuarioId, @terminadoPorUsuarioId)";
+            VALUES (@fechaInicio, @fechaFin, @montoDiario, @fechaEfectivaTerminacion, @multa, @idInquilino, @idInmueble, @creadoPorUsuarioId, @terminadoPorUsuarioId)
+            SELECT LAST_INSERT_ID()";
 
             using(MySqlCommand comando = new MySqlCommand(query, conexion))
             {
@@ -160,16 +161,20 @@ public class RepositorioReserva : RepositorioBase, IRepositorio<Reserva>
     {
         IList<Reserva> res = new List<Reserva>();
 
+        int offset = (paginaNro - 1) * tamPagina;
+
         using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try
             {   
                 string query = @"SELECT idReserva, fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId
-                FROM Reserva";
+                FROM Reserva LIMIT @tamPagina OFFSET @offset";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
+                    comando.Parameters.AddWithValue("@tamPagina", tamPagina);
+                    comando.Parameters.AddWithValue("@offset", offset);
                     conexion.Open();
                     var reader = comando.ExecuteReader();
                     while (reader.Read())
@@ -211,7 +216,9 @@ public class RepositorioReserva : RepositorioBase, IRepositorio<Reserva>
     {
         try
         {
-            string query = "SELECT idReserva, fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId FROM Reserva WHERE idReserva = @idReserva";
+            string query = @"SELECT idReserva, fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId 
+            FROM Reserva 
+            WHERE idReserva = @idReserva";
 
             using (MySqlCommand comando = new MySqlCommand(query, conexion))
             {
