@@ -21,5 +21,8 @@ public class Inquilino
     [Required, EmailAddress]
     public string Email {get; set;} = "";
 
+    [Required]
+    public string Clave { get; set; } = "";
+
     public override string ToString() => $"{Nombre} {Apellido}";
 }

@@ -106,6 +106,7 @@ namespace Inmobiliaria.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]		
 		public ActionResult Edit(int id, Propietario entidad)
+
 		{			
 			try
 			{
@@ -127,8 +128,7 @@ namespace Inmobiliaria.Controllers
 				throw;
 			}
 		}
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+		[HttpGet]
 		public ActionResult Eliminar(int id)
 		{
 			try
@@ -143,10 +143,10 @@ namespace Inmobiliaria.Controllers
 			}
 		}
 
-		// POST: Propietario/Delete
-		[HttpPost]
+		// POST: Propietario/Eliminar/5
+		[HttpPost, ActionName("Eliminar")]
 		[ValidateAntiForgeryToken]
-		public ActionResult Eliminar(int id, Propietario entidad)
+		public ActionResult EliminarConfirmado(int id, Propietario entidad)
 		{
 			try
 			{
