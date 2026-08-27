@@ -108,6 +108,12 @@ namespace Inmobiliaria.Controllers
 		public ActionResult Edit(int id, Propietario entidad)
 
 		{			
+
+			if (!ModelState.IsValid)
+			{
+				return View(entidad);
+			}
+
 			try
 			{
 				var p = repositorio.ObtenerPorId(id);

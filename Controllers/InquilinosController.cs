@@ -111,23 +111,27 @@ namespace Inmobiliaria.Controllers
 		[ValidateAntiForgeryToken]		
 		public ActionResult Edit(int id, Inquilino entidad)
 		{			
+		    if (!ModelState.IsValid)
+		    {
+				return View(entidad);
+			}
 			try
 			{
-				var p = repositorio.ObtenerPorId(id);
-				if (p == null)
-					return NotFound();
-				p.Nombre = entidad.Nombre;
-				p.Apellido = entidad.Apellido;
-				p.Dni = entidad.Dni;
-				p.Email = entidad.Email;
-				p.Telefono = entidad.Telefono;
-				repositorio.Modificacion(p);
-				TempData["Mensaje"] = "Datos guardados correctamente";
+		        var p = repositorio.ObtenerPorId(id);
+		        if (p == null)
+		            return NotFound();
+		        p.Nombre = entidad.Nombre;
+		        p.Apellido = entidad.Apellido;
+		        p.Dni = entidad.Dni;
+		        p.Email = entidad.Email;
+		        p.Telefono = entidad.Telefono;
+		        repositorio.Modificacion(p);
+		        TempData["Mensaje"] = "Datos guardados correctamente";
 				return RedirectToAction(nameof(Index));
 			}
 			catch (Exception ex)
 			{
-				logger.LogError(ex, "Error en Edit");
+		        logger.LogError(ex, "Error en Edit");
 				throw;
 			}
 		}
@@ -138,12 +142,12 @@ namespace Inmobiliaria.Controllers
 			{
 				var entidad = repositorio.ObtenerPorId(id);
 				return View(entidad);
-			}
+	}
 			catch (Exception ex)
 			{
 				logger.LogError(ex, "Error en Eliminar");
 				throw;
-			}
+}
 		}
 
 		// POST: Inquilino/Eliminar/5
@@ -165,3 +169,4 @@ namespace Inmobiliaria.Controllers
 		}
 	}
 }
+
