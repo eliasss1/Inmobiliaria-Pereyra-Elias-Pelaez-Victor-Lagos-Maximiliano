@@ -21,8 +21,8 @@ namespace Inmobiliaria.Models
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"INSERT INTO Propietarios
-					(Nombre, Apellido, Dni, Telefono, Email, Clave)
-					VALUES (@nombre, @apellido, @dni, @telefono, @email, @clave);
+					(Nombre, Apellido, Dni, Telefono, Email)
+					VALUES (@nombre, @apellido, @dni, @telefono, @email);
 					SELECT LAST_INSERT_ID();";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
@@ -32,7 +32,6 @@ namespace Inmobiliaria.Models
 					command.Parameters.AddWithValue("@dni", p.Dni);
 					command.Parameters.AddWithValue("@telefono", p.Telefono);
 					command.Parameters.AddWithValue("@email", p.Email);
-					command.Parameters.AddWithValue("@clave", p.Clave);
 					connection.Open();
 					res = Convert.ToInt32(command.ExecuteScalar());
 					p.IdPropietario = res;
@@ -64,7 +63,7 @@ namespace Inmobiliaria.Models
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"UPDATE Propietarios 
-					SET Nombre=@nombre, Apellido=@apellido, Dni=@dni, Telefono=@telefono, Email=@email, Clave=@clave
+					SET Nombre=@nombre, Apellido=@apellido, Dni=@dni, Telefono=@telefono, Email=@email
 					WHERE IdPropietario = @id";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
@@ -74,7 +73,6 @@ namespace Inmobiliaria.Models
 					command.Parameters.AddWithValue("@dni", p.Dni);
 					command.Parameters.AddWithValue("@telefono", p.Telefono);
 					command.Parameters.AddWithValue("@email", p.Email);
-					command.Parameters.AddWithValue("@clave", p.Clave);
 					command.Parameters.AddWithValue("@id", p.IdPropietario);
 					connection.Open();
 					res = command.ExecuteNonQuery();
@@ -90,7 +88,7 @@ namespace Inmobiliaria.Models
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @$"
-					SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email, Clave
+					SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email
                     FROM Propietarios
                     ORDER BY IdPropietario
                     LIMIT {tamPagina} OFFSET {(paginaNro - 1) * tamPagina}
@@ -110,7 +108,6 @@ namespace Inmobiliaria.Models
 							Dni = reader.GetString(nameof(Propietario.Dni)),
 							Telefono = reader.GetString(nameof(Propietario.Telefono)),
 							Email = reader.GetString(nameof(Propietario.Email)),
-							Clave = reader.GetString(nameof(Propietario.Clave)),
 						};
 						res.Add(p);
 					}
@@ -149,7 +146,7 @@ namespace Inmobiliaria.Models
 			Propietario? p = null;
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email, Clave 
+				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email 
 					FROM Propietarios
 					WHERE IdPropietario=@id";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
@@ -168,7 +165,6 @@ namespace Inmobiliaria.Models
 							Dni = reader.GetString("Dni"),
 							Telefono = reader.GetString("Telefono"),
 							Email = reader.GetString("Email"),
-							Clave = reader.GetString("Clave"),
 						};
 					}
 					connection.Close();
@@ -182,7 +178,7 @@ namespace Inmobiliaria.Models
 			Propietario? p = null;
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email, Clave 
+				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email 
 					FROM Propietarios
 					WHERE Email=@email";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
@@ -201,7 +197,6 @@ namespace Inmobiliaria.Models
 							Dni = reader.GetString("Dni"),
 							Telefono = reader.GetString("Telefono"),
 							Email = reader.GetString("Email"),
-							Clave = reader.GetString("Clave"),
 						};
 					}
 					connection.Close();
@@ -216,7 +211,7 @@ namespace Inmobiliaria.Models
 			nombre = "%" + nombre + "%";
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email, Clave 
+				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email 
 					FROM Propietarios
 					WHERE Nombre LIKE @nombre OR Apellido LIKE @nombre";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
@@ -235,7 +230,6 @@ namespace Inmobiliaria.Models
 							Dni = reader.GetString("Dni"),
 							Telefono = reader.GetString("Telefono"),
 							Email = reader.GetString("Email"),
-							Clave = reader.GetString("Clave"),
 						};
 						res.Add(p);
 					}
