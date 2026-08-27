@@ -4,7 +4,7 @@ using MySqlConnector;
 
 namespace Inmobiliaria.Models;
 
-public class RepositorioReserva : RepositorioBase, IRepositorio<Reserva>
+public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
 {
     public RepositorioReserva(IConfiguration configuration) : base(configuration)

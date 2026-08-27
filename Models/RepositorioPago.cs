@@ -3,7 +3,7 @@ using MySqlConnector;
 
 namespace Inmobiliaria.Models;
 
-public class RepositorioPago : RepositorioBase, IRepositorio<Pago>
+public class RepositorioPago : RepositorioBase, IRepositorioPago
 {
     public RepositorioPago(IConfiguration configuration) : base(configuration)
     {
