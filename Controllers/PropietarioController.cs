@@ -60,32 +60,28 @@ namespace Inmobiliaria.Controllers
 
 		// POST: Propietario/Create
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult Create(Propietario Propietario)
+[ValidateAntiForgeryToken]
+public ActionResult Create(Propietario propietario)
+{
+    try
+    {
+        if (ModelState.IsValid)
         {
-            try
-			{
-				if (ModelState.IsValid)
-				{
-					Propietario.Clave = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-							password: Propietario.Clave,
-							salt: System.Text.Encoding.ASCII.GetBytes(config["Salt"]),
-							prf: KeyDerivationPrf.HMACSHA1,
-							iterationCount: 1000,
-							numBytesRequested: 256 / 8));
-					repositorio.Alta(Propietario);
-					TempData["Id"] = Propietario.IdPropietario;
-					return RedirectToAction(nameof(Index));
-				}
-				else
-					return View(Propietario);
-			}
-			catch (Exception ex)
-			{
-				logger.LogError(ex, "Error en Create");
-				throw;
-			}
+            repositorio.Alta(propietario);
+            TempData["Id"] = propietario.IdPropietario;
+            return RedirectToAction(nameof(Index));
         }
+        else
+        {
+            return View(propietario);
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error en Create");
+        throw;
+    }
+}
 
 
 		public ActionResult Edit(int id)

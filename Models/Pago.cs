@@ -9,7 +9,7 @@ public class Pago {
     public int IdPago { get; set; } 
 
     [Required]
-    public string Concepto { get;set; }
+    public string Concepto { get;set; } = "";
 
     [Required]
     public DateTime FechaPago { get;set; }

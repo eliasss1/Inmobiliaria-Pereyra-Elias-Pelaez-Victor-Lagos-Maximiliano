@@ -11,7 +11,7 @@ namespace Inmobiliaria.Models
         protected RepositorioBase(IConfiguration configuration)
         {
             this.configuration = configuration;
-            connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Falta DefaultConnection");
         }
     }
 }
