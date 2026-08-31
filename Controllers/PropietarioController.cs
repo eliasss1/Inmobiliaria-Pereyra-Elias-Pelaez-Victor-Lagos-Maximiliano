@@ -23,7 +23,7 @@ namespace Inmobiliaria.Controllers
 			this.logger = logger;
 		}     
         [Route("[controller]/Index")]
-        public ActionResult Index(int pagina=1)
+        public IActionResult Index(int pagina=1)
         {
             try
 			{
@@ -45,7 +45,7 @@ namespace Inmobiliaria.Controllers
 			}
         }
 
-		public ActionResult Create()
+		public IActionResult Create()
 		{
 			try
 			{
@@ -61,7 +61,7 @@ namespace Inmobiliaria.Controllers
 		// POST: Propietario/Create
 		[HttpPost]
 [ValidateAntiForgeryToken]
-public ActionResult Create(Propietario propietario)
+public IActionResult Create(Propietario propietario)
 {
     try
     {
@@ -84,7 +84,7 @@ public ActionResult Create(Propietario propietario)
 }
 
 
-		public ActionResult Edit(int id)
+		public IActionResult Edit(int id)
 		{
 			try
 			{
@@ -101,7 +101,7 @@ public ActionResult Create(Propietario propietario)
 		// POST: Propietario/Edit/5
 		[HttpPost]
 		[ValidateAntiForgeryToken]		
-		public ActionResult Edit(int id, Propietario entidad)
+		public IActionResult Edit(int id, Propietario entidad)
 
 		{			
 
@@ -131,7 +131,7 @@ public ActionResult Create(Propietario propietario)
 			}
 		}
 		[HttpGet]
-		public ActionResult Eliminar(int id)
+		public IActionResult Eliminar(int id)
 		{
 			try
 			{
@@ -148,7 +148,7 @@ public ActionResult Create(Propietario propietario)
 		// POST: Propietario/Eliminar/5
 		[HttpPost, ActionName("Eliminar")]
 		[ValidateAntiForgeryToken]
-		public ActionResult EliminarConfirmado(int id, Propietario entidad)
+		public IActionResult EliminarConfirmado(int id, Propietario entidad)
 		{
 			try
 			{

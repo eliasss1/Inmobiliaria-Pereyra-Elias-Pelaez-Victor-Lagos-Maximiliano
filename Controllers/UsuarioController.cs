@@ -11,6 +11,13 @@ public class UsuarioController : Controller
         repo = _repo;
     }
 
+    public IActionResult login()
+    {
+        
+        return View();
+        
+    }
+
 }
 
 
