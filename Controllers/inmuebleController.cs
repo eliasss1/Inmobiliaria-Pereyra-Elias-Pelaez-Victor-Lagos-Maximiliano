@@ -6,13 +6,13 @@ using System;
 
 namespace Inmobiliaria.Controllers
 {
-    public class TipoInmueblesController : Controller
+    public class InmuebleController : Controller
     {
-        private readonly IRepositorioTipoInmueble repositorio;
+        private readonly IRepositorioInmueble repositorio;
         private readonly IConfiguration config;
-        private readonly ILogger<TipoInmueblesController> logger;
+        private readonly ILogger<InmuebleController> logger;
 
-        public TipoInmueblesController(IRepositorioTipoInmueble repo, IConfiguration config, ILogger<TipoInmueblesController> logger)
+        public InmuebleController(IRepositorioInmueble repo, IConfiguration config, ILogger<InmuebleController> logger)
         {
             this.repositorio = repo;
             this.config = config;
@@ -55,17 +55,17 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        // POST: TipoInmuebles/Create
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(TipoInmueble entidad)
+        public ActionResult Create(Inmueble entidad)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
                     repositorio.Alta(entidad);
-                    TempData["Id"] = entidad.IdTipoInmueble;
+                    TempData["Id"] = entidad.IdInmueble;
                     return RedirectToAction(nameof(Index));
                 }
                 else
@@ -94,10 +94,10 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        // POST: TipoInmuebles/Edit/5
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, TipoInmueble entidad)
+        public ActionResult Edit(int id, Inmueble entidad)
         {
             if (!ModelState.IsValid)
             {
@@ -109,7 +109,7 @@ namespace Inmobiliaria.Controllers
                 if (p == null)
                     return NotFound();
                 
-                p.Nombre = entidad.Nombre;
+                p.IdInmueble = entidad.IdInmueble;
                 
                 repositorio.Modificacion(p);
                 TempData["Mensaje"] = "Datos guardados correctamente";
@@ -137,10 +137,9 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        // POST: TipoInmuebles/Eliminar/5
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
-        public ActionResult EliminarConfirmado(int id, TipoInmueble entidad)
+        public ActionResult EliminarConfirmado(int id, Inmueble entidad)
         {
             try
             {
