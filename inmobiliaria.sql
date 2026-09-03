@@ -39,20 +39,19 @@ CREATE TABLE IF NOT EXISTS TipoInmueble (
     Nombre VARCHAR(50) NOT NULL
 );
 
--- TABLA INMUEBLE 
-CREATE TABLE IF NOT EXISTS Inmueble (
+CREATE TABLE Inmueble (
     IdInmueble INT AUTO_INCREMENT PRIMARY KEY,
-    IdPropietario INT NOT NULL,
-    IdTipoInmueble INT NOT NULL,
     Direccion VARCHAR(255) NOT NULL,
     Cupo INT NOT NULL,
-    Coordenadas VARCHAR(100) NULL,
-    PrecioPorDia DECIMAL(10,2) NOT NULL,
-    PorcentajeReserva DECIMAL(5,2) NOT NULL,
-    Estado VARCHAR(50) DEFAULT 'Disponible',
-    ImagenPortada VARCHAR(255) NULL,
-    FOREIGN KEY (IdPropietario) REFERENCES Propietario(IdPropietario) ON DELETE RESTRICT,
-    FOREIGN KEY (IdTipoInmueble) REFERENCES TipoInmueble(IdTipoInmueble) ON DELETE RESTRICT
+    Latitud DOUBLE NOT NULL,
+    Longitud DOUBLE NOT NULL,
+    PrecioPorDia DECIMAL(18,2) NOT NULL,
+    Estado BOOLEAN NOT NULL DEFAULT TRUE,
+    ImagenPortada VARCHAR(255),
+    IdTipoInmueble INT NOT NULL,
+    IdPropietario INT NOT NULL,
+    FOREIGN KEY (IdTipoInmueble) REFERENCES TipoInmueble(IdTipoInmueble),
+    FOREIGN KEY (IdPropietario) REFERENCES Propietario(IdPropietario)
 );
 
 -- TABLA RESERVA
