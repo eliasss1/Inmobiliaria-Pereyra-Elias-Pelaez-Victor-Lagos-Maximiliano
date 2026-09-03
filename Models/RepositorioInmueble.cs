@@ -128,7 +128,7 @@ public int Alta(Inmueble entidad)
                             i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
                     FROM Inmueble i
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    INNER JOIN Propietarios p ON i.IdPropietario = p.IdPropietario";
+                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario";
         
         using (var command = new MySqlCommand(sql, connection))
         {
@@ -180,7 +180,7 @@ public int Alta(Inmueble entidad)
                             i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
                     FROM Inmueble i
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    INNER JOIN Propietarios p ON i.IdPropietario = p.IdPropietario
+                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
                     WHERE i.IdInmueble = @id";
         
         using (var command = new MySqlCommand(sql, connection))
@@ -232,7 +232,7 @@ public int Alta(Inmueble entidad)
                             i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
                     FROM Inmueble i
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    INNER JOIN Propietarios p ON i.IdPropietario = p.IdPropietario
+                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
                     LIMIT @tamPagina OFFSET @offset";
         
         using (var command = new MySqlCommand(sql, connection))
