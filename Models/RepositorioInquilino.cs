@@ -20,7 +20,7 @@ namespace Inmobiliaria.Models
 			int res = -1;
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = @"INSERT INTO Inquilinos 
+				string sql = @"INSERT INTO Inquilino 
 					(Nombre, Apellido, Dni, Telefono, Email)
 					VALUES (@nombre, @apellido, @dni, @telefono, @email);
 					SELECT LAST_INSERT_ID();";
@@ -45,7 +45,7 @@ namespace Inmobiliaria.Models
 			int res = -1;
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = "DELETE FROM Inquilinos WHERE IdInquilino = @id";
+				string sql = "DELETE FROM Inquilino WHERE IdInquilino = @id";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
 					command.CommandType = CommandType.Text;
@@ -62,7 +62,7 @@ namespace Inmobiliaria.Models
 			int res = -1;
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = @"UPDATE Inquilinos 
+				string sql = @"UPDATE Inquilino 
 					SET Nombre=@nombre, Apellido=@apellido, Dni=@dni, Telefono=@telefono, Email=@email
 					WHERE IdInquilino = @id";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
@@ -89,7 +89,7 @@ namespace Inmobiliaria.Models
 			{
 				string sql = @$"
 					SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email
-					FROM Inquilinos
+					FROM Inquilino
 					ORDER BY IdInquilino
 					LIMIT {tamPagina} OFFSET {(paginaNro - 1) * tamPagina}
 				";
@@ -124,7 +124,7 @@ namespace Inmobiliaria.Models
 			{
 				string sql = @$"
 					SELECT COUNT(IdInquilino)
-					FROM Inquilinos
+					FROM Inquilino
 				";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
@@ -147,7 +147,7 @@ namespace Inmobiliaria.Models
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email 
-					FROM Inquilinos
+					FROM Inquilino
 					WHERE IdInquilino=@id";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
@@ -179,7 +179,7 @@ namespace Inmobiliaria.Models
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email 
-					FROM Inquilinos
+					FROM Inquilino
 					WHERE Email=@email";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
@@ -212,7 +212,7 @@ namespace Inmobiliaria.Models
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
 				string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email 
-					FROM Inquilinos
+					FROM Inquilino
 					WHERE Nombre LIKE @nombre OR Apellido LIKE @nombre";
 				using (MySqlCommand command = new MySqlCommand(sql, connection))
 				{
