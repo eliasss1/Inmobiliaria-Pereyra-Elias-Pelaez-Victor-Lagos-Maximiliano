@@ -1,0 +1,41 @@
+@model Inmobiliaria.Models.Inmueble
+<div class="container">
+    <form asp-controller="Inmueble" asp-action="Create" class="d-flex flex-column justify-content-center m-2 p-5 gap-2 bg-light" method="post">
+        
+        <input type="hidden" asp-for="IdPropietario" />
+
+        <div class="w-50">
+            <label>Direccion</label>
+            <input asp-for="Direccion" class="form-control"/>
+        </div>
+        <div class="w-50">
+            <label>Cupo</label>
+            <input asp-for="Cupo" class="form-control"/>
+        </div>
+        <div class="w-50">
+            <label>Latitud</label>
+            <input asp-for="Latitud" class="form-control"/>
+        </div>
+        <div class="w-50">
+            <label>Longitud</label>
+            <input asp-for="Longitud" class="form-control"/>
+        </div>
+        <div class="w-50">
+            <label>Precio por Dia</label>
+            <input asp-for="PrecioPorDia" class="form-control"/>
+        </div>
+        
+        
+        <div class="w-50">
+            <label>Tipo de Inmueble</label>
+            
+            <select asp-for="IdTipoInmueble" class="form-control" asp-items="ViewBag.Tipos">
+                <option value="">-- Seleccione un Tipo --</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </form>
+</div>

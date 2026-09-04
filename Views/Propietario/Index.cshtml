@@ -40,6 +40,7 @@
                         <td>
                             <a asp-action="Edit" asp-route-id="@p.IdPropietario" class="btn btn-warning btn-sm">Editar</a>
                             <a asp-action="Eliminar" asp-route-id="@p.IdPropietario" class="btn btn-danger btn-sm">Eliminar</a>
+                            <a asp-controller="Inmueble" asp-action="PorPropietario" asp-route-id="@p.IdPropietario" class="btn btn-info btn-sm">Ver Inmuebles</a>
                         </td>
                     </tr>
                 }
