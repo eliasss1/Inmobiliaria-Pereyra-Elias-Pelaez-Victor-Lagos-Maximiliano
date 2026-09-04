@@ -1,0 +1,41 @@
+@model Inmobiliaria.Models.Inmueble
+
+<h2>Detalles del Inmueble</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Id Inmueble</dt>
+        <dd class="col-sm-9">@Model.IdInmueble</dd>
+
+        <dt class="col-sm-3">Direccion</dt>
+        <dd class="col-sm-9">@Model.Direccion</dd>
+
+        <dt class="col-sm-3">Cupo</dt>
+        <dd class="col-sm-9">@Model.Cupo</dd>
+
+        <dt class="col-sm-3">Latitud</dt>
+        <dd class="col-sm-9">@Model.Latitud</dd>
+
+        <dt class="col-sm-3">Longitud</dt>
+        <dd class="col-sm-9">@Model.Longitud</dd>
+
+        <dt class="col-sm-3">Precio por Dia</dt>
+        <dd class="col-sm-9">@Model.PrecioPorDia</dd>
+
+        <dt class="col-sm-3">Estado</dt>
+        <dd class="col-sm-9">@(Model.Estado ? "Disponible" : "No Disponible")</dd>
+
+        <dt class="col-sm-3">Imagen Portada</dt>
+        <dd class="col-sm-9">@Model.ImagenPortada</dd>
+
+        <dt class="col-sm-3">Id Tipo Inmueble</dt>
+        <dd class="col-sm-9">@Model.IdTipoInmueble</dd>
+
+        <dt class="col-sm-3">Id Propietario</dt>
+        <dd class="col-sm-9">@Model.IdPropietario</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.IdInmueble" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

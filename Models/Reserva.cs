@@ -10,14 +10,14 @@ public class Reserva {
     public int IdReserva { get; set; }
 
     [Required (ErrorMessage = "La fecha de inicio es obligatoria")]
-    public DateTime FechaInicio { get; set; }
+    public DateTime FechaDesde { get; set; }
 
     [Required (ErrorMessage = "La fecha de fin es obligatoria")]
-    public DateTime FechaFin { get; set; } 
+    public DateTime FechaHasta { get; set; } 
 
     [Required (ErrorMessage = "El monto diario es obligatorio")]
     [Column(TypeName = "decimal(18,2)")]
-    public decimal MontoDiario { get;set; }
+    public decimal MontoPorDia { get;set; }
 
     public DateTime? FechaEfectivaTerminacion { get; set; }
 
@@ -36,8 +36,8 @@ public class Reserva {
     public Inmueble? InmuebleAsociado { get; set; }
 
     [Required(ErrorMessage = "No hay un usuario asociado a la reserva")]
-    public int CreadoPorUsuarioId { get;set; }
+    public int IdUsuarioCreador { get;set; }
 
-    public int? TerminadoPorUsuarioId { get;set;}
+    public int? IdUsuarioTerminador { get;set;}
 
 }

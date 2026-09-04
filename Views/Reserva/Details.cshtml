@@ -1,0 +1,41 @@
+@model Inmobiliaria.Models.Reserva
+
+<h2>Detalles de la Reserva</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Id Reserva</dt>
+        <dd class="col-sm-9">@Model.IdReserva</dd>
+
+        <dt class="col-sm-3">Fecha Inicio</dt>
+        <dd class="col-sm-9">@Model.FechaDesde.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Fecha Fin</dt>
+        <dd class="col-sm-9">@Model.FechaHasta.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Monto Diario</dt>
+        <dd class="col-sm-9">@Model.MontoPorDia</dd>
+
+        <dt class="col-sm-3">Fecha Terminacion</dt>
+        <dd class="col-sm-9">@Model.FechaEfectivaTerminacion?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Multa</dt>
+        <dd class="col-sm-9">@Model.Multa</dd>
+
+        <dt class="col-sm-3">Id Inquilino</dt>
+        <dd class="col-sm-9">@Model.IdInquilino</dd>
+
+        <dt class="col-sm-3">Id Inmueble</dt>
+        <dd class="col-sm-9">@Model.IdInmueble</dd>
+
+        <dt class="col-sm-3">Creado Por (Usuario Id)</dt>
+        <dd class="col-sm-9">@Model.IdUsuarioCreador</dd>
+
+        <dt class="col-sm-3">Terminado Por (Usuario Id)</dt>
+        <dd class="col-sm-9">@Model.IdUsuarioTerminador</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.IdReserva" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

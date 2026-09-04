@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Inmobiliaria.Models;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
@@ -58,7 +59,20 @@ namespace Inmobiliaria.Controllers
                 throw;
             }
         }
+        [Authorize]
+        public ActionResult Details(int id)
+        {
+            var entidad = repositorio.ObtenerPorId(id);
+            
+            if (entidad == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            
+            return View(entidad);
+        }
 
+        [Authorize]
         public ActionResult Create(int? idPropietario)
         {
             try
@@ -86,7 +100,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Inmueble entidad)
@@ -111,6 +125,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [Authorize]
         public IActionResult Edit(int id)
         {
             try
@@ -135,7 +150,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Inmueble entidad)
@@ -160,6 +175,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult Eliminar(int id)
         {
@@ -174,7 +190,8 @@ namespace Inmobiliaria.Controllers
                 throw;
             }
         }
-
+        
+        [Authorize]
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public ActionResult EliminarConfirmado(int id, Inmueble entidad)

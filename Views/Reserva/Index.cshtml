@@ -14,6 +14,7 @@
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
                 <th>Monto Diario</th>
+                <th>Opciones</th>
             </tr>
         </thead>
         <tbody>
@@ -24,9 +25,16 @@
                     <td>@item.InquilinoAsociado.Dni</td>
                     <td>@item.InmuebleAsociado.IdInmueble</td>
                     <td>@item.InmuebleAsociado.Direccion</td>
-                    <td>@item.FechaInicio.ToShortDateString()</td>
-                    <td>@item.FechaFin.ToShortDateString()</td>
-                    <td>@item.MontoDiario</td>
+                    <td>@item.FechaDesde.ToShortDateString()</td>
+                    <td>@item.FechaHasta.ToShortDateString()</td>
+                    <td>@item.MontoPorDia</td>
+                    <td class="d-flex gap-1">
+                        <a asp-controller="Reserva" asp-action="Edit" asp-route-id="@item.IdReserva" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-controller="Reserva" asp-action="Details" asp-route-id="@item.IdReserva" class="btn btn-info btn-sm">Info</a>
+                        <form asp-controller="Reserva" asp-action="Eliminar" asp-route-id="@item.IdReserva" method="post" onsubmit="return confirm('Seguro que deseas eliminar esta reserva?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
