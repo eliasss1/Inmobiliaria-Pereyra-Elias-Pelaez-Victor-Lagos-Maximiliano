@@ -13,22 +13,21 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     }
 
     public int Alta(Reserva p)
+{
+    int res = -1;
+
+    using(MySqlConnection conexion = new MySqlConnection(connectionString))
     {
-        int res = -1;
-
-        using(MySqlConnection conexion = new MySqlConnection(connectionString))
+        try 
         {
-            try {
-            string query = @"INSERT INTO Reserva (FechaDesde, FechaHasta, MontoPorDia, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador)
+            conexion.Open();
+            
+            string queryInsert = @"INSERT INTO Reserva (FechaDesde, FechaHasta, MontoPorDia, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador)
             VALUES (@FechaDesde, @FechaHasta, @MontoPorDia, @FechaEfectivaTerminacion, @IdInquilino, @IdInmueble, @IdUsuarioCreador, @IdUsuarioTerminador);
-            SELECT LAST_INSERT_ID();
-            UPDATE Estado 
-            SET Estado = FALSE
-            WHERE IdInmueble = @IdInmueble";
+            SELECT LAST_INSERT_ID();";
 
-            using(MySqlCommand comando = new MySqlCommand(query, conexion))
+            using(MySqlCommand comando = new MySqlCommand(queryInsert, conexion))
             {
-                comando.CommandType = CommandType.Text;
                 comando.Parameters.AddWithValue("@FechaDesde", p.FechaDesde);
                 comando.Parameters.AddWithValue("@FechaHasta", p.FechaHasta);
                 comando.Parameters.AddWithValue("@MontoPorDia", p.MontoPorDia);
@@ -37,56 +36,88 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                 comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
                 comando.Parameters.AddWithValue("@IdUsuarioCreador", p.IdUsuarioCreador);
                 comando.Parameters.AddWithValue("@IdUsuarioTerminador", p.IdUsuarioTerminador);
-                conexion.Open();
+                
                 res = Convert.ToInt32(comando.ExecuteScalar());
                 p.IdReserva = res;
             }
-            }catch(Exception ex)
-            {
-                Console.WriteLine($"Error al insertar reserva: {ex.Message}");
-            }
-            finally
-            {
-                conexion.Close();
-            }
 
-            return res;
+            if (res > 0)
+            {
+                string queryUpdate = "UPDATE Inmueble SET Estado = FALSE WHERE IdInmueble = @IdInmueble";
+                
+                using (MySqlCommand cmdUpdate = new MySqlCommand(queryUpdate, conexion))
+                {
+                    cmdUpdate.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
+                    cmdUpdate.ExecuteNonQuery();
+                }
+            }
         }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error al insertar reserva: {ex.Message}");
+        }
+        finally
+        {
+            conexion.Close();
+        }
+
+        return res;
+    }
     }
 
     public int Baja(int id)
-    {
-        int res = -1;
+{
+    int res = -1;
 
-        using (MySqlConnection conexion = new MySqlConnection(connectionString))
+    using (MySqlConnection conexion = new MySqlConnection(connectionString))
+    {
+        try
         {
-            try
+            conexion.Open();
+
+            int idInmueble = 0;
+            string querySelect = "SELECT IdInmueble FROM Reserva WHERE IdReserva = @idReserva";
+            
+            using (MySqlCommand cmdSelect = new MySqlCommand(querySelect, conexion))
             {
-                string query = $@"DELETE FROM Reserva Where idReserva = @idReserva
-                UPDATE Estado 
-                SET Estado = FALSE
-                WHERE IdInmueble = @IdInmueble";
-                
-                using (MySqlCommand comando = new MySqlCommand(query, conexion))
+                cmdSelect.Parameters.AddWithValue("@idReserva", id);
+                var result = cmdSelect.ExecuteScalar();
+                if (result != null)
                 {
-                    comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@idReserva", id);
-                    conexion.Open();
-                    res = comando.ExecuteNonQuery();
+                    idInmueble = Convert.ToInt32(result);
                 }
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error al eliminar reserva: {ex.Message}");
-            }
-            finally
-            {
-                conexion.Close();
-            }
 
+            if (idInmueble > 0)
+            {
+                string queryUpdate = "UPDATE Inmueble SET Estado = TRUE WHERE IdInmueble = @IdInmueble";
+                
+                using (MySqlCommand cmdUpdate = new MySqlCommand(queryUpdate, conexion))
+                {
+                    cmdUpdate.Parameters.AddWithValue("@IdInmueble", idInmueble);
+                    cmdUpdate.ExecuteNonQuery();
+                }
+
+                string queryDelete = "DELETE FROM Reserva WHERE IdReserva = @idReserva";
+                
+                using (MySqlCommand cmdDelete = new MySqlCommand(queryDelete, conexion))
+                {
+                    cmdDelete.Parameters.AddWithValue("@idReserva", id);
+                    res = cmdDelete.ExecuteNonQuery();
+                }
+            }
         }
-        return res;
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error al eliminar reserva: {ex.Message}");
+        }
+        finally
+        {
+            conexion.Close();
+        }
     }
+    return res;
+}
 
     public int Modificacion(Reserva p)
     {
