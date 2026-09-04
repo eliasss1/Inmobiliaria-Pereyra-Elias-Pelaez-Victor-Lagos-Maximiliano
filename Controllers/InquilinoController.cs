@@ -163,6 +163,16 @@ public ActionResult Create(Inquilino inquilino)
 				throw;
 			}
 		}
-	}
+			    public IActionResult Details(int id)
+		{
+    	var inquilino = repositorio.ObtenerPorId(id); 
+   		 if (inquilino == null)
+   		 {
+       		 return NotFound();
+ 		   }	
+    	return View(inquilino);
+    	}
+	}	
 }
+
 
