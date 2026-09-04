@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers;
 
@@ -23,19 +24,20 @@ public class TipoInmuebleController : Controller
         
         return View(lista);
     }
-
+    [Authorize]
     public IActionResult Details(int id)
     {
         var entidad = _repositorio.ObtenerPorId(id);
         if (entidad == null) return NotFound();
         return View(entidad);
     }
-
+    
+    [Authorize]
     public IActionResult Create()
     {
         return View();
     }
-
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Create(TipoInmueble entidad)
@@ -48,6 +50,7 @@ public class TipoInmuebleController : Controller
         return View(entidad);
     }
 
+    [Authorize]
     public IActionResult Edit(int id)
     {
         var entidad = _repositorio.ObtenerPorId(id);
@@ -55,6 +58,7 @@ public class TipoInmuebleController : Controller
         return View(entidad);
     }
 
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Edit(int id, TipoInmueble entidad)
@@ -67,14 +71,14 @@ public class TipoInmuebleController : Controller
         return View(entidad);
     }
 
-    
+    [Authorize]
     public IActionResult Eliminar(int id)
     {
         var entidad = _repositorio.ObtenerPorId(id);
         if (entidad == null) return NotFound();
         return View(entidad);
     }
-
+    [Authorize]
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
     public IActionResult EliminarConfirmado(int id)

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Inmobiliaria.Controllers
@@ -48,7 +49,7 @@ namespace Inmobiliaria.Controllers
 				throw;
 			}
         }
-
+		[Authorize]
 		public ActionResult Create()
 		{
 			try
@@ -62,7 +63,7 @@ namespace Inmobiliaria.Controllers
 			}
 		}
 
-		// POST: Inquilino/Create
+[Authorize]
 [HttpPost]
 [ValidateAntiForgeryToken]
 public ActionResult Create(Inquilino inquilino)
@@ -88,6 +89,7 @@ public ActionResult Create(Inquilino inquilino)
 }
 
 
+		[Authorize]
 		public ActionResult Edit(int id)
 		{
 			try
@@ -102,7 +104,7 @@ public ActionResult Create(Inquilino inquilino)
 			}
 		}
 
-		// POST: Inquilino/Edit/5
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]		
 		public ActionResult Edit(int id, Inquilino entidad)
@@ -131,7 +133,9 @@ public ActionResult Create(Inquilino inquilino)
 				throw;
 			}
 		}
+
 		[HttpGet]
+		[Authorize]
 		public ActionResult Eliminar(int id)
 		{
 			try
@@ -146,7 +150,7 @@ public ActionResult Create(Inquilino inquilino)
 }
 		}
 
-		// POST: Inquilino/Eliminar/5
+		[Authorize]
 		[HttpPost, ActionName("Eliminar")]
 		[ValidateAntiForgeryToken]
 		public ActionResult EliminarConfirmado(int id, Inquilino entidad)
@@ -163,7 +167,8 @@ public ActionResult Create(Inquilino inquilino)
 				throw;
 			}
 		}
-			    public IActionResult Details(int id)
+	[Authorize]
+    public IActionResult Details(int id)
 		{
     	var inquilino = repositorio.ObtenerPorId(id); 
    		 if (inquilino == null)

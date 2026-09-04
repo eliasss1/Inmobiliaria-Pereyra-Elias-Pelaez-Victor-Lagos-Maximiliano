@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Inmobiliaria.Controllers
@@ -44,7 +45,7 @@ namespace Inmobiliaria.Controllers
 				throw;
 			}
         }
-
+	 	[Authorize]
 		public IActionResult Create()
 		{
 			try
@@ -58,7 +59,7 @@ namespace Inmobiliaria.Controllers
 			}
 		}
 
-		// POST: Propietario/Create
+		[Authorize]
 		[HttpPost]
 [ValidateAntiForgeryToken]
 public IActionResult Create(Propietario propietario)
@@ -83,7 +84,7 @@ public IActionResult Create(Propietario propietario)
     }
 }
 
-
+		[Authorize]
 		public IActionResult Edit(int id)
 		{
 			try
@@ -98,7 +99,7 @@ public IActionResult Create(Propietario propietario)
 			}
 		}
 
-		// POST: Propietario/Edit/5
+		[Authorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]		
 		public IActionResult Edit(int id, Propietario entidad)
@@ -130,6 +131,7 @@ public IActionResult Create(Propietario propietario)
 				throw;
 			}
 		}
+		[Authorize]
 		[HttpGet]
 		public IActionResult Eliminar(int id)
 		{
@@ -145,7 +147,7 @@ public IActionResult Create(Propietario propietario)
 			}
 		}
 
-		// POST: Propietario/Eliminar/5
+		[Authorize]
 		[HttpPost, ActionName("Eliminar")]
 		[ValidateAntiForgeryToken]
 		public IActionResult EliminarConfirmado(int id, Propietario entidad)
