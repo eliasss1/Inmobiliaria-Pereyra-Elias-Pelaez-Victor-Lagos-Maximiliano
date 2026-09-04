@@ -8,7 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">Listado de Inquilinos</h2>
-        <a asp-action="Create" class="btn btn-primary shadow-sm">
+        <a asp-controller="Inquilino" asp-action="Create" class="btn btn-primary shadow-sm">
             Crear Nuevo Inquilino
         </a>
     </div>
@@ -65,15 +65,17 @@
                                     <td>@item.Email</td>
                                     <td class="text-center pe-4">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-action="Edit" asp-route-id="@item.IdInquilino" class="btn btn-warning text-white" title="Editar">
+                                            <a asp-controller="Inquilino"asp-action="Edit" asp-route-id="@item.IdInquilino" class="btn btn-warning text-white" title="Editar">
                                                 Editar
                                             </a>
-                                            <a asp-action="Details" asp-route-id="@item.IdInquilino" class="btn btn-info text-white" title="Ver Detalles">
+                                            <a asp-controller="Inquilino" asp-action="Details" asp-route-id="@item.IdInquilino" class="btn btn-info text-white" title="Ver Detalles">
                                                 Detalles
                                             </a>
-                                            <a asp-action="Delete" asp-route-id="@item.IdInquilino" class="btn btn-danger" title="Eliminar">
-                                                Eliminar
-                                            </a>
+                                            <form asp-controller="Inquilino" asp-action="Eliminar" asp-route-id="@item.IdInquilino" method="post" onsubmit="return confirm('¿Seguro que queres borrar este inquilino?');">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-trash"></i> Borrar
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
