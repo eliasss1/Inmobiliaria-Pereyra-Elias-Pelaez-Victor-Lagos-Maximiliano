@@ -29,7 +29,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                     comando.Parameters.AddWithValue("@email", p.Email);
                     comando.Parameters.AddWithValue("@nombre", p.Nombre);
                     comando.Parameters.AddWithValue("@apellido", p.Apellido);
-                    comando.Parameters.AddWithValue("@contraseña", p.Contraseña);
+                    comando.Parameters.AddWithValue("@contraseña", p.Clave);
                     comando.Parameters.AddWithValue("@avatar", p.Avatar);
                     comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
@@ -93,7 +93,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                     comando.Parameters.AddWithValue("@email", p.Email);
                     comando.Parameters.AddWithValue("@nombre", p.Nombre);
                     comando.Parameters.AddWithValue("@apellido", p.Apellido);
-                    comando.Parameters.AddWithValue("@contraseña", p.Contraseña);
+                    comando.Parameters.AddWithValue("@contraseña", p.Clave);
                     comando.Parameters.AddWithValue("@avatar", p.Avatar);
                     comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
@@ -242,7 +242,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         {
             try
             {
-                string query = @$"SELECT IdUsuario, Nombre, Apellido, Email, Avatar, Rol 
+                string query = @$"SELECT IdUsuario, Nombre, Apellido, Email, Clave,Avatar, Rol 
                 FROM Usuario 
                 WHERE Email = @Email";
                 using (MySqlCommand comando = new MySqlCommand(query, conexion)) 
@@ -259,6 +259,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                             Email = reader.GetString(nameof(Usuario.Email)),
                             Nombre = reader.GetString(nameof(Usuario.Nombre)),
                             Apellido = reader.GetString(nameof(Usuario.Apellido)),
+                            Clave = reader.GetString(nameof(Usuario.Clave)),
                             Avatar = reader.IsDBNull(nameof(Usuario.Avatar)) ? null : reader.GetString(nameof(Usuario.Avatar)),
                             Rol = reader.GetString(nameof(Usuario.Rol)),
                         };

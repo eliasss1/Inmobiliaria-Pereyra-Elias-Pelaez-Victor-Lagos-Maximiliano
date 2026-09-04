@@ -17,7 +17,7 @@ public class Usuario {
     public string Email { get; set; } = "";
 
     [Required]
-    public string Contraseña { get; set; } = "";
+    public string Clave { get; set; } = "";
 
     public string? Avatar { get; set; }
 
