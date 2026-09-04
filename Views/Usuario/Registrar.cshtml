@@ -1,0 +1,19 @@
+@model Inmobiliaria.Models.Usuario
+
+<div class="d-flex flex-column align-items-center p-2">
+    <div class="w-50">
+        <form asp-controller="Usuario" asp-action="Registrar" class="d-flex flex-column" method="post">
+
+            <label>Nombre</label>
+            <input type="text" asp-for="Nombre" class="form-control" required />
+            <label>Apellido</label>
+            <input type="text" asp-for="Apellido" class="form-control" required />
+            <label>Email</label>
+            <input type="email" asp-for="Email" class="form-control" required />
+            <label>Contraseña</label>
+            <input type="password" asp-for="Contraseña" class="form-control" required />
+
+            <button type="submit" class="btn btn-primary mt-3">Registrar</button>
+        </form>
+    </div>
+</div>

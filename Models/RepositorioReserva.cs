@@ -19,22 +19,21 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         using(MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try {
-            string query = @"INSERT INTO Reserva (fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId)
-            VALUES (@fechaInicio, @fechaFin, @montoDiario, @fechaEfectivaTerminacion, @multa, @idInquilino, @idInmueble, @creadoPorUsuarioId, @terminadoPorUsuarioId)
+            string query = @"INSERT INTO Reserva (FechaDesde, FechaHasta, MontoPorDia, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador)
+            VALUES (@FechaDesde, @FechaHasta, @MontoPorDia, @FechaEfectivaTerminacion, @IdInquilino, @IdInmueble, @IdUsuarioCreador, @IdUsuarioTerminador);
             SELECT LAST_INSERT_ID()";
 
             using(MySqlCommand comando = new MySqlCommand(query, conexion))
             {
                 comando.CommandType = CommandType.Text;
-                comando.Parameters.AddWithValue("@fechaInicio", p.FechaInicio);
-                comando.Parameters.AddWithValue("@fechaFin", p.FechaFin);
-                comando.Parameters.AddWithValue("@montoDiario", p.MontoDiario);
-                comando.Parameters.AddWithValue("@fechaEfectivaTerminacion", p.FechaEfectivaTerminacion);
-                comando.Parameters.AddWithValue("@multa", p.Multa);
-                comando.Parameters.AddWithValue("@idInquilino", p.IdInquilino);
-                comando.Parameters.AddWithValue("@idInmueble", p.IdInmueble);
-                comando.Parameters.AddWithValue("@creadoPorUsuarioId", p.CreadoPorUsuarioId);
-                comando.Parameters.AddWithValue("@terminadoPorUsuarioId", p.TerminadoPorUsuarioId);
+                comando.Parameters.AddWithValue("@FechaDesde", p.FechaInicio);
+                comando.Parameters.AddWithValue("@FechaHasta", p.FechaFin);
+                comando.Parameters.AddWithValue("@MontoPorDia", p.MontoDiario);
+                comando.Parameters.AddWithValue("@FechaEfectivaTerminacion", p.FechaEfectivaTerminacion);
+                comando.Parameters.AddWithValue("@IdInquilino", p.IdInquilino);
+                comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
+                comando.Parameters.AddWithValue("@IdUsuarioCreador", p.CreadoPorUsuarioId);
+                comando.Parameters.AddWithValue("@IdUsuarioTerminador", p.TerminadoPorUsuarioId);
                 conexion.Open();
                 res = Convert.ToInt32(comando.ExecuteScalar());
                 p.IdReserva = res;
@@ -92,22 +91,21 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             try
             {
                 string query = @"UPDATE Reserva
-                SET fechaInicio = @fechaInicio, fechaFin = @fechaFin, montoDiario = @montoDiario, fechaEfectivaTerminacion = @fechaEfectivaTerminacion, multa = @multa, idInquilino = @idInquilino, idInmueble = @idInmueble, creadoPorUsuarioId = @creadoPorUsuarioId, terminadoPorUsuarioId = @terminadoPorUsuarioId
-                WHERE idReserva = @idReserva";
+                SET FechaDesde = @FechaDesde, FechaHasta = @FechaHasta, MontoPorDia = @MontoPorDia, FechaEfectivaTerminacion = @FechaEfectivaTerminacion, IdInquilino = @IdInquilino, IdInmueble = @IdInmueble, IdUsuarioCreador = @IdUsuarioCreador, IdUsuarioTerminador = @IdUsuarioTerminador
+                WHERE IdReserva = @IdReserva";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@idReserva", p.IdReserva);
-                    comando.Parameters.AddWithValue("@fechaInicio", p.FechaInicio);
-                    comando.Parameters.AddWithValue("@fechaFin", p.FechaFin);
-                    comando.Parameters.AddWithValue("@montoDiario", p.MontoDiario);
-                    comando.Parameters.AddWithValue("@fechaEfectivaTerminacion", p.FechaEfectivaTerminacion);
-                    comando.Parameters.AddWithValue("@multa", p.Multa);
-                    comando.Parameters.AddWithValue("@idInquilino", p.IdInquilino);
-                    comando.Parameters.AddWithValue("@idInmueble", p.IdInmueble);
-                    comando.Parameters.AddWithValue("@creadoPorUsuarioId", p.CreadoPorUsuarioId);
-                    comando.Parameters.AddWithValue("@terminadoPorUsuarioId", p.TerminadoPorUsuarioId);
+                    comando.Parameters.AddWithValue("@IdReserva", p.IdReserva);
+                    comando.Parameters.AddWithValue("@FechaDesde", p.FechaInicio);
+                    comando.Parameters.AddWithValue("@FechaHasta", p.FechaFin);
+                    comando.Parameters.AddWithValue("@MontoPorDia", p.MontoDiario);
+                    comando.Parameters.AddWithValue("@FechaEfectivaTerminacion", p.FechaEfectivaTerminacion);
+                    comando.Parameters.AddWithValue("@IdInquilino", p.IdInquilino);
+                    comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
+                    comando.Parameters.AddWithValue("@IdUsuarioCreador", p.CreadoPorUsuarioId);
+                    comando.Parameters.AddWithValue("@IdUsuarioTerminador", p.TerminadoPorUsuarioId);
                     conexion.Open();
                     res = comando.ExecuteNonQuery();
                     
@@ -157,18 +155,79 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         return res;
     }
 
+    public IList<Reserva> ObtenerTodos()
+    {
+        IList<Reserva> res = new List<Reserva>();
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
+        {
+            try
+            {
+                string query = @"SELECT r.IdReserva, r.FechaDesde, r.FechaHasta, r.MontoPorDia, 
+                                r.FechaEfectivaTerminacion, r.IdInquilino, r.IdInmueble, 
+                                r.IdUsuarioCreador, r.IdUsuarioTerminador,
+                                i.Nombre AS InqNombre, i.Apellido AS InqApellido, m.Direccion AS InmDireccion
+                                FROM Reserva r
+                                INNER JOIN Inquilino i ON r.IdInquilino = i.IdInquilino
+                                INNER JOIN Inmueble m ON r.idInmueble = m.IdInmueble";
+
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
+                {
+                    comando.CommandType = CommandType.Text;
+                    conexion.Open();
+                    var reader = comando.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Reserva p = new Reserva {
+                            IdReserva = reader.GetInt32("IdReserva"),
+                            FechaInicio = reader.GetDateTime("FechaDesde"),
+                            FechaFin = reader.GetDateTime("FechaHasta"),
+                            MontoDiario = reader.GetDecimal("MontoPorDia"),
+                            FechaEfectivaTerminacion = reader.IsDBNull(reader.GetOrdinal("FechaEfectivaTerminacion")) ? null : reader.GetDateTime("FechaEfectivaTerminacion"),
+                            IdInquilino = reader.GetInt32("IdInquilino"),
+                            IdInmueble = reader.GetInt32("IdInmueble"),
+                            CreadoPorUsuarioId = reader.GetInt32("IdUsuarioCreador"),
+                            TerminadoPorUsuarioId = reader.IsDBNull(reader.GetOrdinal("IdUsuarioTerminador")) ? null : reader.GetInt32("IdUsuarioTerminador"),
+                            InquilinoAsociado = new Inquilino {
+                                Nombre = reader.GetString("InqNombre"),
+                                Apellido = reader.GetString("InqApellido")
+                            },
+                            InmuebleAsociado = new Inmueble {
+                                Direccion = reader.GetString("InmDireccion")
+                            }
+                        };
+                        res.Add(p);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener todas las reservas: {ex.Message}");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
+        return res;
+    }
+
     public IList<Reserva> ObtenerLista(int paginaNro = 1, int tamPagina = 10)
     {
         IList<Reserva> res = new List<Reserva>();
-
         int offset = (paginaNro - 1) * tamPagina;
 
         using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             try
-            {   
-                string query = @"SELECT idReserva, fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId
-                FROM Reserva LIMIT @tamPagina OFFSET @offset";
+            {
+                string query = @"SELECT r.IdReserva, r.FechaDesde, r.FechaHasta, r.MontoPorDia, 
+                                r.FechaEfectivaTerminacion, r.IdInquilino, r.IdInmueble, 
+                                r.IdUsuarioCreador, r.IdUsuarioTerminador,
+                                i.Nombre AS InqNombre, i.Apellido AS InqApellido, m.Direccion AS InmDireccion
+                                FROM Reserva r
+                                INNER JOIN Inquilino i ON r.IdInquilino = i.IdInquilino
+                                INNER JOIN Inmueble m ON r.IdInmueble = m.IdInmueble 
+                                LIMIT @tamPagina OFFSET @offset";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
@@ -180,21 +239,28 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                     while (reader.Read())
                     {
                         Reserva p = new Reserva {
-                            IdReserva = reader.GetInt32(nameof(Reserva.IdReserva)),
-                            FechaInicio = reader.GetDateTime(nameof(Reserva.FechaInicio)),
-                            FechaFin = reader.GetDateTime(nameof(Reserva.FechaFin)),
-                            MontoDiario = reader.GetDecimal(nameof(Reserva.MontoDiario)),
-                            FechaEfectivaTerminacion = reader.IsDBNull(nameof(Reserva.FechaEfectivaTerminacion)) ? null : reader.GetDateTime(nameof(Reserva.FechaEfectivaTerminacion)),
-                            Multa = reader.IsDBNull(nameof(Reserva.Multa)) ? null : reader.GetDecimal(nameof(Reserva.Multa)),
-                            IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
-                            IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
-                            CreadoPorUsuarioId = reader.GetInt32(nameof(Reserva.CreadoPorUsuarioId)),
-                            TerminadoPorUsuarioId = reader.IsDBNull(nameof(Reserva.TerminadoPorUsuarioId)) ? null : reader.GetInt32(nameof(Reserva.TerminadoPorUsuarioId))
+                            IdReserva = reader.GetInt32("IdReserva"),
+                            FechaInicio = reader.GetDateTime("FechaDesde"),
+                            FechaFin = reader.GetDateTime("FechaHasta"),
+                            MontoDiario = reader.GetDecimal("MontoPorDia"),
+                            FechaEfectivaTerminacion = reader.IsDBNull(reader.GetOrdinal("FechaEfectivaTerminacion")) ? null : reader.GetDateTime("FechaEfectivaTerminacion"),
+                            IdInquilino = reader.GetInt32("IdInquilino"),
+                            IdInmueble = reader.GetInt32("IdInmueble"),
+                            CreadoPorUsuarioId = reader.GetInt32("IdUsuarioCreador"),
+                            TerminadoPorUsuarioId = reader.IsDBNull(reader.GetOrdinal("IdUsuarioTerminador")) ? null : reader.GetInt32("IdUsuarioTerminador"),
+                            InquilinoAsociado = new Inquilino {
+                                Nombre = reader.GetString("InqNombre"),
+                                Apellido = reader.GetString("InqApellido")
+                            },
+                            InmuebleAsociado = new Inmueble {
+                                Direccion = reader.GetString("InmDireccion")
+                            }
                         };
                         res.Add(p);
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error al obtener lista de reservas: {ex.Message}");
             }
@@ -202,7 +268,6 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             {
                 conexion.Close();
             }
-
         }
         return res;
     }
@@ -215,13 +280,13 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     {
         try
         {
-            string query = @"SELECT idReserva, fechaInicio, fechaFin, montoDiario, fechaEfectivaTerminacion, multa, idInquilino, idInmueble, creadoPorUsuarioId, terminadoPorUsuarioId 
+            string query = @"SELECT IdReserva, FechaDesde, FechaHasta, MontoPorDia, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador 
             FROM Reserva 
-            WHERE idReserva = @idReserva";
+            WHERE IdReserva = @IdReserva";
 
             using (MySqlCommand comando = new MySqlCommand(query, conexion))
             {
-                comando.Parameters.AddWithValue("@idReserva", id);
+                comando.Parameters.AddWithValue("@IdReserva", id);
                 conexion.Open();
                 var reader = comando.ExecuteReader();
                 if (reader.Read())
@@ -233,7 +298,6 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                         FechaFin = reader.GetDateTime(nameof(Reserva.FechaFin)),
                         MontoDiario = reader.GetDecimal(nameof(Reserva.MontoDiario)),
                         FechaEfectivaTerminacion = reader.IsDBNull(nameof(Reserva.FechaEfectivaTerminacion)) ? null : reader.GetDateTime(nameof(Reserva.FechaEfectivaTerminacion)),
-                        Multa = reader.IsDBNull(nameof(Reserva.Multa)) ? null : reader.GetDecimal(nameof(Reserva.Multa)),
                         IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
                         IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
                         CreadoPorUsuarioId = reader.GetInt32(nameof(Reserva.CreadoPorUsuarioId)),

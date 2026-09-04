@@ -19,8 +19,8 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         {
             try {
                 string query = @"INSERT INTO Usuario 
-                                (email, nombre, contraseña, avatarUrl, rol)
-                                VALUES (@email, @nombre, @contraseña, @avatarUrl, @rol); 
+                                (Email, Nombre, Apellido, Clave, Avatar, Rol)
+                                VALUES (@email, @nombre, @apellido, @contraseña, @avatar, @rol); 
                                 SELECT LAST_INSERT_ID()";
                 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
@@ -28,8 +28,9 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                     comando.CommandType = CommandType.Text;
                     comando.Parameters.AddWithValue("@email", p.Email);
                     comando.Parameters.AddWithValue("@nombre", p.Nombre);
+                    comando.Parameters.AddWithValue("@apellido", p.Apellido);
                     comando.Parameters.AddWithValue("@contraseña", p.Contraseña);
-                    comando.Parameters.AddWithValue("@avatarUrl", p.AvatarUrl);
+                    comando.Parameters.AddWithValue("@avatar", p.Avatar);
                     comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
                     res = Convert.ToInt32(comando.ExecuteScalar());
@@ -55,11 +56,11 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         using (MySqlConnection conexion = new MySqlConnection (connectionString))
         {
             try {
-                string query = @"DELETE FROM Usuario WHERE idUsuario = @idUsuario";
+                string query = @"DELETE FROM Usuario WHERE IdUsuario = @IdUsuario";
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@idUsuario", id);
+                    comando.Parameters.AddWithValue("@IdUsuario", id);
                     conexion.Open();
                     res = comando.ExecuteNonQuery();
                 }
@@ -82,17 +83,18 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
             try
             {
                 string query = @"UPDATE Usuario 
-                SET email = @email, nombre = @nombre, contraseña = @contraseña, avatar Url = @avatarUrl, rol = @rol 
-                WHERE idUsuario = @idUsuario";
+                SET Email = @email, Nombre = @nombre, Apellido = @apellido, Contraseña = @contraseña, Avatar = @avatar, Rol = @rol 
+                WHERE IdUsuario = @IdUsuario";
                 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@idUsuario", p.IdUsuario);
+                    comando.Parameters.AddWithValue("@IdUsuario", p.IdUsuario);
                     comando.Parameters.AddWithValue("@email", p.Email);
                     comando.Parameters.AddWithValue("@nombre", p.Nombre);
+                    comando.Parameters.AddWithValue("@apellido", p.Apellido);
                     comando.Parameters.AddWithValue("@contraseña", p.Contraseña);
-                    comando.Parameters.AddWithValue("@avatarUrl", p.AvatarUrl);
+                    comando.Parameters.AddWithValue("@avatar", p.Avatar);
                     comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
                     res = comando.ExecuteNonQuery();
@@ -117,7 +119,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         {
             try
             {
-                string query = "SELECT COUNT(idUsuario) FROM Usuario";
+                string query = "SELECT COUNT(IdUsuario) FROM Usuario";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
@@ -151,9 +153,9 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
             try
             {
                 string query = @$"
-                                SELECT idUsuario, nombre, email, avatarUrl, rol
+                                SELECT IdUsuario, Nombre, Apellido, Email, Avatar, Rol
                                 FROM Usuario
-                                ORDER BY idUsuario
+                                ORDER BY IdUsuario
                                 OFFSET {(paginaNro - 1) * tamPagina} ROW 
                                 FETCH NEXT {tamPagina} ROWS ONLY
                 ";
@@ -167,8 +169,10 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                         Usuario p = new Usuario
                         {
                             IdUsuario = reader.GetInt32(nameof(Usuario.IdUsuario)),
+                            Nombre = reader.GetString(nameof(Usuario.Nombre)),
+                            Apellido = reader.GetString(nameof(Usuario.Apellido)),
                             Email = reader.GetString(nameof(Usuario.Email)),
-                            AvatarUrl = reader.IsDBNull(nameof(Usuario.AvatarUrl)) ? null : reader.GetString(nameof(Usuario.AvatarUrl)),
+                            Avatar = reader.IsDBNull(nameof(Usuario.Avatar)) ? null : reader.GetString(nameof(Usuario.Avatar)),
                             Rol = reader.GetString(nameof(Usuario.Rol))
                         };
                         res.Add(p);
@@ -194,13 +198,13 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         {
             try
             {
-                string query = @$"SELECT idUsuario, nombre, email, avatarUrl, rol 
+                string query = @$"SELECT IdUsuario, Nombre, Apellido, Email, Avatar, Rol 
                 FROM Usuario 
-                WHERE idUsuario = @idUsuario";
+                WHERE IdUsuario = @IdUsuario";
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
-                    comando.Parameters.Add("@idUsuario", MySqlDbType.Int32).Value = id;
+                    comando.Parameters.Add("@IdUsuario", MySqlDbType.Int32).Value = id;
                     conexion.Open();
                     var reader = comando.ExecuteReader();
                     if(reader.Read())
@@ -210,7 +214,8 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                             IdUsuario = reader.GetInt32(nameof(Usuario.IdUsuario)),
                             Email = reader.GetString(nameof(Usuario.Email)),
                             Nombre = reader.GetString(nameof(Usuario.Nombre)),
-                            AvatarUrl = reader.IsDBNull(nameof(Usuario.AvatarUrl)) ? null : reader.GetString(nameof(Usuario.AvatarUrl)),
+                            Apellido = reader.GetString(nameof(Usuario.Apellido)),
+                            Avatar = reader.IsDBNull(nameof(Usuario.Avatar)) ? null : reader.GetString(nameof(Usuario.Avatar)),
                             Rol = reader.GetString(nameof(Usuario.Rol)),
                         };
                         
@@ -227,5 +232,49 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
 
         }
         return p;
+    }
+
+    public Usuario ObtenerPorEmail(String email)
+    {
+        Usuario? res = null;
+
+        using(MySqlConnection conexion = new MySqlConnection(connectionString))
+        {
+            try
+            {
+                string query = @$"SELECT IdUsuario, Nombre, Apellido, Email, Avatar, Rol 
+                FROM Usuario 
+                WHERE Email = @Email";
+                using (MySqlCommand comando = new MySqlCommand(query, conexion)) 
+                {
+                    comando.CommandType = CommandType.Text;
+                    comando.Parameters.Add("@Email", MySqlDbType.VarChar).Value = email;
+                    conexion.Open();
+                    var reader = comando.ExecuteReader();
+                    if(reader.Read())
+                    {
+                        res = new Usuario
+                        {
+                            IdUsuario = reader.GetInt32(nameof(Usuario.IdUsuario)),
+                            Email = reader.GetString(nameof(Usuario.Email)),
+                            Nombre = reader.GetString(nameof(Usuario.Nombre)),
+                            Apellido = reader.GetString(nameof(Usuario.Apellido)),
+                            Avatar = reader.IsDBNull(nameof(Usuario.Avatar)) ? null : reader.GetString(nameof(Usuario.Avatar)),
+                            Rol = reader.GetString(nameof(Usuario.Rol)),
+                        };
+                        
+                    }
+                }
+            }catch(Exception ex)
+            {
+                Console.WriteLine($"Error al obtener usuario por Email: {ex.Message}");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
+
+        return res;
     }
 }

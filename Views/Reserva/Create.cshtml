@@ -1,0 +1,49 @@
+@model Inmobiliaria.Models.Reserva
+
+<div class="container mt-4">
+    <h2>Crear Reserva</h2>
+    <form asp-controller="Reserva" asp-action="Create" method="post" class="bg-light p-4 border rounded">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>Inquilino</label>
+                <select asp-for="IdInquilino" class="form-control" asp-items="ViewBag.Inquilinos">
+                    <option value="">-- Seleccione un Inquilino --</option>
+                </select>
+                <span asp-validation-for="IdInquilino" class="text-danger"></span>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label>Inmueble</label>
+                <select asp-for="IdInmueble" class="form-control" asp-items="ViewBag.Inmuebles">
+                    <option value="">-- Seleccione un Inmueble --</option>
+                </select>
+                <span asp-validation-for="IdInmueble" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Fecha Inicio</label>
+                <input asp-for="FechaInicio" type="date" class="form-control" />
+                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label>Fecha Fin</label>
+                <input asp-for="FechaFin" type="date" class="form-control" />
+                <span asp-validation-for="FechaFin" class="text-danger"></span>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label>Monto Diario</label>
+                <input asp-for="MontoDiario" type="number" step="0.01" class="form-control" />
+                <span asp-validation-for="MontoDiario" class="text-danger"></span>
+            </div>
+        </div>
+            
+        <div class="d-flex justify-content-between mt-3">
+            <div class="w-50 bg-light border rounded">
+                <span asp-validation-for="CreadoPorUsuarioId" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar Reserva</button>
+        </div>
+    </form>
+</div>

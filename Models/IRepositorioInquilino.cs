@@ -8,6 +8,6 @@ namespace Inmobiliaria.Models
 {
 	public interface IRepositorioInquilino : IRepositorio<Inquilino>
 	{
-
+		public IList<Inquilino> ObtenerTodos();
 	}
 }

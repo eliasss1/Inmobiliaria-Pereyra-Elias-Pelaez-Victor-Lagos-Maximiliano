@@ -239,5 +239,40 @@ namespace Inmobiliaria.Models
 			return res;
 		}
 
+
+	public IList<Inquilino> ObtenerTodos()
+	{
+		IList<Inquilino> res = new List<Inquilino>();
+		using (MySqlConnection connection = new MySqlConnection(connectionString))
+		{
+			string sql = @"
+				SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email
+				FROM Inquilino
+				ORDER BY IdInquilino";
+			using (MySqlCommand command = new MySqlCommand(sql, connection))
+			{
+				command.CommandType = CommandType.Text;
+				connection.Open();
+				var reader = command.ExecuteReader();
+				while (reader.Read())
+				{
+					Inquilino i = new Inquilino
+					{
+						IdInquilino = reader.GetInt32(nameof(Inquilino.IdInquilino)),
+						Nombre = reader.GetString(nameof(Inquilino.Nombre)),
+						Apellido = reader.GetString(nameof(Inquilino.Apellido)),
+						Dni = reader.GetString(nameof(Inquilino.Dni)),
+						Telefono = reader.GetString(nameof(Inquilino.Telefono)),
+						Email = reader.GetString(nameof(Inquilino.Email)),
+					};
+					res.Add(i);
+				}
+				connection.Close();
+			}
+		}
+		return res;
 	}
+
+}
+
 }
