@@ -1,0 +1,39 @@
+@model Inmobiliaria.Models.Inquilino
+
+@{
+    ViewData["Title"] = "Detalles del Inquilino";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Información Detallada del Inquilino</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 text-muted">ID Inquilino</dt>
+                <dd class="col-sm-9 fw-bold text-dark">@Model.IdInquilino</dd>
+
+                <dt class="col-sm-3 text-muted">Nombre Completo</dt>
+                <dd class="col-sm-9">@Model.Nombre @Model.Apellido</dd>
+
+                <dt class="col-sm-3 text-muted">DNI (Documento)</dt>
+                <dd class="col-sm-9">@Model.Dni</dd>
+
+                <dt class="col-sm-3 text-muted">Teléfono de Contacto</dt>
+                <dd class="col-sm-9">
+                    @(string.IsNullOrEmpty(Model.Telefono) ? "No registrado" : Model.Telefono)
+                </dd>
+
+                <dt class="col-sm-3 text-muted">Correo Electrónico</dt>
+                <dd class="col-sm-9">
+                    <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-end gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.IdInquilino" class="btn btn-warning text-white">Editar Datos</a>
+            <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
+        </div>
+    </div>
+</div>
