@@ -4,6 +4,20 @@
 <div class="container mt-4">
     <h2>Tipos de Inmueble</h2>
     <p><a asp-action="Create" class="btn btn-primary">Nuevo Tipo</a></p>
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["MensajeError"]
+        </div>
+    }
+
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["MensajeExito"]
+        </div>
+    }
     
     <table class="table table-striped">
         <thead class="table-dark">

@@ -23,7 +23,7 @@ namespace Inmobiliaria.Controllers
         public ActionResult Index(int pagina = 1)
         {
             try
-            {
+            {   
                 var tamaño = 5;
                 var lista = repositorio.ObtenerLista(Math.Max(pagina, 1), tamaño);
                 ViewBag.Pagina = pagina;
@@ -42,11 +42,42 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        public ActionResult Create()
+        [Route("[controller]/PorPropietario/{id}")]
+        public ActionResult PorPropietario(int id)
         {
             try
             {
-                return View();
+                
+                var lista = repositorio.ObtenerPorPropietario(id); 
+                ViewBag.IdPropietario = id; 
+                return View("Index", lista);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error en PorPropietario");
+                throw;
+            }
+        }
+
+        public ActionResult Create(int? idPropietario)
+        {
+            try
+            {
+                var inmueble = new Inmueble();
+                if (idPropietario.HasValue)
+                {
+                    inmueble.IdPropietario = idPropietario.Value; 
+                }
+
+                var repoTipos = new RepositorioTipoInmueble(config);
+                
+                
+                var listaTipos = repoTipos.ObtenerTodos();
+                
+                
+                ViewBag.Tipos = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(listaTipos, "IdTipoInmueble", "Nombre");
+
+                return View(inmueble);
             }
             catch (Exception ex)
             {
@@ -80,11 +111,21 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        public ActionResult Edit(int id)
+        public IActionResult Edit(int id)
         {
             try
             {
                 var entidad = repositorio.ObtenerPorId(id);
+                if (entidad == null)
+                    return NotFound();
+
+                
+                var repoTipos = new RepositorioTipoInmueble(config);
+                var listaTipos = repoTipos.ObtenerTodos();
+                
+                
+                ViewBag.Tipos = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(listaTipos, "IdTipoInmueble", "Nombre", entidad.IdTipoInmueble);
+
                 return View(entidad);
             }
             catch (Exception ex)
@@ -101,17 +142,14 @@ namespace Inmobiliaria.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var repoTipos = new RepositorioTipoInmueble(config);
+                ViewBag.Tipos = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(repoTipos.ObtenerTodos(), "IdTipoInmueble", "Nombre", entidad.IdTipoInmueble);
                 return View(entidad);
             }
             try
             {
-                var p = repositorio.ObtenerPorId(id);
-                if (p == null)
-                    return NotFound();
+                repositorio.Modificacion(entidad); 
                 
-                p.IdInmueble = entidad.IdInmueble;
-                
-                repositorio.Modificacion(p);
                 TempData["Mensaje"] = "Datos guardados correctamente";
                 return RedirectToAction(nameof(Index));
             }

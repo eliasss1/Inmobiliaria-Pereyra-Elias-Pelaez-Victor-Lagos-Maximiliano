@@ -274,4 +274,49 @@ public int Alta(Inmueble entidad)
     }
     return res;
 }
+
+public IList<Inmueble> ObtenerPorPropietario(int idPropietario)
+    {
+        var res = new List<Inmueble>();
+        using (var connection = new MySqlConnection(connectionString))
+        {
+            
+            string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, i.PrecioPorDia, i.Estado, i.ImagenPortada,
+                                i.IdTipoInmueble, t.Nombre AS TipoNombre,
+                                i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
+                        FROM Inmueble i
+                        INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
+                        INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
+                        WHERE i.IdPropietario = @idPropietario";
+            
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@idPropietario", idPropietario);
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        res.Add(new Inmueble
+                        {
+                            IdInmueble = reader.GetInt32(0),
+                            Direccion = reader.GetString(1),
+                            Cupo = reader.GetInt32(2),
+                            Latitud = reader.GetDouble(3),
+                            Longitud = reader.GetDouble(4),
+                            PrecioPorDia = reader.GetDecimal(5),
+                            Estado = reader.GetBoolean(6),
+                            ImagenPortada = reader.IsDBNull(7) ? null : reader.GetString(7),
+                            IdTipoInmueble = reader.GetInt32(8),
+                            Tipo = new TipoInmueble { IdTipoInmueble = reader.GetInt32(8), Nombre = reader.GetString(9) },
+                            IdPropietario = reader.GetInt32(10),
+                            Dueño = new Propietario { IdPropietario = reader.GetInt32(10), Nombre = reader.GetString(11), Apellido = reader.GetString(12) }
+                        });
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
 }

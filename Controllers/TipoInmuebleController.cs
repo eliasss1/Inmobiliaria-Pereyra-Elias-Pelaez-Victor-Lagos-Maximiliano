@@ -3,11 +3,11 @@ using Inmobiliaria.Models;
 
 namespace Inmobiliaria.Controllers;
 
-public class TipoInmueblesController : Controller
+public class TipoInmuebleController : Controller
 {
     private readonly IRepositorioTipoInmueble _repositorio;
 
-    public TipoInmueblesController(IRepositorioTipoInmueble repositorio)
+    public TipoInmuebleController(IRepositorioTipoInmueble repositorio)
     {
         _repositorio = repositorio;
     }
@@ -79,7 +79,34 @@ public class TipoInmueblesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult EliminarConfirmado(int id)
     {
-        _repositorio.Baja(id);
-        return RedirectToAction(nameof(Index));
+        try 
+        {
+            _repositorio.Baja(id);
+            TempData["MensajeExito"] = "El tipo de inmueble se elimino correctamente.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (MySqlConnector.MySqlException ex)
+        {
+            
+            if (ex.Number == 1451)
+            {
+                
+                TempData["MensajeError"] = "No se puede eliminar este Tipo de Inmueble porque hay Inmuebles asociados a el. Primero debe eliminar o modificar esos inmuebles.";
+            }
+            else 
+            {
+                
+                TempData["MensajeError"] = "Ocurrio un error en la base de datos al intentar eliminar.";
+            }
+            
+            
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            
+            TempData["MensajeError"] = "Ocurrio un error inesperado.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
