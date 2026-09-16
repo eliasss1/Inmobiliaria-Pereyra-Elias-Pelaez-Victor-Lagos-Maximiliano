@@ -47,6 +47,12 @@
                 </div>
             </a>
         </div>
+        <a id="btn-inicio" class="btn m-2 btn-animado" style="background-color: transparent; border: 2px solid #1520c0; box-shadow: 0px 5px 9px rgba(0, 0, 0, 0.2);" asp-controller="Usuario" asp-action="Perfil">
+                <div class="p-2 align-items-center"  style="width: 300px; height: 100px;">
+                    <i class="bi bi-person fs-4 text-center"></i>
+                    <p class="text-center">Dale un vistazo a tu propio perfil</p>
+                </div>
+        </a>
         @if (User.IsInRole("Administrador"))
         {
             <div class="justify-content-between">
