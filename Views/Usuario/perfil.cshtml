@@ -1,0 +1,70 @@
+@model Inmobiliaria.Models.Usuario
+
+@{
+    ViewData["Title"] = "Perfil";
+}
+<div class="d-flex justify-content-center">
+    <div class="card p-1 align-items-center justify-content-center" style="width:800px; height: 350px">
+        <div id="infoNormal" class="d-flex justify-content-center align-items-center d-none">
+            <div class="burbuja-foto m-5 ">
+                    
+            </div>
+            <div>
+                <h3>@Model.Nombre @Model.Apellido</h3>
+                <h6><strong>Email</strong></h6>
+                <p>@Model.Email</p>
+                <h6><strong>Rol</strong></h6>
+                <p>@Model.Rol</p>
+                <h6><strong>ID</strong></h6>
+                <p>@Model.IdUsuario</p>
+                <a class="text-primary" data-bs-toggle="modal" data-bs-target="#modalContraseña">
+                    Editar Contraseña
+                </a>
+            </div>
+            <div class="h-100 ps-4" style="padding-top: 32px">
+                <a id="boton-editar" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil">Editar</i>
+                </a>
+            </div>
+            
+        </div>
+        <form id="infoParaEditar" class="d-flex justify-content-center align-items-center d-non">
+            <div class="burbuja-foto m-5 ">
+                    
+            </div>
+            <div>
+                <h3><strong>Nombre</strong></h3>
+                <input asp-for="Nombre" class="form-control form-control-sm" />
+                <h6><strong>Email</strong></h6>
+                <p>@Model.Email</p>
+                <h6><strong>Rol</strong></h6>
+                <p>@Model.Rol</p>
+                <h6><strong>ID</strong></h6>
+                <p>@Model.IdUsuario</p>
+                <a class="text-primary" data-bs-toggle="modal" data-bs-target="#modalContraseña">
+                    Editar Contraseña
+                </a>
+            </div>
+            <div class="h-100 ps-4" style="padding-top: 32px">
+                <a id="boton-editar" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil">Editar</i>
+                </a>
+            </div>
+            
+        </form>
+</div>
+
+<style>
+    .burbuja-foto {
+        width: 230px;
+        height: 230px;
+        border-radius: 50%;
+        border: 1px solid #1520c0;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .burbuja-foto:hover {
+        transform: scale(1.1); 
+    }
+
+</style>

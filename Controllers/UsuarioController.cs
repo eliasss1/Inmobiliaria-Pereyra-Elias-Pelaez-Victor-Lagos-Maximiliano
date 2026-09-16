@@ -3,7 +3,8 @@ using Inmobiliaria.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Inmobiliaria.Helpers; 
+using Inmobiliaria.Helpers;
+using Microsoft.AspNetCore.Authorization;
 namespace Inmobiliaria.Controllers;
 
 public class UsuarioController : Controller
@@ -91,5 +92,28 @@ public class UsuarioController : Controller
             return RedirectToAction("Index", "Home");
         }
         return View(entidad);
+    }
+
+    [Authorize]
+    public IActionResult Perfil()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var usuario = repo.ObtenerPorId(int.Parse(userId));
+        return View(usuario);
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Perfil(Usuario e)
+    {
+        if (ModelState.IsValid)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            e.IdUsuario = int.Parse(userId);
+            repo.Modificacion(e);
+            return RedirectToAction("Perfil");
+        }
+        return View(e);
     }
 }
