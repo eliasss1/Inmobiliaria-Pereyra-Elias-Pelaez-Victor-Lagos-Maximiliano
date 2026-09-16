@@ -131,7 +131,7 @@ public IActionResult Create(Propietario propietario)
 				throw;
 			}
 		}
-		[Authorize]
+		[Authorize(Roles = "Administrador")]
 		[HttpGet]
 		public IActionResult Eliminar(int id)
 		{
@@ -147,7 +147,7 @@ public IActionResult Create(Propietario propietario)
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Administrador")]
 		[HttpPost, ActionName("Eliminar")]
 		[ValidateAntiForgeryToken]
 		public IActionResult EliminarConfirmado(int id, Propietario entidad)

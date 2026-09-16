@@ -135,7 +135,7 @@ public ActionResult Create(Inquilino inquilino)
 		}
 
 		[HttpGet]
-		[Authorize]
+		[Authorize(Roles = "Administrador")]
 		public ActionResult Eliminar(int id)
 		{
 			try
@@ -150,7 +150,7 @@ public ActionResult Create(Inquilino inquilino)
 }
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Administrador")]
 		[HttpPost, ActionName("Eliminar")]
 		[ValidateAntiForgeryToken]
 		public ActionResult EliminarConfirmado(int id, Inquilino entidad)

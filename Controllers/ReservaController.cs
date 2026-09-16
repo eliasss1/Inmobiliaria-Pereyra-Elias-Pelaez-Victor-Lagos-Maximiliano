@@ -127,7 +127,7 @@ namespace Inmobiliaria.Controllers
             ViewBag.Inmuebles = new SelectList(repoInmueble.ObtenerTodos(), "IdInmueble", "IdInmueble", entidad?.IdInmueble);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
@@ -145,7 +145,7 @@ namespace Inmobiliaria.Controllers
 
         }
 
-        [Authorize]
+        [Authorize(Roles = "Administrador")]
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public IActionResult EliminarConfirmacion(int id, Reserva entidad)

@@ -71,14 +71,14 @@ public class TipoInmuebleController : Controller
         return View(entidad);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     public IActionResult Eliminar(int id)
     {
         var entidad = _repositorio.ObtenerPorId(id);
         if (entidad == null) return NotFound();
         return View(entidad);
     }
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     [HttpPost, ActionName("Eliminar")]
     [ValidateAntiForgeryToken]
     public IActionResult EliminarConfirmado(int id)
