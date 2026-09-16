@@ -83,7 +83,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
             try
             {
                 string query = @"UPDATE Usuario 
-                SET Email = @email, Nombre = @nombre, Apellido = @apellido, Contraseña = @contraseña, Avatar = @avatar, Rol = @rol 
+                SET Email = @email, Nombre = @nombre, Apellido = @apellido, Avatar = @avatar, Rol = @rol 
                 WHERE IdUsuario = @IdUsuario";
                 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
@@ -93,7 +93,6 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                     comando.Parameters.AddWithValue("@email", p.Email);
                     comando.Parameters.AddWithValue("@nombre", p.Nombre);
                     comando.Parameters.AddWithValue("@apellido", p.Apellido);
-                    comando.Parameters.AddWithValue("@contraseña", p.Clave);
                     comando.Parameters.AddWithValue("@avatar", p.Avatar);
                     comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();

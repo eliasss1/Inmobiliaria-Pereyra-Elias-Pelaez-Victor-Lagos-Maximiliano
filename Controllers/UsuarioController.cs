@@ -105,7 +105,7 @@ public class UsuarioController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Perfil(Usuario e)
+    public IActionResult EditarPerfil(Usuario e)
     {
         if (ModelState.IsValid)
         {
