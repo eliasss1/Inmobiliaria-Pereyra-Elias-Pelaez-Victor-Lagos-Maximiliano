@@ -19,7 +19,7 @@ public class Pago {
     public decimal Importe { get; set; }
 
     [Required]
-    public bool Estado { get;set; }
+    public string Estado { get;set; }
 
     [Required]
     public int IdReserva { get; set; }
@@ -27,7 +27,7 @@ public class Pago {
     public Reserva? ReservaAsociada { get;set; }
 
     [Required]
-    public int CreadoPorUsuarioId { get; set; }
-    public int? AnuladoPorUsuarioId { get; set; }
+    public int IdUsuarioCreador { get; set; }
+    public int? IdUsuarioAnulador { get; set; }
 
 }

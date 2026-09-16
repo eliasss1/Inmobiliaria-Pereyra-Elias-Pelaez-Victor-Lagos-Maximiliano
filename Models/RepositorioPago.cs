@@ -18,8 +18,8 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         {
             try
             {
-                string query = @"INSERT INTO Pago (Concepto, FechaPago, Importe, Estado, IdReserva, ReservaAsociada, CreadoPorUsuarioId, AnuladoPorUsuarioId)
-                VALUES (@Concepto, @FechaPago, @Importe, @Estado, @IdReserva, @ReservaAsociada, @CreadoPorUsuarioId, @AnuladoPorUsuarioId)
+                string query = @"INSERT INTO Pago (Concepto, FechaPago, Importe, Estado, IdReserva, ReservaAsociada, IdUsuarioCreador, IdUsuarioAnulador)
+                VALUES (@Concepto, @FechaPago, @Importe, @Estado, @IdReserva, @ReservaAsociada, @IdUsuarioCreador, @IdUsuarioAnulador)
                 SELECT LAST_INSERT_ID()";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
@@ -31,8 +31,8 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                     comando.Parameters.AddWithValue("@Estado", p.Estado);
                     comando.Parameters.AddWithValue("@IdReserva", p.IdReserva);
                     comando.Parameters.AddWithValue("@ReservaAsociada", p.ReservaAsociada);
-                    comando.Parameters.AddWithValue("@CreadoPorUsuarioId", p.CreadoPorUsuarioId);
-                    comando.Parameters.AddWithValue("@AnuladoPorUsuarioId", p.AnuladoPorUsuarioId);
+                    comando.Parameters.AddWithValue("@IdUsuarioCreador", p.IdUsuarioCreador);
+                    comando.Parameters.AddWithValue("@IdUsuarioAnulador", p.IdUsuarioAnulador);
                     conexion.Open();
                     res = Convert.ToInt32(comando.ExecuteScalar());
                     p.IdPago = res;
@@ -51,75 +51,47 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         return res;
     }
 
-    public int Baja(int id)
+public int Baja(int id, int idUsuarioAnulador) 
     {
         int res = -1;
-        
         using(MySqlConnection conexion = new MySqlConnection(connectionString))
         {
-            try
+            
+            string query = @"UPDATE Pago 
+                            SET Estado = 'Anulado', IdUsuarioAnulador = @IdAnulador 
+                            WHERE IdPago = @IdPago";
+            using (MySqlCommand comando = new MySqlCommand(query, conexion))
             {
-                string query = @"DELETE FROM Pago WHERE IdPago = @IdPago";
-                
-                using (MySqlCommand comando = new MySqlCommand(query, conexion))
-                {
-                    comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@IdPago", id);
-                    conexion.Open();
-                    res = comando.ExecuteNonQuery();
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error al eliminar un pago: {ex.Message}");
-            }
-            finally
-            {
-                conexion.Close();
+                comando.Parameters.AddWithValue("@IdAnulador", idUsuarioAnulador);
+                comando.Parameters.AddWithValue("@IdPago", id);
+                conexion.Open();
+                res = comando.ExecuteNonQuery();
             }
         }
-        
         return res;
+    }
+
+    public int Baja(int id)
+    {
+        throw new NotSupportedException("Para anular un pago es obligatorio usar la sobrecarga Baja(int id, int idUsuarioAnulador) para registrar la auditoria.");
     }
 
     public int Modificacion(Pago p)
     {
         int res = -1;
-        
         using(MySqlConnection conexion = new MySqlConnection(connectionString))
         {
-            try
+            string query = @"UPDATE Pago 
+                            SET Concepto = @Concepto 
+                            WHERE IdPago = @IdPago";
+            using (MySqlCommand comando = new MySqlCommand(query, conexion))
             {
-                string query = @"UPDATE Pago
-                SET Concepto = @Concepto, FechaPago = @FechaPago, Importe = @Importe, Estado = @Estado, IdReserva = @IdReserva, ReservaAsociada = @ReservaAsociada, CreadoPorUsuarioId = @CreadoPorUsuarioId, AnuladoPorUsuarioId = @AnuladoPorUsuarioId
-                WHERE IdPago = @IdPago";
-
-                using (MySqlCommand comando = new MySqlCommand(query, conexion))
-                {
-                    comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@Concepto", p.Concepto);
-                    comando.Parameters.AddWithValue("@FechaPago", p.FechaPago);
-                    comando.Parameters.AddWithValue("@Importe", p.Importe);
-                    comando.Parameters.AddWithValue("@Estado", p.Estado);
-                    comando.Parameters.AddWithValue("@IdReserva", p.IdReserva);
-                    comando.Parameters.AddWithValue("@ReservaAsociada", p.ReservaAsociada);
-                    comando.Parameters.AddWithValue("@CreadoPorUsuarioId", p.CreadoPorUsuarioId);
-                    comando.Parameters.AddWithValue("@AnuladoPorUsuarioId", p.AnuladoPorUsuarioId);
-                    comando.Parameters.AddWithValue("@IdPago", p.IdPago);
-                    conexion.Open();
-                    res = comando.ExecuteNonQuery();
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error al modificar la tabla pago: {ex.Message}");
-            }
-            finally
-            {
-                conexion.Close();
+                comando.Parameters.AddWithValue("@Concepto", p.Concepto);
+                comando.Parameters.AddWithValue("@IdPago", p.IdPago);
+                conexion.Open();
+                res = comando.ExecuteNonQuery();
             }
         }
-        
         return res;
     }
 
@@ -188,10 +160,10 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                             Concepto = reader.GetString(nameof(p.Concepto)),
                             FechaPago = reader.GetDateTime(nameof(p.FechaPago)),
                             Importe = reader.GetDecimal(nameof(p.Importe)),
-                            Estado = reader.GetBoolean(nameof(p.Estado)),
+                            Estado = reader.GetString(nameof(p.Estado)),
                             IdReserva = reader.GetInt32(nameof(p.IdReserva)),
-                            CreadoPorUsuarioId = reader.GetInt32(nameof(p.CreadoPorUsuarioId)),
-                            AnuladoPorUsuarioId = reader.IsDBNull(nameof(p.AnuladoPorUsuarioId)) ? null : reader.GetInt32(nameof(p.AnuladoPorUsuarioId))
+                            IdUsuarioCreador = reader.GetInt32(nameof(p.IdUsuarioCreador)),
+                            IdUsuarioAnulador = reader.IsDBNull(nameof(p.IdUsuarioAnulador)) ? null : reader.GetInt32(nameof(p.IdUsuarioAnulador))
                         };
                         res.Add(p); 
                     }
@@ -234,10 +206,10 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                             Concepto = reader.GetString(nameof(res.Concepto)),
                             FechaPago = reader.GetDateTime(nameof(res.FechaPago)),
                             Importe = reader.GetDecimal(nameof(res.Importe)),
-                            Estado = reader.GetBoolean(nameof(res.Estado)),
+                            Estado = reader.GetString(nameof(res.Estado)),
                             IdReserva = reader.GetInt32(nameof(res.IdReserva)),
-                            CreadoPorUsuarioId = reader.GetInt32(nameof(res.CreadoPorUsuarioId)),
-                            AnuladoPorUsuarioId = reader.IsDBNull(nameof(res.AnuladoPorUsuarioId)) ? null : reader.GetInt32(nameof(res.AnuladoPorUsuarioId))
+                            IdUsuarioCreador = reader.GetInt32(nameof(res.IdUsuarioCreador)),
+                            IdUsuarioAnulador = reader.IsDBNull(nameof(res.IdUsuarioAnulador)) ? null : reader.GetInt32(nameof(res.IdUsuarioAnulador))
                         };
                     }
                 }
@@ -252,6 +224,35 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
             }
         }
         
+        return res;
+    }
+
+    public IList<Pago> ObtenerPorReserva(int idReserva)
+    {
+        var res = new List<Pago>();
+        using(MySqlConnection conexion = new MySqlConnection(connectionString))
+        {
+            string query = "SELECT * FROM Pago WHERE IdReserva = @idReserva";
+            using (MySqlCommand comando = new MySqlCommand(query, conexion))
+            {
+                comando.Parameters.AddWithValue("@idReserva", idReserva);
+                conexion.Open();
+                var reader = comando.ExecuteReader();
+                while (reader.Read())
+                {
+                    res.Add(new Pago {
+                        IdPago = reader.GetInt32(nameof(Pago.IdPago)),
+                        Concepto = reader.GetString(nameof(Pago.Concepto)),
+                        FechaPago = reader.GetDateTime(nameof(Pago.FechaPago)),
+                        Importe = reader.GetDecimal(nameof(Pago.Importe)),
+                        Estado = reader.GetString(nameof(Pago.Estado)),
+                        IdReserva = reader.GetInt32(nameof(Pago.IdReserva)),
+                        IdUsuarioCreador = reader.GetInt32(nameof(Pago.IdUsuarioCreador)),
+                        IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal(nameof(Pago.IdUsuarioAnulador))) ? null : reader.GetInt32(nameof(Pago.IdUsuarioAnulador))
+                    });
+                }
+            }
+        }
         return res;
     }
 }
