@@ -113,6 +113,39 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         }
     }
 
+    public int ModificarContraseña(Usuario e)
+    {
+        int res = -1;
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
+        {
+            try
+            {
+                string query = @"UPDATE Usuario 
+                SET Clave = @Clave
+                WHERE IdUsuario = @IdUsuario";
+
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
+                {
+                    comando.CommandType = CommandType.Text;
+                    comando.Parameters.AddWithValue("@IdUsuario", e.IdUsuario);
+                    conexion.Open();
+                    res = comando.ExecuteNonQuery();
+                    Console.WriteLine("Modificación de contraseña de usuario completada, cerrando la conexión.");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error al modificar contraseña de usuario: {ex.Message}");
+            }
+            finally
+            {
+                conexion.Close();
+            }
+            return res;
+        }
+
+    }
+
     public int ObtenerCantidad()
     {
         int res = -1;

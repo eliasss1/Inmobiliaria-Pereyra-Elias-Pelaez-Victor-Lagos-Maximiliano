@@ -120,4 +120,33 @@ public class UsuarioController : Controller
         }
         return View(e);
     }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult CambiarContraseña(Usuario e)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        e.IdUsuario = int.Parse(userId);
+        ModelState.Remove(nameof(e.Nombre));
+        ModelState.Remove(nameof(e.Apellido));
+        ModelState.Remove(nameof(e.Email));
+        ModelState.Remove(nameof(e.Rol));
+        ModelState.Remove(nameof(e.Avatar));
+        if (ModelState.IsValid)
+        {
+            var usuario = repo.ObtenerPorId(e.IdUsuario);
+            string claveHasheada = SeguridadHelper.HashearClave(e.Clave);
+            if (usuario.Clave == claveHasheada)
+            {
+                ViewBag.Mensaje = "La nueva contraseña no puede ser igual a la actual";
+                return View(e);
+            }
+            usuario.Clave = claveHasheada;
+            repo.ModificarContraseña(usuario);
+            ViewBag.Mensaje = "Contraseña actualizada correctamente";
+            return RedirectToAction(nameof(Perfil));
+        }
+        return View(e);
+    }
 }
