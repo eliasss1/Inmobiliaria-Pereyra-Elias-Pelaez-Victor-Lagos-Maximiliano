@@ -431,6 +431,55 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             } 
             return exito; 
     } 
+
+    public IList<Reserva> Buscar(string busqueda)
+{
+    var lista = new List<Reserva>();
+    using (MySqlConnection conexion = new MySqlConnection(connectionString))
+    {
+        string sql = @"SELECT r.IdReserva, r.IdInmueble, r.IdInquilino, r.FechaDesde, r.FechaHasta, r.MontoPorDia, r.Estado,
+                            inm.Direccion AS InmuebleDireccion, 
+                            inq.Nombre AS InquilinoNombre, 
+                            inq.Apellido AS InquilinoApellido 
+                    FROM Reserva r
+                    INNER JOIN Inmueble inm ON r.IdInmueble = inm.IdInmueble
+                    INNER JOIN Inquilino inq ON r.IdInquilino = inq.IdInquilino
+                    WHERE inq.Apellido LIKE @busqueda OR inm.Direccion LIKE @busqueda";
+
+        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        {
+            comando.Parameters.AddWithValue("@busqueda", "%" + busqueda + "%");
+            conexion.Open();
+            using (MySqlDataReader reader = comando.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    lista.Add(new Reserva
+                    {
+                        IdReserva = reader.GetInt32(nameof(Reserva.IdReserva)),
+                        IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
+                        IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
+                        FechaDesde = reader.GetDateTime(nameof(Reserva.FechaDesde)),
+                        FechaHasta = reader.GetDateTime(nameof(Reserva.FechaHasta)),
+                        MontoPorDia = reader.GetDecimal(nameof(Reserva.MontoPorDia)),
+                        Estado = reader.GetInt32(nameof(Reserva.Estado)),
+                        
+                        InmuebleAsociado = new Inmueble 
+                        { 
+                            Direccion = reader.GetString("InmuebleDireccion") 
+                        },
+                        InquilinoAsociado = new Inquilino 
+                        { 
+                            Nombre = reader.GetString("InquilinoNombre"), 
+                            Apellido = reader.GetString("InquilinoApellido") 
+                        }
+                    });
+                }
+            }
+        }
+    }
+    return lista;
+}
 }
 
 

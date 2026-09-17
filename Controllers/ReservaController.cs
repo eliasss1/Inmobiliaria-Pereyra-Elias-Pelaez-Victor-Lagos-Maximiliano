@@ -26,12 +26,42 @@ namespace Inmobiliaria.Controllers
             this.logger = logger;
         }
 
-        public ActionResult Index()
-        {
-            var lista = repoReserva.ObtenerTodos();
+        public ActionResult Index(string buscar, int pagina = 1)
+{
+    try
+    {
+        var tamaño = 5;
+        ViewBag.Buscar = buscar;
+        ViewBag.Pagina = pagina;
 
-            return View(lista);
+        IList<Reserva> lista;
+        int totalRegistros;
+
+        if (string.IsNullOrEmpty(buscar))
+        {
+            lista = repoReserva.ObtenerLista(Math.Max(pagina, 1), tamaño);
+            totalRegistros = repoReserva.ObtenerCantidad();
         }
+        else
+        {
+            var listaFiltrada = repoReserva.Buscar(buscar);
+            totalRegistros = listaFiltrada.Count;
+            lista = listaFiltrada.Skip((Math.Max(pagina, 1) - 1) * tamaño).Take(tamaño).ToList();
+        }
+
+        ViewBag.TotalPaginas = totalRegistros % tamaño == 0 ? totalRegistros / tamaño : totalRegistros / tamaño + 1;
+        
+        if (TempData.ContainsKey("Mensaje")) ViewBag.Mensaje = TempData["Mensaje"];
+        if (TempData.ContainsKey("Error")) ViewBag.Error = TempData["Error"];
+
+        return View(lista);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error en Index Reserva");
+        throw;
+    }
+}
 
         [Authorize]
         public ActionResult Edit(int id)
