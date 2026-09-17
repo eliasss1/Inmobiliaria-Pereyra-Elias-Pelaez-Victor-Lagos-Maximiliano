@@ -219,6 +219,35 @@ namespace Inmobiliaria.Controllers
             return View(entidad);
         }
 
+        public IActionResult FinalizarAnticipado(int idReserva, DateTime fechaTerminacion, decimal montoMulta, bool pagoEfectuado) 
+        { 
+            if (!pagoEfectuado) 
+            { 
+                ModelState.AddModelError("", "No se puede finalizar la reserva si no se confirma el cobro de la multa en el momento."); 
+                var reserva = repositorioReserva.ObtenerPorId(idReserva); 
+                ViewBag.MontoMulta = montoMulta; 
+                return View(reserva); 
+            } 
+            try 
+            { 
+                int idUsuarioLogueado = User.Identity.IsAuthenticated ? Convert.ToInt32(User.FindFirst("Id")?.Value ?? "1") : 1;
+                bool resultado = repositorioReserva.RegistrarTerminacionAnticipadaConPago( idReserva, fechaTerminacion, montoMulta, idUsuarioLogueado ); 
+                if (resultado) 
+                { 
+                    TempData["Mensaje"] = "La reserva se finalizó correctamente y el pago de la multa fue registrado."; 
+                    return RedirectToAction(nameof(Index)); 
+                } 
+            } 
+            catch (Exception ex) 
+            { 
+                ModelState.AddModelError("", "Ocurrió un error al procesar la transacción: " + ex.Message); 
+            } 
+            var reservaOriginal = repositorioReserva.ObtenerPorId(idReserva); 
+            ViewBag.MontoMulta = montoMulta;
+            return View(reservaOriginal); 
+        }
+    }
 }
-}
+
+
 

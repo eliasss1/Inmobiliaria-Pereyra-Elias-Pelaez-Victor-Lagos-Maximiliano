@@ -386,18 +386,18 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     }
     
     public bool RegistrarTerminacionAnticipadaConPago(int idReserva, DateTime fechaTerminacion, decimal montoMulta, int idUsuario) {
-         bool exito = false; 
-         string connectionString = GetConnectionString(); 
-         using (var connection = new MySqlConnection(connectionString)) 
-         { 
-            connection.Open();
-                using (var transaction = connection.BeginTransaction()) 
+            bool exito = false; 
+            string connectionString = GetConnectionString(); 
+            using(MySqlConnection conexion = new MySqlConnection(connectionString)) 
+            { 
+            conexion.Open();
+                using (var transaction = conexion.BeginTransaction()) 
                 { 
                     try 
                     { 
                     string sqlPago = @"INSERT INTO pago (IdReserva, Concepto, FechaPago, Importe) 
                     VALUES (@IdReserva, @Concepto, @FechaPago, @Importe);"; 
-                    using (var cmdPago = new MySqlCommand(sqlPago, connection, transaction)) 
+                    using (var cmdPago = new MySqlCommand(sqlPago, conexion, transaction)) 
                     { 
                         cmdPago.Parameters.AddWithValue("@IdReserva", idReserva); 
                         cmdPago.Parameters.AddWithValue("@Concepto", "Multa por terminación anticipada"); 
@@ -410,13 +410,13 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                             Estado = 3, 
                             IdUsuarioTerminacion = @IdUsuario 
                             WHERE IdReserva = @IdReserva;"; 
-                        using (var cmdReserva = new MySqlCommand(sqlReserva, connection, transaction)) 
+                        using (var cmdReserva = new MySqlCommand(sqlReserva, conexion, transaction)) 
                         {
                             cmdReserva.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion); 
                             cmdReserva.Parameters.AddWithValue("@IdUsuario", idUsuario); 
                             cmdReserva.Parameters.AddWithValue("@IdReserva", idReserva); 
                             cmdReserva.ExecuteNonQuery(); 
-                        } // 4\. Si ambas consultas se ejecutaron sin errores, confirmamos los cambios en la BD 
+                        }
                     transaction.Commit(); 
                     exito = true; 
                     }
@@ -425,7 +425,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                     transaction.Rollback(); throw; 
                     } 
                     finally 
-                    { connection.Close(); 
+                    { conexion.Close(); 
                     } 
                 } 
             } 
