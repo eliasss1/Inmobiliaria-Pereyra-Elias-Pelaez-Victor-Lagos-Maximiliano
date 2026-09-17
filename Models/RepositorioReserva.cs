@@ -384,6 +384,53 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         } 
         return estaOcupado; 
     }
+    
+    public bool RegistrarTerminacionAnticipadaConPago(int idReserva, DateTime fechaTerminacion, decimal montoMulta, int idUsuario) {
+         bool exito = false; 
+         string connectionString = GetConnectionString(); 
+         using (var connection = new MySqlConnection(connectionString)) 
+         { 
+            connection.Open();
+                using (var transaction = connection.BeginTransaction()) 
+                { 
+                    try 
+                    { 
+                    string sqlPago = @"INSERT INTO pago (IdReserva, Concepto, FechaPago, Importe) 
+                    VALUES (@IdReserva, @Concepto, @FechaPago, @Importe);"; 
+                    using (var cmdPago = new MySqlCommand(sqlPago, connection, transaction)) 
+                    { 
+                        cmdPago.Parameters.AddWithValue("@IdReserva", idReserva); 
+                        cmdPago.Parameters.AddWithValue("@Concepto", "Multa por terminación anticipada"); 
+                        cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now); 
+                        cmdPago.Parameters.AddWithValue("@Importe", montoMulta); 
+                        cmdPago.ExecuteNonQuery(); } // (Estado = 3: Terminada Anticipada) 
+                        string sqlReserva = @"UPDATE reserva 
+                        SET FechaRealTerminacion = 
+                        @FechaTerminacion, 
+                            Estado = 3, 
+                            IdUsuarioTerminacion = @IdUsuario 
+                            WHERE IdReserva = @IdReserva;"; 
+                        using (var cmdReserva = new MySqlCommand(sqlReserva, connection, transaction)) 
+                        {
+                            cmdReserva.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion); 
+                            cmdReserva.Parameters.AddWithValue("@IdUsuario", idUsuario); 
+                            cmdReserva.Parameters.AddWithValue("@IdReserva", idReserva); 
+                            cmdReserva.ExecuteNonQuery(); 
+                        } // 4\. Si ambas consultas se ejecutaron sin errores, confirmamos los cambios en la BD 
+                    transaction.Commit(); 
+                    exito = true; 
+                    }
+                    catch (Exception) 
+                    {  
+                    transaction.Rollback(); throw; 
+                    } 
+                    finally 
+                    { connection.Close(); 
+                    } 
+                } 
+            } 
+            return exito; 
+    } 
 }
-        
+
 

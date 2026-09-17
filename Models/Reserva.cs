@@ -40,4 +40,9 @@ public class Reserva {
 
     public int? IdUsuarioTerminador { get;set;}
 
+    public DateTime? FechaRealTerminacion { get; set; } 
+    public int Estado { get; set; } = 1; // 1: Vigente, 2: Finalizada,  3: Terminada Anticipadamente
+    public int? IdUsuarioTerminacion { get; set; } 
+    public Usuario? UsuarioTerminacion { get; set; } 
+
 }
