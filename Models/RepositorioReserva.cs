@@ -359,5 +359,31 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
     return res;
     }
-
+    public bool ExisteSolapamiento(Reserva reserva) 
+    {
+        bool estaOcupado = false; 
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
+        {
+        string sql = 
+            @"SELECT COUNT(\*) 
+            FROM Reserva 
+            WHERE IdInmueble = @IdInmueble 
+            AND IdReserva != @IdReserva 
+            AND (FechaDesde <= @FechaHasta AND FechaHasta >= @FechaDesde)"; 
+        using (var command = new MySqlCommand(sql, conexion))
+        { 
+            command.Parameters.AddWithValue("@IdInmueble", reserva.IdInmueble); 
+            command.Parameters.AddWithValue("@IdReserva", reserva.IdReserva); 
+            command.Parameters.AddWithValue("@FechaDesde", reserva.FechaDesde); 
+            command.Parameters.AddWithValue("@FechaHasta", reserva.FechaHasta); 
+            conexion.Open(); 
+            int cantidad = Convert.ToInt32(command.ExecuteScalar()); 
+            conexion.Close(); 
+            estaOcupado = cantidad > 0; 
+            } 
+        } 
+        return estaOcupado; 
+    }
 }
+        
+

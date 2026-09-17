@@ -94,32 +94,46 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Reserva entidad)
         {
-            try
-            {
-                var IdEmpleado = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                entidad.IdUsuarioCreador = int.Parse(IdEmpleado);
-
-                if (ModelState.IsValid)
-                {
-                    repoReserva.Alta(entidad);
-                    return RedirectToAction(nameof(Index));
-                }
-
-                SetViewBag(entidad);
-                return View(entidad);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al crear una reserva: {ex.Message}");
-                ModelState.AddModelError("", "Ocurrio un error inesperado al intentar guardar la reserva en la base de datos.");
-                
-                SetViewBag(entidad);
-                return View(entidad);
-            }
             
+                if (entidad.FechaHasta < entidad.FechaDesde || entidad.FechaDesde < DateTime.Today)
+                {
+                    ModelState.AddModelError("FechaReserva", "Las fechas ingresadas no son válidas. La fecha de inicio debe ser anterior a la fecha de fin y no puede ser anterior a la fecha actual.");
+                    return View(entidad);
+                }               
+                else 
+                {
+                    try
+                    {
+                        var IdEmpleado = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        }
+                        entidad.IdUsuarioCreador = int.Parse(IdEmpleado);
+
+                        if (ModelState.IsValid)
+                        {
+                            bool ocupado = repoReserva.ExisteSolapamiento(entidad); 
+                            if (ocupado)
+                            {
+                                ModelState.AddModelError("FechaReserva", "El inmueble ya está reservado en las fechas seleccionadas.");
+                                SetViewBag(entidad);
+                                return View(entidad);
+                                }
+                            repoReserva.Alta(entidad);
+                            return RedirectToAction(nameof(Index));
+                        }
+
+                        SetViewBag(entidad);
+                        return View(entidad);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error al crear una reserva: {ex.Message}");
+                        ModelState.AddModelError("", "Ocurrio un error inesperado al intentar guardar la reserva en la base de datos.");
+                        
+                        SetViewBag(entidad);
+                        return View(entidad);
+                    }                  
+                }
+}
         private void SetViewBag(Reserva? entidad = null)
         {   
             ViewBag.Inquilinos = new SelectList(repoInquilino.ObtenerTodos(), "IdInquilino", "Dni", entidad?.IdInquilino);
