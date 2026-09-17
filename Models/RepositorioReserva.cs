@@ -386,18 +386,18 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     }
     
     public bool RegistrarTerminacionAnticipadaConPago(int idReserva, DateTime fechaTerminacion, decimal montoMulta, int idUsuario) {
-         bool exito = false; 
-         string connectionString = GetConnectionString(); 
-         using (var connection = new MySqlConnection(connectionString)) 
-         { 
-            connection.Open();
-                using (var transaction = connection.BeginTransaction()) 
+            bool exito = false; 
+            string connectionString = GetConnectionString(); 
+            using(MySqlConnection conexion = new MySqlConnection(connectionString)) 
+            { 
+            conexion.Open();
+                using (var transaction = conexion.BeginTransaction()) 
                 { 
                     try 
                     { 
                     string sqlPago = @"INSERT INTO pago (IdReserva, Concepto, FechaPago, Importe) 
                     VALUES (@IdReserva, @Concepto, @FechaPago, @Importe);"; 
-                    using (var cmdPago = new MySqlCommand(sqlPago, connection, transaction)) 
+                    using (var cmdPago = new MySqlCommand(sqlPago, conexion, transaction)) 
                     { 
                         cmdPago.Parameters.AddWithValue("@IdReserva", idReserva); 
                         cmdPago.Parameters.AddWithValue("@Concepto", "Multa por terminación anticipada"); 
@@ -410,13 +410,13 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                             Estado = 3, 
                             IdUsuarioTerminacion = @IdUsuario 
                             WHERE IdReserva = @IdReserva;"; 
-                        using (var cmdReserva = new MySqlCommand(sqlReserva, connection, transaction)) 
+                        using (var cmdReserva = new MySqlCommand(sqlReserva, conexion, transaction)) 
                         {
                             cmdReserva.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion); 
                             cmdReserva.Parameters.AddWithValue("@IdUsuario", idUsuario); 
                             cmdReserva.Parameters.AddWithValue("@IdReserva", idReserva); 
                             cmdReserva.ExecuteNonQuery(); 
-                        } // 4\. Si ambas consultas se ejecutaron sin errores, confirmamos los cambios en la BD 
+                        }
                     transaction.Commit(); 
                     exito = true; 
                     }
@@ -425,12 +425,61 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                     transaction.Rollback(); throw; 
                     } 
                     finally 
-                    { connection.Close(); 
+                    { conexion.Close(); 
                     } 
                 } 
             } 
             return exito; 
     } 
+
+    public IList<Reserva> Buscar(string busqueda)
+{
+    var lista = new List<Reserva>();
+    using (MySqlConnection conexion = new MySqlConnection(connectionString))
+    {
+        string sql = @"SELECT r.IdReserva, r.IdInmueble, r.IdInquilino, r.FechaDesde, r.FechaHasta, r.MontoPorDia, r.Estado,
+                            inm.Direccion AS InmuebleDireccion, 
+                            inq.Nombre AS InquilinoNombre, 
+                            inq.Apellido AS InquilinoApellido 
+                    FROM Reserva r
+                    INNER JOIN Inmueble inm ON r.IdInmueble = inm.IdInmueble
+                    INNER JOIN Inquilino inq ON r.IdInquilino = inq.IdInquilino
+                    WHERE inq.Apellido LIKE @busqueda OR inm.Direccion LIKE @busqueda";
+
+        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        {
+            comando.Parameters.AddWithValue("@busqueda", "%" + busqueda + "%");
+            conexion.Open();
+            using (MySqlDataReader reader = comando.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    lista.Add(new Reserva
+                    {
+                        IdReserva = reader.GetInt32(nameof(Reserva.IdReserva)),
+                        IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
+                        IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
+                        FechaDesde = reader.GetDateTime(nameof(Reserva.FechaDesde)),
+                        FechaHasta = reader.GetDateTime(nameof(Reserva.FechaHasta)),
+                        MontoPorDia = reader.GetDecimal(nameof(Reserva.MontoPorDia)),
+                        Estado = reader.GetInt32(nameof(Reserva.Estado)),
+                        
+                        InmuebleAsociado = new Inmueble 
+                        { 
+                            Direccion = reader.GetString("InmuebleDireccion") 
+                        },
+                        InquilinoAsociado = new Inquilino 
+                        { 
+                            Nombre = reader.GetString("InquilinoNombre"), 
+                            Apellido = reader.GetString("InquilinoApellido") 
+                        }
+                    });
+                }
+            }
+        }
+    }
+    return lista;
+}
 }
 
 
