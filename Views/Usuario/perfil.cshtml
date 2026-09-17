@@ -31,10 +31,11 @@
             </div>
             <div>
                 <div class="d-flex gap-1">
-                    <h3 id="h3-nombre" contenteditable="true">@Model.Nombre</h3>
+                    <h3 id="h3-nombre" contenteditable="true" style="outline: none;">@Model.Nombre</h3>
                     <input id="input-nombre" type="hidden" name="Nombre" value="@Model.Nombre"/>
 
-                    <h3 id="h3-apellido" contenteditable="true">@Model.Apellido</h3>
+                    <h3 id="h3-apellido" contenteditable="true" style="outline: none;">@Model.Apellido <i class="bi bi-pencil"></i></h3>
+                    
                     <input id="input-apellido" type="hidden" name="Apellido" value="@Model.Apellido"/>
 
                 </div>
@@ -44,19 +45,59 @@
                 <input id="input-avatar" type="hidden" name="Avatar" value="@Model.Avatar"/>
 
                 <h6><strong>Email</strong></h6>
-                <p id="p-email" contenteditable="true">@Model.Email</p>
+                <p id="p-email" contenteditable="true" style="outline: none;">@Model.Email <i class="bi bi-pencil"></i></p>
+                
                 <input id="input-email" type="hidden" name="Email" value="@Model.Email"/>
 
                 <a class="text-primary" data-bs-toggle="modal" data-bs-target="#modalContraseña">Editar Contraseña</a>
             </div>
             <div class="h-100 ps-4 me-4" style="padding-top: 32px">
                 <button id="boton-guardar" type="submit" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-pencil">Guardar</i>
+                    <i class="bi bi-save"> Guardar</i>
+                </button>
+                <button id="boton-cancelar" type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-x">Cancelar</i>
                 </button>
             </div>
             
         </form>
     </div>
+</div>
+
+<div class="modal fade" id="modalContraseña" tabindex="-1" aria-labelledby="modalContraseñaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalContraseñaLabel">Cambiar Contraseña</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form asp-controller="Usuario" asp-action="CambiarContraseña" method="post">
+                <div class="modal-body">
+                    
+                    <input type="hidden" name="IdUsuario" value="@Model.IdUsuario" />
+
+                    <div class="mb-3">
+                        <label for="ContraseñaActual" class="form-label">Contraseña Actual</label>
+                        <input type="password" class="form-control" id="ContraseñaActual" name="ContraseñaActual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="NuevaContraseña" class="form-label">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="NuevaContraseña" name="NuevaContraseña" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ConfirmarContraseña" class="form-label">Confirmar Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="ConfirmarContraseña" name="ConfirmarContraseña" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <style>
     .burbuja-foto {
@@ -80,16 +121,17 @@
     const infoEditar = document.getElementById("infoParaEditar");
     const btnGuardar = document.getElementById("boton-guardar");
     const btnEditar = document.getElementById("boton-editar");
+    const btnCancelar = document.getElementById("boton-cancelar");
 
     const nombreEdit = document.getElementById("h3-nombre");
     const apellidoEdit = document.getElementById("h3-apellido");
     const emailEdit = document.getElementById("p-email");
-    const contraEdit = document.getElementById("");
+    
 
     const nombreInput = document.getElementById("input-nombre");
     const apellidoInput = document.getElementById("input-apellido");
     const emailInput = document.getElementById("input-email");
-    const contraInput = document.getElementById("input-contraseña");
+    
 
     
 
@@ -97,6 +139,11 @@
             infoNormal.classList.add("d-none");
             infoEditar.classList.remove("d-none");
             btnGuardar.disabled = true;
+    });
+
+    btnCancelar.addEventListener("click", function () {
+        infoNormal.classList.remove("d-none");
+        infoEditar.classList.add("d-none");
     });
 
     document.addEventListener("DOMContentLoaded", function () {
