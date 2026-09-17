@@ -247,6 +247,55 @@ namespace Inmobiliaria.Controllers
             ViewBag.MontoMulta = montoMulta;
             return View(reservaOriginal); 
         }
+    [HttpGet] 
+        public IActionResult Renovar(int id) 
+        { 
+            var reservaOriginal = repositorioReserva.ObtenerPorId(id);
+            if (reservaOriginal == null) 
+            {
+                return NotFound("La reserva original no existe."); 
+            } 
+            var nuevaReserva = new Reserva 
+            { 
+                IdInmueble = reservaOriginal.IdInmueble,
+                IdInquilino = reservaOriginal.IdInquilino, 
+                Inmueble = reservaOriginal.Inmueble, 
+                Inquilino = reservaOriginal.Inquilino,
+                FechaDesde = reservaOriginal.FechaHasta, 
+                FechaHasta = reservaOriginal.FechaHasta.AddDays(1) 
+                }; 
+                ViewBag.ReservaOriginal = reservaOriginal; 
+                return View(nuevaReserva); 
+        } 
+    [HttpPost]
+    [ValidateAntiForgeryToken] 
+        public IActionResult Renovar(Reserva nuevaReserva) 
+        {
+            if (nuevaReserva.FechaHasta <= nuevaReserva.FechaDesde) 
+            { 
+                ModelState.AddModelError("FechaHasta", "La fecha de finalización debe ser posterior a la fecha de inicio de la extensión."); 
+                }
+            var inmueble = repositorioInmueble.ObtenerPorId(nuevaReserva.IdInmueble); 
+            if (inmueble == null) 
+            {
+                ModelState.AddModelError("", "El inmueble asociado no fue encontrado."); 
+            } 
+            if (inmueble != null && repositorioReserva.ExisteSolapamiento(nuevaReserva)) 
+            { 
+                ModelState.AddModelError("", "No se puede extender la reserva: el inmueble ya posee otra reserva confirmada en las fechas seleccionadas."); 
+            } 
+            if (!ModelState.IsValid) 
+            {
+                ViewBag.ReservaOriginal = repositorioReserva.ObtenerPorId(nuevaReserva.IdReserva); 
+                if (inmueble != null) nuevaReserva.Inmueble = inmueble; 
+                nuevaReserva.Inquilino = repositorioInquilino.ObtenerPorId(nuevaReserva.IdInquilino);
+                return View(nuevaReserva); 
+            } 
+            nuevaReserva.PrecioPorDia = inmueble.Precio;
+            int nuevoId = repositorioReserva.Alta(nuevaReserva, inmueble.PorcentajeSena, inmueble.Precio); 
+            TempData["Mensaje"] = $"Reserva extendida exitosamente. Se ha generado un nuevo alquiler (Reserva #{nuevoId})."; 
+            return RedirectToAction(nameof(Index)); 
+        }
     }
 }
 
