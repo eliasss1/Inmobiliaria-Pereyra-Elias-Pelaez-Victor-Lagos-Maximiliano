@@ -119,6 +119,7 @@ namespace Inmobiliaria.Controllers
             SetViewBag();
             return View();
         }
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -133,26 +134,26 @@ namespace Inmobiliaria.Controllers
                 else 
                 {
                     try
-                    {
-                        var IdEmpleado = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                        entidad.IdUsuarioCreador = int.Parse(IdEmpleado);
-
-                        if (ModelState.IsValid)
-                        {
-                            bool ocupado = repoReserva.ExisteSolapamiento(entidad); 
-                            if (ocupado)
-                            {
-                                ModelState.AddModelError("FechaReserva", "El inmueble ya está reservado en las fechas seleccionadas.");
-                                SetViewBag(entidad);
-                                return View(entidad);
-                                }
-                            repoReserva.Alta(entidad);
-                            return RedirectToAction(nameof(Index));
+                    { 
+                        Inmueble inmueble = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
+                        if (inmueble == null) 
+                        { 
+                            ModelState.AddModelError("IdInmueble", "El inmueble seleccionado no es válido o no existe."); 
                         }
-
-                        SetViewBag(entidad);
-                        return View(entidad);
+                        if (inmueble != null && repositorioReserva.ExisteSolapamiento(reserva)) 
+                        {
+                            ModelState.AddModelError("", "El inmueble seleccionado ya se encuentra reservado en el rango de fechas elegido."); 
+                        } 
+                        if (!ModelState.IsValid)
+                        { 
+                            ViewBag.Inmuebles = repositorioInmueble.ObtenerTodos(); 
+                            ViewBag.Inquilinos = repositorioInquilino.ObtenerTodos(); 
+                            return View(reserva); 
+                        }  
+                        reserva.PrecioPorDia = inmueble.Precio;
+                        repositorioReserva.Alta(reserva, inmueble.PorcentajeSena, inmueble.Precio); 
+                        TempData["Mensaje"] = "Reserva creada exitosamente y pago de seña registrado."; 
+                        return RedirectToAction(nameof(Index));
                     }
                     catch (Exception ex)
                     {

@@ -12,7 +12,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         
     }
 
-    public int Alta(Reserva p)
+    public int Alta(Reserva p, decimal porcentajeSena, decimal precioPorDia)
 {
     int res = -1;
 
@@ -22,15 +22,15 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         {
             conexion.Open();
             
-            string queryInsert = @"INSERT INTO Reserva (FechaDesde, FechaHasta, MontoPorDia, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador)
-            VALUES (@FechaDesde, @FechaHasta, @MontoPorDia, @FechaEfectivaTerminacion, @IdInquilino, @IdInmueble, @IdUsuarioCreador, @IdUsuarioTerminador);
-            SELECT LAST_INSERT_ID();";
+            string queryInsert = @"INSERT INTO Reserva (IdInmueble, IdInquilino, FechaDesde, FechaHasta, PrecioPorDia, Estado) 
+            VALUES (@IdInmueble, @IdInquilino, @FechaDesde, @FechaHasta, @PrecioPorDia, 1); 
+            SELECT LAST\_INSERT\_ID();";
 
             using(MySqlCommand comando = new MySqlCommand(queryInsert, conexion))
             {
                 comando.Parameters.AddWithValue("@FechaDesde", p.FechaDesde);
                 comando.Parameters.AddWithValue("@FechaHasta", p.FechaHasta);
-                comando.Parameters.AddWithValue("@MontoPorDia", p.MontoPorDia);
+                comando.Parameters.AddWithValue("@PrecioPorDia", p.PrecioPorDia);
                 comando.Parameters.AddWithValue("@FechaEfectivaTerminacion", p.FechaEfectivaTerminacion);
                 comando.Parameters.AddWithValue("@IdInquilino", p.IdInquilino);
                 comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
@@ -41,29 +41,30 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                 p.IdReserva = res;
             }
 
-            if (res > 0)
-            {
-                string queryUpdate = "UPDATE Inmueble SET Estado = FALSE WHERE IdInmueble = @IdInmueble";
-                
-                using (MySqlCommand cmdUpdate = new MySqlCommand(queryUpdate, conexion))
-                {
-                    cmdUpdate.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
-                    cmdUpdate.ExecuteNonQuery();
-                }
-            }
-        }
-        catch(Exception ex)
-        {
-            Console.WriteLine($"Error al insertar reserva: {ex.Message}");
-        }
-        finally
-        {
-            conexion.Close();
-        }
-
-        return res;
-    }
-    }
+            int diasTotales = (reserva.FechaHasta - reserva.FechaDesde).Days; 
+            decimal montoTotalEstancia = diasTotales * precioPorDia; 
+            decimal montoSena = montoTotalEstancia * (porcentajeSena / 100m);
+            
+            string sqlPago = @"INSERT INTO Pago (IdReserva, Concepto, FechaPago, Importe) 
+            VALUES (@IdReserva, @Concepto, @FechaPago, @Importe);"; 
+            using (var cmdPago = new MySqlCommand(sqlPago, connection, transaction)) 
+            { 
+                cmdPago.Parameters.AddWithValue("@IdReserva", idReservaCreada); 
+                cmdPago.Parameters.AddWithValue("@Concepto", $"Seña inicial ({porcentajeSena}% del total)"); 
+                cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now); 
+                cmdPago.Parameters.AddWithValue("@Importe", montoSena); 
+                cmdPago.ExecuteNonQuery(); 
+            } 
+        transaction.Commit(); 
+        } 
+        catch (Exception) 
+        { 
+            transaction.Rollback(); 
+            throw; 
+        } 
+    }  
+    return idReservaCreada;
+}
 
     public int Baja(int id)
 {

@@ -41,4 +41,6 @@ public class Inmueble
     public Propietario? Dueño { get; set; }
 
     public override string ToString() => $"{Direccion} - Cupo: {Cupo}";
+
+    public decimal PorcentajeSena { get; set; }
 }
