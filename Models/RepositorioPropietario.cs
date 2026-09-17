@@ -205,39 +205,74 @@ namespace Inmobiliaria.Models
 			return p;
 		}
 
-		public IList<Propietario> BuscarPorNombre(string nombre)
-		{
-			List<Propietario> res = new List<Propietario>();
-			nombre = "%" + nombre + "%";
-			using (MySqlConnection connection = new MySqlConnection(connectionString))
-			{
-				string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email 
-					FROM Propietario
-					WHERE Nombre LIKE @nombre OR Apellido LIKE @nombre";
-				using (MySqlCommand command = new MySqlCommand(sql, connection))
-				{
-					command.Parameters.Add("@nombre", MySqlDbType.VarChar).Value = nombre;
-					command.CommandType = CommandType.Text;
-					connection.Open();
-					var reader = command.ExecuteReader();
-					while (reader.Read())
-					{
-						var p = new Propietario
-						{
-							IdPropietario = reader.GetInt32(nameof(Propietario.IdPropietario)),
-							Nombre = reader.GetString("Nombre"),
-							Apellido = reader.GetString("Apellido"),
-							Dni = reader.GetString("Dni"),
-							Telefono = reader.GetString("Telefono"),
-							Email = reader.GetString("Email"),
-						};
-						res.Add(p);
-					}
-					connection.Close();
-				}
-			}
-			return res;
-		}
+public IList<Propietario> BuscarPorNombre(string nombre)
+        {
+            List<Propietario> res = new List<Propietario>();
+            nombre = "%" + nombre + "%";
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"SELECT IdPropietario, Nombre, Apellido, Dni, Telefono, Email 
+                    FROM Propietario
+                    WHERE Nombre LIKE @nombre OR Apellido LIKE @nombre";
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.Add("@nombre", MySqlDbType.VarChar).Value = nombre;
+                    command.CommandType = CommandType.Text;
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var p = new Propietario
+                        {
+                            IdPropietario = reader.GetInt32(nameof(Propietario.IdPropietario)),
+                            Nombre = reader.GetString("Nombre"),
+                            Apellido = reader.GetString("Apellido"),
+                            Dni = reader.GetString("Dni"),
+                            Telefono = reader.GetString("Telefono"),
+                            Email = reader.GetString("Email"),
+                        };
+                        res.Add(p);
+                    }
+                    connection.Close();
+                }
+            }
+            return res;
+        }
 
-	}
-}
+        public IList<Propietario> Buscar(string busqueda)
+        {
+            var lista = new List<Propietario>();
+            using (MySqlConnection conexion = new MySqlConnection(connectionString))
+            {
+                string sql = @"SELECT IdPropietario, Dni, Nombre, Apellido, Telefono, Email 
+                                FROM Propietario 
+                                WHERE Dni LIKE @busqueda OR Nombre LIKE @busqueda OR Apellido LIKE @busqueda";
+                
+                using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+                {
+                    comando.Parameters.AddWithValue("@busqueda", "%" + busqueda + "%");
+                    conexion.Open();
+                    using (MySqlDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new Propietario
+                            {
+                                IdPropietario = reader.GetInt32("IdPropietario"),
+                                Dni = reader.GetString("Dni"),
+                                Nombre = reader.GetString("Nombre"),
+                                Apellido = reader.GetString("Apellido"),
+                                Telefono = reader.IsDBNull(reader.GetOrdinal("Telefono")) ? null : reader.GetString("Telefono"),
+                                Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? null : reader.GetString("Email")
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
+
+    }
+} 
+
+
