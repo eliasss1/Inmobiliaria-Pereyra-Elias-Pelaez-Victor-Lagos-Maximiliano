@@ -25,7 +25,7 @@
             </div>
             
         </div>
-        <form id="infoParaEditar" class="d-flex justify-content-center align-items-center d-none">
+        <form id="infoParaEditar" method="post"  asp-controller="Usuario" asp-action="Perfil" class="d-flex justify-content-center align-items-center d-none">
             <div class="burbuja-foto m-5 ">
                     
             </div>
@@ -35,11 +35,13 @@
                     <input id="input-nombre" type="hidden" name="Nombre" value="@Model.Nombre"/>
 
                     <h3 id="h3-apellido" contenteditable="true">@Model.Apellido</h3>
-                    <input id="input-apellido" type="hidden" name="Nombre" value="@Model.Apellido"/>
+                    <input id="input-apellido" type="hidden" name="Apellido" value="@Model.Apellido"/>
 
                 </div>
 
                 <input id="input-id" type="hidden" name="Id" value="@Model.IdUsuario"/>
+                <input id="input-rol" type="hidden" name="Rol" value="@Model.Rol"/>
+                <input id="input-avatar" type="hidden" name="Avatar" value="@Model.Avatar"/>
 
                 <h6><strong>Email</strong></h6>
                 <p id="p-email" contenteditable="true">@Model.Email</p>
@@ -48,9 +50,9 @@
                 <a class="text-primary" data-bs-toggle="modal" data-bs-target="#modalContraseña">Editar Contraseña</a>
             </div>
             <div class="h-100 ps-4 me-4" style="padding-top: 32px">
-                <a id="boton-guardar" type="submit" asp-controller="Usuario" asp-action="EditarPerfil" class="btn btn-sm btn-outline-primary">
+                <button id="boton-guardar" type="submit" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-pencil">Guardar</i>
-                </a>
+                </button>
             </div>
             
         </form>
@@ -71,14 +73,16 @@
 
 </style>
 
+
 <script>
+
     const infoNormal = document.getElementById("infoNormal");
     const infoEditar = document.getElementById("infoParaEditar");
     const btnGuardar = document.getElementById("boton-guardar");
     const btnEditar = document.getElementById("boton-editar");
 
     const nombreEdit = document.getElementById("h3-nombre");
-    const apellidoEdit = document.getElementById("input-apellido");
+    const apellidoEdit = document.getElementById("h3-apellido");
     const emailEdit = document.getElementById("p-email");
     const contraEdit = document.getElementById("");
 
@@ -87,18 +91,93 @@
     const emailInput = document.getElementById("input-email");
     const contraInput = document.getElementById("input-contraseña");
 
+    
+
     btnEditar.addEventListener("click", function () {
             infoNormal.classList.add("d-none");
             infoEditar.classList.remove("d-none");
+            btnGuardar.disabled = true;
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-        
+
+        const nombreOriginal = nombreEdit.innerText;
+        const apellOriginal = apellidoEdit.innerText;
+        const emailOriginal = emailEdit.innerText;
+
+
+        nombreEdit.addEventListener("blur", function () {
+            nombreInput.value = nombreEdit.innerText.trim();
+
+            if(validarCambios(nombreOriginal, apellOriginal, emailOriginal)){
+                btnGuardar.disabled = false;
+            }else{
+                btnGuardar.disabled = true;
+            }
+
+        });
+        nombreEdit.addEventListener("keydown", function (e) {
+            if (e.key === "Enter"){
+                e.preventDefault();
+                nombreEdit.blur();
+            }
+        });
+
+        apellidoEdit.addEventListener("blur", function () {
+            apellidoInput.value = apellidoEdit.innerText.trim();
+
+            if(validarCambios(nombreOriginal, apellOriginal, emailOriginal)){
+                btnGuardar.disabled = false;
+            }else{
+                btnGuardar.disabled = true;
+            }
+
+        });
+        apellidoEdit.addEventListener("keydown", function (e) {
+            if (e.key === "Enter"){
+                e.preventDefault();
+                apellidoEdit.blur();
+            }
+        });
+
+        emailEdit.addEventListener("blur", function () {
+            emailInput.value = emailEdit.innerText.trim();
+
+            if(validarCambios(nombreOriginal, apellOriginal, emailOriginal)){
+                btnGuardar.disabled = false;
+            }else{
+                btnGuardar.disabled = true;
+            }
+
+        });
+        emailEdit.addEventListener("keydown", function (e) {
+            if (e.key === "Enter"){
+                e.preventDefault();
+                emailEdit.blur();
+            }
+        });
+
     });
 
     btnGuardar.addEventListener("click", function () {
         infoNormal.classList.remove("d-none");
         infoEditar.classList.add("d-none");
     });
+
+    
+
+    function validarCambios(n, a, e) {
+        let cambios = false;
+
+        const nombreActual = nombreEdit.innerText.trim();
+        const apellidoActual = apellidoEdit.innerText.trim();
+        const emailActual  = emailEdit.innerText.trim();
+
+        if(nombreActual !== n || apellidoActual !== a || emailActual !== e){
+            cambios = true;
+        }
+
+        return cambios;
+    }
 
 </script>

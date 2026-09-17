@@ -97,6 +97,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                     comando.Parameters.AddWithValue("@rol", p.Rol);
                     conexion.Open();
                     res = comando.ExecuteNonQuery();
+                    Console.WriteLine("Modificacion de Usuario completada, cerrando la conexión.");
                 }
             }
             catch(Exception ex)
@@ -105,6 +106,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
             }
             finally
             {
+                
                 conexion.Close();
             }
             return res;

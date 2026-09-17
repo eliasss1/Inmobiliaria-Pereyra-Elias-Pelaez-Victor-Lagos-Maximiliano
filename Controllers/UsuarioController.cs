@@ -105,14 +105,18 @@ public class UsuarioController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult EditarPerfil(Usuario e)
+    public IActionResult Perfil(Usuario e)
     {
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        e.IdUsuario = int.Parse(userId);
+
+        ModelState.Remove(nameof(e.Clave));
+
         if (ModelState.IsValid)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            e.IdUsuario = int.Parse(userId);
+        {               
             repo.Modificacion(e);
-            return RedirectToAction("Perfil");
+            return RedirectToAction(nameof(Perfil));
         }
         return View(e);
     }
