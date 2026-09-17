@@ -21,27 +21,42 @@ namespace Inmobiliaria.Controllers
         }
 
         [Route("[controller]/Index")]
-        public ActionResult Index(int pagina = 1)
+            public ActionResult Index(string buscar, int pagina = 1)
+    {
+        try
         {
-            try
-            {   
-                var tamaño = 5;
-                var lista = repositorio.ObtenerLista(Math.Max(pagina, 1), tamaño);
-                ViewBag.Pagina = pagina;
-                var total = repositorio.ObtenerCantidad();
-                ViewBag.TotalPaginas = total % tamaño == 0 ? total / tamaño : total / tamaño + 1;
-                ViewBag.Id = TempData["Id"];
+            var tamaño = 5;
+            ViewBag.Buscar = buscar;
+            ViewBag.Pagina = pagina;
 
-                if (TempData.ContainsKey("Mensaje"))
-                    ViewBag.Mensaje = TempData["Mensaje"];
-                return View(lista);
-            }
-            catch (Exception ex)
+        IList<Inmueble> lista;
+            int totalRegistros;
+
+        if (string.IsNullOrEmpty(buscar))
             {
-                logger.LogError(ex, "Error en Index");
-                throw;
+                lista = repositorio.ObtenerLista(Math.Max(pagina, 1), tamaño);
+                totalRegistros = repositorio.ObtenerCantidad();
             }
+        else
+            {
+                var listaFiltrada = repositorio.Buscar(buscar);
+                totalRegistros = listaFiltrada.Count;
+                lista = listaFiltrada.Skip((Math.Max(pagina, 1) - 1) * tamaño).Take(tamaño).ToList();
+            }
+
+            ViewBag.TotalPaginas = totalRegistros % tamaño == 0 ? totalRegistros / tamaño : totalRegistros / tamaño + 1;
+        
+            if (TempData.ContainsKey("Mensaje")) ViewBag.Mensaje = TempData["Mensaje"];
+            if (TempData.ContainsKey("Error")) ViewBag.Error = TempData["Error"];
+
+            return View(lista);
         }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error en Index Inmueble");
+            throw;
+        }
+    }
 
         [Route("[controller]/PorPropietario/{id}")]
         public ActionResult PorPropietario(int id)

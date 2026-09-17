@@ -8,6 +8,6 @@ namespace Inmobiliaria.Models
 {
 	public interface IRepositorioPropietario : IRepositorio<Propietario>
 	{
-
+	IList<Propietario> Buscar(string busqueda);
 	}
 }

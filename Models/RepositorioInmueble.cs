@@ -319,4 +319,55 @@ public IList<Inmueble> ObtenerPorPropietario(int idPropietario)
         return res;
     }
 
+public IList<Inmueble> Buscar(string busqueda)
+{
+    var lista = new List<Inmueble>();
+    using (MySqlConnection conexion = new MySqlConnection(connectionString))
+    {
+        string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
+                            i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
+                            p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
+                            t.Nombre AS TipoNombre
+                    FROM Inmueble i
+                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
+                    INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
+                    WHERE i.Direccion LIKE @busqueda OR t.Nombre LIKE @busqueda";
+
+        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        {
+            comando.Parameters.AddWithValue("@busqueda", "%" + busqueda + "%");
+            conexion.Open();
+            using (MySqlDataReader reader = comando.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    lista.Add(new Inmueble
+                    {
+                        IdInmueble = reader.GetInt32(nameof(Inmueble.IdInmueble)),
+                        Direccion = reader.GetString(nameof(Inmueble.Direccion)),
+                        Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
+                        Latitud = reader.GetDouble(nameof(Inmueble.Latitud)),
+                        Longitud = reader.GetDouble(nameof(Inmueble.Longitud)),
+                        PrecioPorDia = reader.GetDecimal(nameof(Inmueble.PrecioPorDia)),
+                        Estado = reader.GetBoolean(nameof(Inmueble.Estado)),
+                        ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString(nameof(Inmueble.ImagenPortada)),
+                        IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                        IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                        
+                        Dueño = new Propietario 
+                        {
+                            Nombre = reader.GetString("PropietarioNombre"),
+                            Apellido = reader.GetString("PropietarioApellido")
+                        },
+                        Tipo = new TipoInmueble
+                        {
+                            Nombre = reader.GetString("TipoNombre") 
+                        }
+                    });
+                }
+            }
+        }
+    }
+    return lista;
+}
 }
