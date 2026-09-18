@@ -7,64 +7,107 @@ namespace Inmobiliaria.Models;
 public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
 {
+
+
     public RepositorioReserva(IConfiguration configuration) : base(configuration)
     {
         
     }
 
-    public int Alta(Reserva p, decimal porcentajeSena, decimal precioPorDia)
-{
-    int res = -1;
-
-    using(MySqlConnection conexion = new MySqlConnection(connectionString))
+    public int Alta(Reserva p)
     {
-        try 
-        {
-            conexion.Open();
-            
-            string queryInsert = @"INSERT INTO Reserva (IdInmueble, IdInquilino, FechaDesde, FechaHasta, PrecioPorDia, Estado) 
-            VALUES (@IdInmueble, @IdInquilino, @FechaDesde, @FechaHasta, @PrecioPorDia, 1); 
-            SELECT LAST\_INSERT\_ID();";
+        int idReservaCreada;
 
-            using(MySqlCommand comando = new MySqlCommand(queryInsert, conexion))
+        using var conexion = new MySqlConnection(connectionString);
+        conexion.Open();
+
+        using var transaction = conexion.BeginTransaction();
+
+        try
+        {
+            const string queryInmueble = @"
+                SELECT PrecioPorDia, PorcentajeSeña
+                FROM Inmueble
+                WHERE IdInmueble = @IdInmueble";
+
+            decimal precioPorDia;
+            decimal porcentajeSeña;
+
+            using (var comandoInmueble = new MySqlCommand(queryInmueble, conexion, transaction))
             {
-                comando.Parameters.AddWithValue("@FechaDesde", p.FechaDesde);
-                comando.Parameters.AddWithValue("@FechaHasta", p.FechaHasta);
-                comando.Parameters.AddWithValue("@PrecioPorDia", p.PrecioPorDia);
-                comando.Parameters.AddWithValue("@FechaEfectivaTerminacion", p.FechaEfectivaTerminacion);
-                comando.Parameters.AddWithValue("@IdInquilino", p.IdInquilino);
-                comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
-                comando.Parameters.AddWithValue("@IdUsuarioCreador", p.IdUsuarioCreador);
-                comando.Parameters.AddWithValue("@IdUsuarioTerminador", p.IdUsuarioTerminador);
-                
-                res = Convert.ToInt32(comando.ExecuteScalar());
-                p.IdReserva = res;
+                comandoInmueble.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
+                using var readerInmueble = comandoInmueble.ExecuteReader();
+
+                if (!readerInmueble.Read())
+                {
+                    throw new InvalidOperationException("El inmueble seleccionado no existe.");
+                }
+
+                precioPorDia = readerInmueble.GetDecimal("PrecioPorDia");
+                porcentajeSeña = readerInmueble.GetDecimal("PorcentajeSeña");
             }
 
-            int diasTotales = (reserva.FechaHasta - reserva.FechaDesde).Days; 
-            decimal montoTotalEstancia = diasTotales * precioPorDia; 
-            decimal montoSena = montoTotalEstancia * (porcentajeSena / 100m);
-            
-            string sqlPago = @"INSERT INTO Pago (IdReserva, Concepto, FechaPago, Importe) 
-            VALUES (@IdReserva, @Concepto, @FechaPago, @Importe);"; 
-            using (var cmdPago = new MySqlCommand(sqlPago, connection, transaction)) 
-            { 
-                cmdPago.Parameters.AddWithValue("@IdReserva", idReservaCreada); 
-                cmdPago.Parameters.AddWithValue("@Concepto", $"Seña inicial ({porcentajeSena}% del total)"); 
-                cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now); 
-                cmdPago.Parameters.AddWithValue("@Importe", montoSena); 
-                cmdPago.ExecuteNonQuery(); 
-            } 
-        transaction.Commit(); 
-        } 
-        catch (Exception) 
-        { 
-            transaction.Rollback(); 
-            throw; 
-        } 
-    }  
-    return idReservaCreada;
-}
+            p.MontoPorDia = precioPorDia;
+
+            const string queryInsert = @"
+                INSERT INTO Reserva
+                    (IdInmueble, IdInquilino, FechaDesde, FechaHasta,
+                    MontoPorDia, Estado, IdUsuarioCreador)
+                VALUES
+                    (@IdInmueble, @IdInquilino, @FechaDesde, @FechaHasta,
+                    @MontoPorDia, 1, @IdUsuarioCreador);
+
+                SELECT LAST_INSERT_ID();";
+
+            using var comando = new MySqlCommand(
+                queryInsert,
+                conexion,
+                transaction);
+
+            comando.Parameters.AddWithValue("@FechaDesde", p.FechaDesde);
+            comando.Parameters.AddWithValue("@FechaHasta", p.FechaHasta);
+            comando.Parameters.AddWithValue("@MontoPorDia", p.MontoPorDia);
+            comando.Parameters.AddWithValue("@IdInquilino", p.IdInquilino);
+            comando.Parameters.AddWithValue("@IdInmueble", p.IdInmueble);
+            comando.Parameters.AddWithValue("@IdUsuarioCreador", p.IdUsuarioCreador);
+
+            idReservaCreada = Convert.ToInt32(comando.ExecuteScalar());
+            p.IdReserva = idReservaCreada;
+
+            int diasTotales = (p.FechaHasta - p.FechaDesde).Days;
+            decimal montoTotalEstancia = diasTotales * p.MontoPorDia;
+            decimal montoSena = montoTotalEstancia * porcentajeSeña / 100m;
+
+            const string sqlPago = @"
+                INSERT INTO Pago
+                    (IdReserva, Concepto, FechaPago, Importe, Estado, IdUsuarioCreador)
+                VALUES
+                    (@IdReserva, @Concepto, @FechaPago, @Importe, 'Activo', @IdUsuarioCreador);";
+
+            using var cmdPago = new MySqlCommand(
+                sqlPago,
+                conexion,
+                transaction);
+
+            cmdPago.Parameters.AddWithValue("@IdReserva", idReservaCreada);
+            cmdPago.Parameters.AddWithValue(
+                "@Concepto",
+                $"Seña inicial ({porcentajeSeña}% del total)");
+            cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now);
+            cmdPago.Parameters.AddWithValue("@Importe", montoSena);
+            cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", p.IdUsuarioCreador);
+
+            cmdPago.ExecuteNonQuery();
+
+            transaction.Commit();
+            return idReservaCreada;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
 
     public int Baja(int id)
 {
@@ -388,7 +431,6 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     
     public bool RegistrarTerminacionAnticipadaConPago(int idReserva, DateTime fechaTerminacion, decimal montoMulta, int idUsuario) {
             bool exito = false; 
-            string connectionString = GetConnectionString(); 
             using(MySqlConnection conexion = new MySqlConnection(connectionString)) 
             { 
             conexion.Open();
@@ -396,14 +438,15 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                 { 
                     try 
                     { 
-                    string sqlPago = @"INSERT INTO pago (IdReserva, Concepto, FechaPago, Importe) 
-                    VALUES (@IdReserva, @Concepto, @FechaPago, @Importe);"; 
+                    string sqlPago = @"INSERT INTO pago (IdReserva, Concepto, FechaPago, Importe, Estado, IdUsuarioCreador) 
+                    VALUES (@IdReserva, @Concepto, @FechaPago, @Importe, 'Activo', @IdUsuarioCreador);"; 
                     using (var cmdPago = new MySqlCommand(sqlPago, conexion, transaction)) 
                     { 
                         cmdPago.Parameters.AddWithValue("@IdReserva", idReserva); 
                         cmdPago.Parameters.AddWithValue("@Concepto", "Multa por terminación anticipada"); 
                         cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now); 
                         cmdPago.Parameters.AddWithValue("@Importe", montoMulta); 
+                        cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", idUsuario); 
                         cmdPago.ExecuteNonQuery(); } // (Estado = 3: Terminada Anticipada) 
                         string sqlReserva = @"UPDATE reserva 
                         SET FechaRealTerminacion = 

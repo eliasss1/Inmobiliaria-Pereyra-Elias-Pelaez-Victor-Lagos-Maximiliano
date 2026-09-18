@@ -239,8 +239,40 @@ namespace Inmobiliaria.Models
 			return res;
 		}
 
-
-	public IList<Inquilino> ObtenerTodos()
+		public IList<Inquilino> Buscar(string busqueda)
+        {
+            List<Inquilino> res = new List<Inquilino>();
+            busqueda = "%" + busqueda + "%";
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string sql = @"SELECT IdInquilino, Nombre, Apellido, Dni, Telefono, Email 
+                    FROM Inquilino
+                    WHERE Nombre LIKE @busqueda OR Apellido LIKE @busqueda OR Email LIKE @busqueda";
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                {
+                    command.Parameters.Add("@busqueda", MySqlDbType.VarChar).Value = busqueda;
+                    command.CommandType = CommandType.Text;
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var i = new Inquilino
+                        {
+                            IdInquilino = reader.GetInt32(nameof(Inquilino.IdInquilino)),
+                            Nombre = reader.GetString("Nombre"),
+                            Apellido = reader.GetString("Apellido"),
+                            Dni = reader.GetString("Dni"),
+                            Telefono = reader.GetString("Telefono"),
+                            Email = reader.GetString("Email"),
+                        };
+                        res.Add(i);
+                    }
+                    connection.Close();
+                }
+            }
+            return res;
+        }
+		public IList<Inquilino> ObtenerTodos()
 	{
 		IList<Inquilino> res = new List<Inquilino>();
 		using (MySqlConnection connection = new MySqlConnection(connectionString))

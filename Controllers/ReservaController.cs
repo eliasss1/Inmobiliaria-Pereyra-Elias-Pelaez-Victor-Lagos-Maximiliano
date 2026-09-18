@@ -125,7 +125,8 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Reserva entidad)
         {
-            
+            entidad.IdUsuarioCreador = int.Parse(User.FindFirstValue("Id") ?? "0");
+
                 if (entidad.FechaHasta < entidad.FechaDesde || entidad.FechaDesde < DateTime.Today)
                 {
                     ModelState.AddModelError("FechaReserva", "Las fechas ingresadas no son válidas. La fecha de inicio debe ser anterior a la fecha de fin y no puede ser anterior a la fecha actual.");
@@ -135,23 +136,22 @@ namespace Inmobiliaria.Controllers
                 {
                     try
                     { 
-                        Inmueble inmueble = repositorioInmueble.ObtenerPorId(reserva.IdInmueble);
+                        Inmueble? inmueble = repoInmueble.ObtenerPorId(entidad.IdInmueble);
                         if (inmueble == null) 
                         { 
                             ModelState.AddModelError("IdInmueble", "El inmueble seleccionado no es válido o no existe."); 
                         }
-                        if (inmueble != null && repositorioReserva.ExisteSolapamiento(reserva)) 
+                        if (inmueble != null && repoReserva.ExisteSolapamiento(entidad)) 
                         {
                             ModelState.AddModelError("", "El inmueble seleccionado ya se encuentra reservado en el rango de fechas elegido."); 
                         } 
                         if (!ModelState.IsValid)
                         { 
-                            ViewBag.Inmuebles = repositorioInmueble.ObtenerTodos(); 
-                            ViewBag.Inquilinos = repositorioInquilino.ObtenerTodos(); 
-                            return View(reserva); 
+                            SetViewBag(entidad);
+                            return View(entidad); 
                         }  
-                        reserva.PrecioPorDia = inmueble.Precio;
-                        repositorioReserva.Alta(reserva, inmueble.PorcentajeSena, inmueble.Precio); 
+                        entidad.MontoPorDia = inmueble.PrecioPorDia;
+                        repoReserva.Alta(entidad); 
                         TempData["Mensaje"] = "Reserva creada exitosamente y pago de seña registrado."; 
                         return RedirectToAction(nameof(Index));
                     }
@@ -225,14 +225,14 @@ namespace Inmobiliaria.Controllers
             if (!pagoEfectuado) 
             { 
                 ModelState.AddModelError("", "No se puede finalizar la reserva si no se confirma el cobro de la multa en el momento."); 
-                var reserva = repositorioReserva.ObtenerPorId(idReserva); 
+                var reserva = repoReserva.ObtenerPorId(idReserva); 
                 ViewBag.MontoMulta = montoMulta; 
                 return View(reserva); 
             } 
             try 
             { 
                 int idUsuarioLogueado = User.Identity.IsAuthenticated ? Convert.ToInt32(User.FindFirst("Id")?.Value ?? "1") : 1;
-                bool resultado = repositorioReserva.RegistrarTerminacionAnticipadaConPago( idReserva, fechaTerminacion, montoMulta, idUsuarioLogueado ); 
+                bool resultado = repoReserva.RegistrarTerminacionAnticipadaConPago( idReserva, fechaTerminacion, montoMulta, idUsuarioLogueado ); 
                 if (resultado) 
                 { 
                     TempData["Mensaje"] = "La reserva se finalizó correctamente y el pago de la multa fue registrado."; 
@@ -243,14 +243,14 @@ namespace Inmobiliaria.Controllers
             { 
                 ModelState.AddModelError("", "Ocurrió un error al procesar la transacción: " + ex.Message); 
             } 
-            var reservaOriginal = repositorioReserva.ObtenerPorId(idReserva); 
+            var reservaOriginal = repoReserva.ObtenerPorId(idReserva); 
             ViewBag.MontoMulta = montoMulta;
             return View(reservaOriginal); 
         }
     [HttpGet] 
         public IActionResult Renovar(int id) 
         { 
-            var reservaOriginal = repositorioReserva.ObtenerPorId(id);
+            var reservaOriginal = repoReserva.ObtenerPorId(id);
             if (reservaOriginal == null) 
             {
                 return NotFound("La reserva original no existe."); 
@@ -259,8 +259,8 @@ namespace Inmobiliaria.Controllers
             { 
                 IdInmueble = reservaOriginal.IdInmueble,
                 IdInquilino = reservaOriginal.IdInquilino, 
-                Inmueble = reservaOriginal.Inmueble, 
-                Inquilino = reservaOriginal.Inquilino,
+                InmuebleAsociado = reservaOriginal.InmuebleAsociado, 
+                InquilinoAsociado = reservaOriginal.InquilinoAsociado,
                 FechaDesde = reservaOriginal.FechaHasta, 
                 FechaHasta = reservaOriginal.FechaHasta.AddDays(1) 
                 }; 
@@ -275,24 +275,25 @@ namespace Inmobiliaria.Controllers
             { 
                 ModelState.AddModelError("FechaHasta", "La fecha de finalización debe ser posterior a la fecha de inicio de la extensión."); 
                 }
-            var inmueble = repositorioInmueble.ObtenerPorId(nuevaReserva.IdInmueble); 
+            var inmueble = repoInmueble.ObtenerPorId(nuevaReserva.IdInmueble); 
             if (inmueble == null) 
             {
                 ModelState.AddModelError("", "El inmueble asociado no fue encontrado."); 
             } 
-            if (inmueble != null && repositorioReserva.ExisteSolapamiento(nuevaReserva)) 
+            if (inmueble != null && repoReserva.ExisteSolapamiento(nuevaReserva)) 
             { 
                 ModelState.AddModelError("", "No se puede extender la reserva: el inmueble ya posee otra reserva confirmada en las fechas seleccionadas."); 
             } 
             if (!ModelState.IsValid) 
             {
-                ViewBag.ReservaOriginal = repositorioReserva.ObtenerPorId(nuevaReserva.IdReserva); 
-                if (inmueble != null) nuevaReserva.Inmueble = inmueble; 
-                nuevaReserva.Inquilino = repositorioInquilino.ObtenerPorId(nuevaReserva.IdInquilino);
+                ViewBag.ReservaOriginal = repoReserva.ObtenerPorId(nuevaReserva.IdReserva); 
+                if (inmueble != null) nuevaReserva.InmuebleAsociado = inmueble; 
+                nuevaReserva.InquilinoAsociado = repoInquilino.ObtenerPorId(nuevaReserva.IdInquilino);
                 return View(nuevaReserva); 
             } 
-            nuevaReserva.PrecioPorDia = inmueble.Precio;
-            int nuevoId = repositorioReserva.Alta(nuevaReserva, inmueble.PorcentajeSena, inmueble.Precio); 
+            nuevaReserva.MontoPorDia = inmueble!.PrecioPorDia;
+            nuevaReserva.IdUsuarioCreador = int.Parse(User.FindFirstValue("Id") ?? "0");
+            int nuevoId = repoReserva.Alta(nuevaReserva); 
             TempData["Mensaje"] = $"Reserva extendida exitosamente. Se ha generado un nuevo alquiler (Reserva #{nuevoId})."; 
             return RedirectToAction(nameof(Index)); 
         }

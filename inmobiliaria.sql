@@ -46,6 +46,7 @@ CREATE TABLE Inmueble (
     Latitud DOUBLE NOT NULL,
     Longitud DOUBLE NOT NULL,
     PrecioPorDia DECIMAL(18,2) NOT NULL,
+    PorcentajeSeña DECIMAL(5,2) NOT NULL DEFAULT 0,
     Estado BOOLEAN NOT NULL DEFAULT TRUE,
     ImagenPortada VARCHAR(255),
     IdTipoInmueble INT NOT NULL,

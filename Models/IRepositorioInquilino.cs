@@ -9,6 +9,11 @@ namespace Inmobiliaria.Models
 	public interface IRepositorioInquilino : IRepositorio<Inquilino>
 	{
 		public IList<Inquilino> ObtenerTodos();
-		IList<Inquilino> Buscar(string busqueda);
+		public IList<Inquilino> Buscar(string busqueda);
+
+		public Inquilino? ObtenerPorEmail(string email);
+
+		public IList<Inquilino> BuscarPorNombre(string nombre);
+		
 	}
 }

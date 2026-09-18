@@ -28,49 +28,49 @@ namespace Inmobiliaria.Controllers
 			this.logger = logger;
 		}     
         [Route("[controller]/Index")]
-public ActionResult Index(string buscar, int pagina = 1)
-{
-    try
-    {
-        var tamaño = 5; 
-        
-        ViewBag.Buscar = buscar; 
-        ViewBag.Pagina = pagina;
+		public ActionResult Index(string buscar, int pagina = 1)
+		{
+			try
+			{
+				var tamaño = 5; 
+				
+				ViewBag.Buscar = buscar; 
+				ViewBag.Pagina = pagina;
 
-        IList<Inquilino> lista; 
-        int totalRegistros;
+				IList<Inquilino> lista; 
+				int totalRegistros;
 
-        if (string.IsNullOrEmpty(buscar))
-        {
-            lista = repositorio.ObtenerLista(Math.Max(pagina, 1), tamaño);
-            totalRegistros = repositorio.ObtenerCantidad();
-        }
-        else
-        {
-            var listaFiltrada = repositorio.Buscar(buscar); 
-            
-            totalRegistros = listaFiltrada.Count;
+				if (string.IsNullOrEmpty(buscar))
+				{
+					lista = repositorio.ObtenerLista(Math.Max(pagina, 1), tamaño);
+					totalRegistros = repositorio.ObtenerCantidad();
+				}
+				else
+				{
+					var listaFiltrada = repositorio.Buscar(buscar); 
+					
+					totalRegistros = listaFiltrada.Count;
 
-            lista = listaFiltrada
-                        .Skip((Math.Max(pagina, 1) - 1) * tamaño)
-                        .Take(tamaño)
-                        .ToList();
-        }
+					lista = listaFiltrada
+								.Skip((Math.Max(pagina, 1) - 1) * tamaño)
+								.Take(tamaño)
+								.ToList();
+				}
 
-        ViewBag.TotalPaginas = totalRegistros % tamaño == 0 ? totalRegistros / tamaño : totalRegistros / tamaño + 1;
-        ViewBag.Id = TempData["Id"];
+				ViewBag.TotalPaginas = totalRegistros % tamaño == 0 ? totalRegistros / tamaño : totalRegistros / tamaño + 1;
+				ViewBag.Id = TempData["Id"];
 
-        if (TempData.ContainsKey("Mensaje"))
-            ViewBag.Mensaje = TempData["Mensaje"];
-            
-        return View(lista);
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "Error en Index");
-        throw;
-    }
-}
+				if (TempData.ContainsKey("Mensaje"))
+					ViewBag.Mensaje = TempData["Mensaje"];
+					
+				return View(lista);
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error en Index");
+				throw;
+			}
+		}
 		[Authorize]
 		public ActionResult Create()
 		{
@@ -85,10 +85,10 @@ public ActionResult Index(string buscar, int pagina = 1)
 			}
 		}
 
-[Authorize]
-[HttpPost]
-[ValidateAntiForgeryToken]
-public ActionResult Create(Inquilino inquilino)
+		[Authorize]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public ActionResult Create(Inquilino inquilino)
 {
     try
     {
@@ -189,17 +189,18 @@ public ActionResult Create(Inquilino inquilino)
 				throw;
 			}
 		}
-	[Authorize]
-    public IActionResult Details(int id)
-		{
-    	var inquilino = repositorio.ObtenerPorId(id); 
-   		 if (inquilino == null)
-   		 {
-       		 return NotFound();
- 		   }	
-    	return View(inquilino);
-    	}
-	}	
+		
+		[Authorize]
+		public IActionResult Details(int id)
+			{
+			var inquilino = repositorio.ObtenerPorId(id); 
+			if (inquilino == null)
+			{
+				return NotFound();
+			}	
+			return View(inquilino);
+			}
+		}	
 }
 
 

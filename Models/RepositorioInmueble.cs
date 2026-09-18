@@ -18,8 +18,8 @@ public int Alta(Inmueble entidad)
     using (var connection = new MySqlConnection(connectionString))
     {
         string sql = @"INSERT INTO Inmueble 
-                    (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, Estado, ImagenPortada, IdTipoInmueble, IdPropietario) 
-                    VALUES (@direccion, @cupo, @latitud, @longitud, @precio, @estado, @imagen, @idTipo, @idPropietario); 
+                    (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, PorcentajeSeña, Estado, ImagenPortada, IdTipoInmueble, IdPropietario) 
+                    VALUES (@direccion, @cupo, @latitud, @longitud, @precio, @porcentajeSeña, @estado, @imagen, @idTipo, @idPropietario); 
                     SELECT LAST_INSERT_ID();";
         
         using (var command = new MySqlCommand(sql, connection))
@@ -29,6 +29,7 @@ public int Alta(Inmueble entidad)
             command.Parameters.AddWithValue("@latitud", entidad.Latitud);
             command.Parameters.AddWithValue("@longitud", entidad.Longitud);
             command.Parameters.AddWithValue("@precio", entidad.PrecioPorDia);
+            command.Parameters.AddWithValue("@porcentajeSeña", entidad.PorcentajeSeña);
             command.Parameters.AddWithValue("@estado", entidad.Estado);
             command.Parameters.AddWithValue("@imagen", entidad.ImagenPortada ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@idTipo", entidad.IdTipoInmueble);
@@ -79,7 +80,7 @@ public int Alta(Inmueble entidad)
     {
         string sql = @"UPDATE Inmueble 
                     SET Direccion = @direccion, Cupo = @cupo, Latitud = @latitud, Longitud = @longitud, 
-                    PrecioPorDia = @precio, Estado = @estado, ImagenPortada = @imagen, 
+                    PrecioPorDia = @precio, PorcentajeSeña = @porcentajeSeña, Estado = @estado, ImagenPortada = @imagen, 
                     IdTipoInmueble = @idTipo, IdPropietario = @idPropietario 
                     WHERE IdInmueble = @id";
         
@@ -90,6 +91,7 @@ public int Alta(Inmueble entidad)
             command.Parameters.AddWithValue("@latitud", entidad.Latitud);
             command.Parameters.AddWithValue("@longitud", entidad.Longitud);
             command.Parameters.AddWithValue("@precio", entidad.PrecioPorDia);
+            command.Parameters.AddWithValue("@porcentajeSeña", entidad.PorcentajeSeña);
             command.Parameters.AddWithValue("@estado", entidad.Estado);
             command.Parameters.AddWithValue("@imagen", entidad.ImagenPortada ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@idTipo", entidad.IdTipoInmueble);
@@ -125,7 +127,8 @@ public int Alta(Inmueble entidad)
     {
         string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, i.PrecioPorDia, i.Estado, i.ImagenPortada,
                             i.IdTipoInmueble, t.Nombre AS TipoNombre,
-                            i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
+                            i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido,
+                            i.PorcentajeSeña
                     FROM Inmueble i
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
                     INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario";
@@ -145,6 +148,7 @@ public int Alta(Inmueble entidad)
                         Latitud = reader.GetDouble(3),
                         Longitud = reader.GetDouble(4),
                         PrecioPorDia = reader.GetDecimal(5),
+                        PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
                         Estado = reader.GetBoolean(6),
                         ImagenPortada = reader.IsDBNull(7) ? null : reader.GetString(7),
                         IdTipoInmueble = reader.GetInt32(8),
@@ -177,7 +181,8 @@ public int Alta(Inmueble entidad)
     {
         string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, i.PrecioPorDia, i.Estado, i.ImagenPortada,
                             i.IdTipoInmueble, t.Nombre AS TipoNombre,
-                            i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
+                            i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido,
+                            i.PorcentajeSeña
                     FROM Inmueble i
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
                     INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
@@ -199,6 +204,7 @@ public int Alta(Inmueble entidad)
                         Latitud = reader.GetDouble(3),
                         Longitud = reader.GetDouble(4),
                         PrecioPorDia = reader.GetDecimal(5),
+                        PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
                         Estado = reader.GetBoolean(6),
                         ImagenPortada = reader.IsDBNull(7) ? null : reader.GetString(7),
                         IdTipoInmueble = reader.GetInt32(8),
@@ -229,7 +235,8 @@ public int Alta(Inmueble entidad)
     {
         string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, i.PrecioPorDia, i.Estado, i.ImagenPortada,
                             i.IdTipoInmueble, t.Nombre AS TipoNombre,
-                            i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
+                            i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido,
+                            i.PorcentajeSeña
                     FROM Inmueble i
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
                     INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
@@ -252,6 +259,7 @@ public int Alta(Inmueble entidad)
                         Latitud = reader.GetDouble(3),
                         Longitud = reader.GetDouble(4),
                         PrecioPorDia = reader.GetDecimal(5),
+                        PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
                         Estado = reader.GetBoolean(6),
                         ImagenPortada = reader.IsDBNull(7) ? null : reader.GetString(7),
                         IdTipoInmueble = reader.GetInt32(8),
@@ -283,7 +291,8 @@ public IList<Inmueble> ObtenerPorPropietario(int idPropietario)
             
             string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, i.PrecioPorDia, i.Estado, i.ImagenPortada,
                                 i.IdTipoInmueble, t.Nombre AS TipoNombre,
-                                i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido
+                                i.IdPropietario, p.Nombre AS PropNombre, p.Apellido AS PropApellido,
+                                i.PorcentajeSeña
                         FROM Inmueble i
                         INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
                         INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
@@ -305,6 +314,7 @@ public IList<Inmueble> ObtenerPorPropietario(int idPropietario)
                             Latitud = reader.GetDouble(3),
                             Longitud = reader.GetDouble(4),
                             PrecioPorDia = reader.GetDecimal(5),
+                            PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
                             Estado = reader.GetBoolean(6),
                             ImagenPortada = reader.IsDBNull(7) ? null : reader.GetString(7),
                             IdTipoInmueble = reader.GetInt32(8),
@@ -327,7 +337,8 @@ public IList<Inmueble> Buscar(string busqueda)
         string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
                             i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
                             p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
-                            t.Nombre AS TipoNombre
+                            t.Nombre AS TipoNombre,
+                            i.PorcentajeSeña
                     FROM Inmueble i
                     INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
                     INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
@@ -349,6 +360,7 @@ public IList<Inmueble> Buscar(string busqueda)
                         Latitud = reader.GetDouble(nameof(Inmueble.Latitud)),
                         Longitud = reader.GetDouble(nameof(Inmueble.Longitud)),
                         PrecioPorDia = reader.GetDecimal(nameof(Inmueble.PrecioPorDia)),
+                        PorcentajeSeña = reader.GetDecimal(nameof(Inmueble.PorcentajeSeña)),
                         Estado = reader.GetBoolean(nameof(Inmueble.Estado)),
                         ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString(nameof(Inmueble.ImagenPortada)),
                         IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),

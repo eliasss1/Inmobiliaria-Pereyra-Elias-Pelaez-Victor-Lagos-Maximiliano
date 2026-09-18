@@ -42,5 +42,5 @@ public class Inmueble
 
     public override string ToString() => $"{Direccion} - Cupo: {Cupo}";
 
-    public decimal PorcentajeSena { get; set; }
+    public decimal PorcentajeSeña { get; set; }
 }

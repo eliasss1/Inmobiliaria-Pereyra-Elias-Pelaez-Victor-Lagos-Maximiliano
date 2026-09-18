@@ -10,11 +10,13 @@ namespace Inmobiliaria.Controllers;
 public class UsuarioController : Controller
 {
     private readonly IRepositorioUsuario repo;
+    private readonly IWebHostEnvironment env;
 
-    public UsuarioController(IRepositorioUsuario _repo)
-    {
-        repo = _repo;
-    }
+    public UsuarioController(IRepositorioUsuario _repo, IWebHostEnvironment _env)
+{
+    repo = _repo;
+    env = _env;
+}
 
     public ActionResult Login()
     {
@@ -105,7 +107,7 @@ public class UsuarioController : Controller
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Perfil(Usuario e)
+    public async Task<IActionResult> Perfil(Usuario e, IFormFile? avatarFile)
     {
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -115,6 +117,27 @@ public class UsuarioController : Controller
 
         if (ModelState.IsValid)
         {               
+            if (avatarFile != null && avatarFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(env.WebRootPath, "img", "avatars");
+                if (!Directory.Exists(uploadsFolder)) 
+                    Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + avatarFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await avatarFile.CopyToAsync(fileStream);
+                }
+
+                e.Avatar = "/img/avatars/" + uniqueFileName;
+            }
+            else
+            {
+                var usuarioAnterior = repo.ObtenerPorId(e.IdUsuario);
+                e.Avatar = usuarioAnterior.Avatar;
+            }
             repo.Modificacion(e);
             return RedirectToAction(nameof(Perfil));
         }
