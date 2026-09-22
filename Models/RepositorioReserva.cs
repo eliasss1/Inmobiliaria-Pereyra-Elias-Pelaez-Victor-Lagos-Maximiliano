@@ -409,7 +409,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
         string sql = 
-            @"SELECT COUNT(\*) 
+            @"SELECT COUNT(*) 
             FROM Reserva 
             WHERE IdInmueble = @IdInmueble 
             AND IdReserva != @IdReserva 

@@ -25,7 +25,7 @@
             </div>
             
         </div>
-        <form id="infoParaEditar" method="post"  asp-controller="Usuario" asp-action="Perfil" class="d-flex justify-content-center align-items-center d-none">
+        <form id="infoParaEditar" method="post"  enctype="multipart/form-data" asp-controller="Usuario" asp-action="Perfil" class="d-flex justify-content-center align-items-center d-none">
             <label for="avatarFile" class="burbuja-foto m-5 overflow-hidden d-flex justify-content-center align-items-center" style="cursor: pointer; position: relative;">
                 <img id="previewAvatar" src="@(string.IsNullOrEmpty(Model.Avatar) ? "/img/mr-musculo.png" : Model.Avatar)" class="w-100 h-100" style="object-fit: cover;" alt="Avatar" />
 
@@ -226,7 +226,7 @@
         const apellidoActual = apellidoEdit.innerText.trim();
         const emailActual  = emailEdit.innerText.trim();
 
-        if(nombreActual !== n || apellidoActual !== a || emailActual !== e || ){
+        if(nombreActual !== n || apellidoActual !== a || emailActual !== e){
             cambios = true;
         }
 

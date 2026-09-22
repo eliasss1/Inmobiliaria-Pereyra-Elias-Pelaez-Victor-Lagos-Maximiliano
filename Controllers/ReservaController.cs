@@ -27,41 +27,41 @@ namespace Inmobiliaria.Controllers
         }
 
         public ActionResult Index(string buscar, int pagina = 1)
-{
-    try
-    {
-        var tamaño = 5;
-        ViewBag.Buscar = buscar;
-        ViewBag.Pagina = pagina;
-
-        IList<Reserva> lista;
-        int totalRegistros;
-
-        if (string.IsNullOrEmpty(buscar))
         {
-            lista = repoReserva.ObtenerLista(Math.Max(pagina, 1), tamaño);
-            totalRegistros = repoReserva.ObtenerCantidad();
-        }
-        else
-        {
-            var listaFiltrada = repoReserva.Buscar(buscar);
-            totalRegistros = listaFiltrada.Count;
-            lista = listaFiltrada.Skip((Math.Max(pagina, 1) - 1) * tamaño).Take(tamaño).ToList();
-        }
+            try
+            {
+                var tamaño = 5;
+                ViewBag.Buscar = buscar;
+                ViewBag.Pagina = pagina;
 
-        ViewBag.TotalPaginas = totalRegistros % tamaño == 0 ? totalRegistros / tamaño : totalRegistros / tamaño + 1;
-        
-        if (TempData.ContainsKey("Mensaje")) ViewBag.Mensaje = TempData["Mensaje"];
-        if (TempData.ContainsKey("Error")) ViewBag.Error = TempData["Error"];
+                IList<Reserva> lista;
+                int totalRegistros;
 
-        return View(lista);
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "Error en Index Reserva");
-        throw;
-    }
-}
+                if (string.IsNullOrEmpty(buscar))
+                {
+                    lista = repoReserva.ObtenerLista(Math.Max(pagina, 1), tamaño);
+                    totalRegistros = repoReserva.ObtenerCantidad();
+                }
+                else
+                {
+                    var listaFiltrada = repoReserva.Buscar(buscar);
+                    totalRegistros = listaFiltrada.Count;
+                    lista = listaFiltrada.Skip((Math.Max(pagina, 1) - 1) * tamaño).Take(tamaño).ToList();
+                }
+
+                ViewBag.TotalPaginas = totalRegistros % tamaño == 0 ? totalRegistros / tamaño : totalRegistros / tamaño + 1;
+                
+                if (TempData.ContainsKey("Mensaje")) ViewBag.Mensaje = TempData["Mensaje"];
+                if (TempData.ContainsKey("Error")) ViewBag.Error = TempData["Error"];
+
+                return View(lista);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error en Index Reserva");
+                throw;
+            }
+        }
 
         [Authorize]
         public ActionResult Edit(int id)
@@ -127,12 +127,19 @@ namespace Inmobiliaria.Controllers
         {
             entidad.IdUsuarioCreador = int.Parse(User.FindFirstValue("Id") ?? "0");
 
-                if (entidad.FechaHasta < entidad.FechaDesde || entidad.FechaDesde < DateTime.Today)
+                if (entidad.FechaHasta < entidad.FechaDesde)
                 {
-                    ModelState.AddModelError("FechaReserva", "Las fechas ingresadas no son válidas. La fecha de inicio debe ser anterior a la fecha de fin y no puede ser anterior a la fecha actual.");
-                    return View(entidad);
+                    ModelState.AddModelError("FechaHasta", "La fecha de fin debe ser posterior a la fecha de inicio.");
+                    SetViewBag(entidad);
+                    return View();
                 }               
-                else 
+                else if(entidad.FechaDesde < DateTime.Today)
+                {
+                    ModelState.AddModelError("FechaDesde", "La fecha de inicio debe ser posterior a la fecha actual.");
+                    SetViewBag(entidad);
+                    return View();
+                }
+                else
                 {
                     try
                     { 
@@ -164,7 +171,7 @@ namespace Inmobiliaria.Controllers
                         return View(entidad);
                     }                  
                 }
-}
+        }
         private void SetViewBag(Reserva? entidad = null)
         {   
             ViewBag.Inquilinos = new SelectList(repoInquilino.ObtenerTodos(), "IdInquilino", "Dni", entidad?.IdInquilino);
