@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
+	[Authorize]
     public class InquilinoController : Controller
     {
 		// Sin inyección de dependencias (crear dentro del ctor)

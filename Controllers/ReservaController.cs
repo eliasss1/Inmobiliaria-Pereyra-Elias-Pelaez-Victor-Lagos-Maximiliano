@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
+    [Authorize]
     public class ReservaController : Controller
     {
         private readonly IRepositorioReserva repoReserva;
         private readonly IRepositorioInquilino repoInquilino;
         private readonly IRepositorioInmueble repoInmueble;
-
         private readonly ILogger<ReservaController> logger;
 
 

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers
 {
+	[Authorize]
     public class PropietarioController : Controller
     {
 		private readonly IRepositorioPropietario repositorio;
