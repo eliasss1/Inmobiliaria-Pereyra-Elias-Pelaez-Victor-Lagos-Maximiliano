@@ -8,12 +8,12 @@ using System;
 namespace Inmobiliaria.Controllers
 {
     [Authorize]
-    public class PagosController : Controller
+    public class PagoController : Controller
     {
         private readonly IRepositorioPago repositorio;
-        private readonly ILogger<PagosController> logger;
+        private readonly ILogger<PagoController> logger;
 
-        public PagosController(IRepositorioPago repo, ILogger<PagosController> logger)
+        public PagoController(IRepositorioPago repo, ILogger<PagoController> logger)
         {
             this.repositorio = repo;
             this.logger = logger;
@@ -57,6 +57,9 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
+                ModelState.Remove(nameof(entidad.Estado));
+                ModelState.Remove(nameof(entidad.IdUsuarioCreador));
+                ModelState.Remove(nameof(entidad.ReservaAsociada));
                 if (ModelState.IsValid)
                 {
                     entidad.IdUsuarioCreador = int.Parse(User.FindFirstValue("Id") ?? "0");
@@ -94,6 +97,11 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Pago entidad)
         {
+            ModelState.Remove(nameof(entidad.Estado));
+            ModelState.Remove(nameof(entidad.IdUsuarioCreador));
+            ModelState.Remove(nameof(entidad.ReservaAsociada));
+            ModelState.Remove(nameof(entidad.FechaPago));
+            ModelState.Remove(nameof(entidad.Importe));
             if (!ModelState.IsValid) return View(entidad);
             
             try
@@ -139,22 +147,75 @@ namespace Inmobiliaria.Controllers
             try
             {
                 var pagoDb = repositorio.ObtenerPorId(id);
-                if (pagoDb != null)
+                if (pagoDb == null)
                 {
-                    pagoDb.Estado = "Anulado";
-                    pagoDb.IdUsuarioAnulador = int.Parse(User.FindFirstValue("Id") ?? "0");
-                    
-                    
-                    repositorio.Modificacion(pagoDb); 
+                    TempData["Error"] = "El pago que intenta anular no existe.";
+                    return RedirectToAction(nameof(Index));
                 }
-                
-                TempData["Mensaje"] = "Pago anulado correctamente";
+                if (pagoDb.Estado == "Anulado")
+                {
+                    TempData["Error"] = "El pago ya se encuentra anulado.";
+                    return RedirectToAction(nameof(Index));
+                }
+                var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("Id");
+                if (string.IsNullOrEmpty(idClaim) || !int.TryParse(idClaim, out int idUsuarioAnulador))
+                {
+                    TempData["Error"] = "No se pudo identificar al usuario administrador para registrar la auditoría.";
+                    return RedirectToAction(nameof(Index));
+                }
+                repositorio.Baja(id, idUsuarioAnulador);
+                TempData["Mensaje"] = "Pago anulado correctamente.";
                 return RedirectToAction(nameof(Index));
+        }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al anular el pago {Id}", id);
+                TempData["Error"] = "Ocurrió un error al intentar anular el pago.";
+                return RedirectToAction(nameof(Index));
+            }
+    }
+        
+        [HttpGet]
+        [Authorize]
+        public ActionResult Details(int id)
+        {
+            try
+            {
+                var entidad = repositorio.ObtenerPorId(id);
+                if (entidad == null)
+                {
+                    return NotFound();
+                }
+                return View(entidad);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error en Eliminar POST");
-                throw;
+                logger.LogError(ex, "Error al obtener los detalles del pago {Id}", id);
+                TempData["Error"] = "Ocurrió un error al cargar los detalles del pago.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+        [HttpGet]
+        [Route("[controller]/PorReserva/{id}")]
+        public ActionResult PorReserva(int id)
+        {
+            try
+            {
+                var lista = repositorio.ObtenerPorReserva(id);
+                
+                // Guardamos el ID de la reserva para poder ofrecer el botón "Cargar nuevo pago"
+                ViewBag.IdReserva = id;
+                if (TempData.ContainsKey("Mensaje"))
+                    ViewBag.Mensaje = TempData["Mensaje"];
+                if (TempData.ContainsKey("Error"))
+                    ViewBag.Error = TempData["Error"];
+                return View(lista); // Busca la vista Views/Pagos/PorReserva.cshtml
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error al obtener los pagos de la reserva {Id}", id);
+                TempData["Error"] = "Ocurrió un error al cargar los pagos de la reserva.";
+                return RedirectToAction(nameof(Index));
             }
         }
     }

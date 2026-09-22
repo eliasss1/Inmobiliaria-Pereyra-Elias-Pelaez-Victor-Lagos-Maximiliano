@@ -18,10 +18,9 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         {
             try
             {
-                string query = @"INSERT INTO Pago (Concepto, FechaPago, Importe, Estado, IdReserva, ReservaAsociada, IdUsuarioCreador, IdUsuarioAnulador)
-                VALUES (@Concepto, @FechaPago, @Importe, @Estado, @IdReserva, @ReservaAsociada, @IdUsuarioCreador, @IdUsuarioAnulador)
-                SELECT LAST_INSERT_ID()";
-
+                string query = @"INSERT INTO Pago (Concepto, FechaPago, Importe, Estado, IdReserva, IdUsuarioCreador)
+                VALUES (@Concepto, @FechaPago, @Importe, @Estado, @IdReserva, @IdUsuarioCreador);
+                SELECT LAST_INSERT_ID();";
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
                     comando.CommandType = CommandType.Text;
@@ -30,9 +29,7 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                     comando.Parameters.AddWithValue("@Importe", p.Importe);
                     comando.Parameters.AddWithValue("@Estado", p.Estado);
                     comando.Parameters.AddWithValue("@IdReserva", p.IdReserva);
-                    comando.Parameters.AddWithValue("@ReservaAsociada", p.ReservaAsociada);
                     comando.Parameters.AddWithValue("@IdUsuarioCreador", p.IdUsuarioCreador);
-                    comando.Parameters.AddWithValue("@IdUsuarioAnulador", p.IdUsuarioAnulador);
                     conexion.Open();
                     res = Convert.ToInt32(comando.ExecuteScalar());
                     p.IdPago = res;
