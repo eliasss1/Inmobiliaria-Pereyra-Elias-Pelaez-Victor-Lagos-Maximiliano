@@ -1,0 +1,35 @@
+@model Inmobiliaria.Models.Usuario
+
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmar Eliminación</h4>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">¿Está seguro de que desea eliminar a este usuario?</h5>
+                    <p class="card-text text-muted mb-4">Esta acción no se puede deshacer.</p>
+                    
+                    <ul class="list-group list-group-flush text-start mb-4">
+                        <li class="list-group-item"><strong>Nombre:</strong> @Model.Nombre @Model.Apellido</li>
+                        <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                        <li class="list-group-item"><strong>Rol:</strong> <span class="badge bg-secondary">@Model.Rol</span></li>
+                    </ul>
+
+                    <form asp-action="Eliminar" method="post">
+                        <input type="hidden" asp-for="IdUsuario" />
+                        <div class="d-flex justify-content-center gap-2">
+                            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Sí, Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

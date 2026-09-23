@@ -58,9 +58,13 @@
                 <text>Listado de Inmuebles</text>
             }
         </h2>
-        <a asp-controller="Inmueble" asp-action="Create" class="btn btn-primary shadow-sm">
-            Crear Nuevo Inmueble
-        </a>
+        
+        @if (ViewBag.IdPropietario != null)
+        {
+            <a asp-controller="Inmueble" asp-action="Create" asp-route-idPropietario="@ViewBag.IdPropietario" class="btn btn-primary shadow-sm">
+                Crear Nuevo Inmueble
+            </a>
+        }
     </div>
 
     <div class="table-responsive shadow-sm">

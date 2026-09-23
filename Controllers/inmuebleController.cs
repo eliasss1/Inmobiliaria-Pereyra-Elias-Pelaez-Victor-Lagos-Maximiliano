@@ -136,11 +136,14 @@ namespace Inmobiliaria.Controllers
         {
             try
             {
-                var inmueble = new Inmueble();
-                if (idPropietario.HasValue)
+                if (!idPropietario.HasValue)
                 {
-                    inmueble.IdPropietario = idPropietario.Value; 
+                    TempData["Error"] = "Debe crear el inmueble desde la vista de un propietario.";
+                    return RedirectToAction("Index", "Propietario");
                 }
+
+                var inmueble = new Inmueble();
+                inmueble.IdPropietario = idPropietario.Value; 
 
                 var repoTipos = new RepositorioTipoInmueble(config);
                 

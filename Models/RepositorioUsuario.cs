@@ -190,8 +190,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                                 SELECT IdUsuario, Nombre, Apellido, Email, Avatar, Rol
                                 FROM Usuario
                                 ORDER BY IdUsuario
-                                OFFSET {(paginaNro - 1) * tamPagina} ROW 
-                                FETCH NEXT {tamPagina} ROWS ONLY
+                                LIMIT {tamPagina} OFFSET {(paginaNro - 1) * tamPagina}
                 ";
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {

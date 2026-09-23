@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -17,9 +17,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm box-shadow mb-3" style="border-bottom: 1px solid #2b2f69;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark box-shadow mb-3" style="background-color: #2b2f69;">
             <div class="container-fluid">
-                <a class="navbar-brand" style="color: #1520c0; font-weight: bold;" asp-area="" asp-controller="Home" asp-action="Index">InmobiliariaEMV</a>
+                <a class="navbar-brand" style="color: #ffffff; font-weight: bold;" asp-area="" asp-controller="Home" asp-action="Index">InmobiliariaEMV</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -27,29 +27,14 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Propietario" asp-action="Index">Propietarios</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Inquilino" asp-action="Index">Inquilinos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Inmueble" asp-action="Index">Inmuebles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="TipoInmueble" asp-action="Index">Tipos de Inmuebles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Reserva" asp-action="Index">Reserva</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                 </div>
-                <div class="d-flex justify-content-end">
+                <div class="d-flex justify-content-end align-items-center">
 
                     <button id="theme-toggle-btn" class="btn btn-secondary me-2">
                         <i id="theme-icon" class="bi bi-brightness-high-fill"></i>
@@ -58,22 +43,18 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <div class="d-flex align-items-center justify-content-between">
-                            <span class="navbar-text me-3 ms-3">Bienvenido, @User.Identity.Name</span>
+                            <span class="navbar-text text-white me-3 ms-3">Bienvenido, @User.Identity.Name</span>
                             <form asp-controller="Usuario" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
+                                <button type="submit" class="btn btn-link nav-link text-white">Cerrar Sesión</button>
                             </form>
                         </div>
-                        
                     }
                     else
                     {
                         <div class="d-flex justify-content-end gap-1">
-                            <a class="btn btn-primary" asp-controller="Usuario" asp-action="login">Iniciar Sesion</a>
-                            <a class="btn btn-warning" asp-controller="Usuario" asp-action="Registrar">Registrarse</a>
+                            <a class="btn btn-light" asp-controller="Usuario" asp-action="login">Iniciar Sesion</a>
                         </div>
                     }
-
-                    
 
                 </div>
             </div>

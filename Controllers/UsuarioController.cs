@@ -96,6 +96,83 @@ public class UsuarioController : Controller
         return View(entidad);
     }
 
+    [Authorize(Roles = "Administrador")]
+    public ActionResult Index(int pagina = 1)
+    {
+        var tamaño = 10;
+        var lista = repo.ObtenerLista(pagina, tamaño);
+        int total = repo.ObtenerCantidad();
+        ViewBag.TotalPaginas = total % tamaño == 0 ? total / tamaño : (total / tamaño) + 1;
+        ViewBag.Pagina = pagina;
+        if (TempData.ContainsKey("Mensaje")) ViewBag.Mensaje = TempData["Mensaje"];
+        return View(lista);
+    }
+
+    [Authorize(Roles = "Administrador")]
+    public ActionResult Create()
+    {
+        return View();
+    }
+
+    [Authorize(Roles = "Administrador")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Create(Usuario entidad)
+    {
+        if (ModelState.IsValid)
+        {
+            entidad.Clave = SeguridadHelper.HashearClave(entidad.Clave);
+            repo.Alta(entidad);
+            TempData["Mensaje"] = "Usuario creado exitosamente.";
+            return RedirectToAction(nameof(Index));
+        }
+        return View(entidad);
+    }
+
+    [Authorize(Roles = "Administrador")]
+    public ActionResult Edit(int id)
+    {
+        var e = repo.ObtenerPorId(id);
+        if (e == null) return RedirectToAction(nameof(Index));
+        return View(e);
+    }
+
+    [Authorize(Roles = "Administrador")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Edit(int id, Usuario entidad)
+    {
+        ModelState.Remove(nameof(entidad.Clave));
+        if (ModelState.IsValid)
+        {
+            entidad.IdUsuario = id;
+            var u = repo.ObtenerPorId(id);
+            entidad.Avatar = u.Avatar; 
+            repo.Modificacion(entidad);
+            TempData["Mensaje"] = "Usuario modificado exitosamente.";
+            return RedirectToAction(nameof(Index));
+        }
+        return View(entidad);
+    }
+
+    [Authorize(Roles = "Administrador")]
+    public ActionResult Eliminar(int id)
+    {
+        var e = repo.ObtenerPorId(id);
+        if (e == null) return RedirectToAction(nameof(Index));
+        return View(e);
+    }
+
+    [Authorize(Roles = "Administrador")]
+    [HttpPost, ActionName("Eliminar")]
+    [ValidateAntiForgeryToken]
+    public ActionResult ConfirmarEliminar(int id)
+    {
+        repo.Baja(id);
+        TempData["Mensaje"] = "Usuario eliminado exitosamente.";
+        return RedirectToAction(nameof(Index));
+    }
+
     [Authorize]
     public IActionResult Perfil()
     {

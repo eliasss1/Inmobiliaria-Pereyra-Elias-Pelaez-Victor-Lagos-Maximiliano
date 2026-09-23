@@ -62,18 +62,19 @@ CREATE TABLE IF NOT EXISTS Reserva (
     IdInquilino INT NOT NULL,
     FechaDesde DATE NOT NULL,
     FechaHasta DATE NOT NULL,
-    MontoPorDia DECIMAL(10,2) NOT NULL,
-    Estado VARCHAR(50) DEFAULT 'Vigente',
-    FechaEfectivaTerminacion DATE NULL,
-    IdUsuarioCreador INT NOT NULL, 
-    IdUsuarioTerminador INT NULL,
+    MontoPorDia DECIMAL(18,2) NOT NULL,
+    Multa DECIMAL(18,2) NULL,
+    FechaEfectivaTerminacion DATETIME NULL,
     FechaRealTerminacion DATETIME NULL,
     Estado INT NOT NULL DEFAULT 1,
+    IdUsuarioCreador INT NOT NULL, 
+    IdUsuarioTerminador INT NULL,
     IdUsuarioTerminacion INT NULL,  
     FOREIGN KEY (IdInmueble) REFERENCES Inmueble(IdInmueble) ON DELETE RESTRICT,
     FOREIGN KEY (IdInquilino) REFERENCES Inquilino(IdInquilino) ON DELETE RESTRICT,
     FOREIGN KEY (IdUsuarioCreador) REFERENCES Usuario(IdUsuario) ON DELETE RESTRICT,
-    FOREIGN KEY (IdUsuarioTerminador) REFERENCES Usuario(IdUsuario) ON DELETE RESTRICT
+    FOREIGN KEY (IdUsuarioTerminador) REFERENCES Usuario(IdUsuario) ON DELETE RESTRICT,
+    FOREIGN KEY (IdUsuarioTerminacion) REFERENCES Usuario(IdUsuario) ON DELETE RESTRICT
 );
 
 -- TABLA PAGO 
@@ -103,10 +104,14 @@ INSERT INTO Inquilino (Nombre, Apellido, Dni, Telefono, Email) VALUES
 
 -- Usuario administrador
 INSERT INTO Usuario (Nombre, Apellido, Email, Clave, Rol) VALUES
-('Admin', 'Principal', 'admin@inmobiliaria.com', 'admin123', 'Administrador');
+('Admin', 'Principal', 'admin@inmobiliaria.com', 'QRtmeYlpSnMaa/AAbPiCFCABqFvDw5iujZqs9xROCU4=', 'Administrador');
 
--- Tipos de inmueble iniciales
 INSERT INTO TipoInmueble (Nombre) VALUES
 ('Casa'),
 ('Departamento'),
-('Monoambiente'),
+('Monoambiente');
+
+INSERT INTO Inmueble (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, PorcentajeSeña, Estado, ImagenPortada, IdTipoInmueble, IdPropietario) VALUES
+('Calle Falsa 123', 3, 120, 120, 1000, 0.2, TRUE, 'casa.jpg', 1, 1),
+('Avenida Falsa 456', 2, 80, 80, 6000, 0.15, TRUE, 'departamento.jpg', 2, 2),
+('Calle Falsa 789', 1, 50, 50, 3000, 0.1, TRUE, 'monoambiente.jpg', 3, 3);
