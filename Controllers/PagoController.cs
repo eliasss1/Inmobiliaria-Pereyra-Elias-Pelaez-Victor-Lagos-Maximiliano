@@ -108,7 +108,6 @@ namespace Inmobiliaria.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Pago entidad)
         {
-            ModelState.Remove(nameof(entidad.Estado));
             ModelState.Remove(nameof(entidad.IdUsuarioCreador));
             ModelState.Remove(nameof(entidad.ReservaAsociada));
             ModelState.Remove(nameof(entidad.FechaPago));
@@ -122,8 +121,24 @@ namespace Inmobiliaria.Controllers
                 
                 pagoOriginal.Concepto = entidad.Concepto;
                 
+                // Si el estado cambia a Anulado desde la edición, podríamos querer registrar quién lo anuló, 
+                // pero por ahora solo actualizamos el estado.
+                if (entidad.Estado == "Anulado" && pagoOriginal.Estado != "Anulado")
+                {
+                    var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("Id");
+                    if (int.TryParse(idClaim, out int idUsuarioAnulador))
+                    {
+                        pagoOriginal.IdUsuarioAnulador = idUsuarioAnulador;
+                    }
+                }
+                else if (entidad.Estado == "Activo" && pagoOriginal.Estado == "Anulado")
+                {
+                    pagoOriginal.IdUsuarioAnulador = null;
+                }
+                pagoOriginal.Estado = entidad.Estado;
+
                 repositorio.Modificacion(pagoOriginal);
-                TempData["Mensaje"] = "Concepto modificado correctamente";
+                TempData["Mensaje"] = "Pago modificado correctamente";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -220,7 +235,7 @@ namespace Inmobiliaria.Controllers
                     ViewBag.Mensaje = TempData["Mensaje"];
                 if (TempData.ContainsKey("Error"))
                     ViewBag.Error = TempData["Error"];
-                return View(lista); // Busca la vista Views/Pagos/PorReserva.cshtml
+                return View("Index", lista);
             }
             catch (Exception ex)
             {

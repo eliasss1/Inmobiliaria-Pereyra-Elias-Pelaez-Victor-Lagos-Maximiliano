@@ -63,6 +63,37 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+        [Route("[controller]/Vigentes")]
+        public ActionResult Vigentes(DateTime? inicio, DateTime? fin)
+        {
+            if (!inicio.HasValue || !fin.HasValue)
+            {
+                ViewBag.MostrarFormFechas = true;
+                ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
+                return View("Index", new List<Reserva>());
+            }
+
+            var lista = repoReserva.ObtenerVigentes(inicio, fin);
+            ViewBag.FiltroActivo = $"Vigentes entre {inicio.Value.ToShortDateString()} y {fin.Value.ToShortDateString()}";
+            ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
+            return View("Index", lista);
+        }
+
+        [Route("[controller]/TerminanEnXDias")]
+        public ActionResult TerminanEnXDias(int? dias)
+        {
+            if (!dias.HasValue)
+            {
+                ViewBag.MostrarFormDias = true;
+                ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
+                return View("Index", new List<Reserva>());
+            }
+            var lista = repoReserva.ObtenerTerminanEnXDias(dias.Value);
+            ViewBag.FiltroActivo = $"Terminan en los próximos {dias.Value} días";
+            ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
+            return View("Index", lista);
+        }
+
         [Authorize]
         public ActionResult Edit(int id)
         {

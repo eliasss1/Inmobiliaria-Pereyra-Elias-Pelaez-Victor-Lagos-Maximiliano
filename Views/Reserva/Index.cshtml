@@ -6,14 +6,57 @@
 
 <div class="container mt-4">
 
-    <form asp-controller="Reserva" asp-action="Index" method="get" class="mb-3 d-flex">
-        <input type="text" name="buscar" class="form-control me-2" placeholder="Buscar por Apellido de inquilino o Dirección..." value="@ViewBag.Buscar" />
-        <button type="submit" class="btn btn-outline-secondary me-2">Buscar</button>
+    <form asp-controller="Reserva" asp-action="Index" method="get" class="mb-3 d-flex flex-wrap gap-2">
+        <input type="text" name="buscar" class="form-control" style="width: auto; flex-grow: 1;" placeholder="Buscar por Apellido de inquilino o Dirección..." value="@ViewBag.Buscar" />
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
         <a asp-controller="Reserva" asp-action="Index" class="btn btn-outline-danger">Limpiar</a>
+
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle" type="button" id="informesReservas" data-bs-toggle="dropdown" aria-expanded="false">
+                Informes
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="informesReservas">
+                <li><a class="dropdown-item" asp-action="Vigentes">Reservas vigentes (entre fechas)</a></li>
+                <li><a class="dropdown-item" asp-action="TerminanEnXDias">Reservas que terminan en X días</a></li>
+            </ul>
+        </div>
     </form>
 
+    @if (ViewBag.MostrarFormFechas == true)
+    {
+        <div class="card mb-3 p-3 bg-light">
+            <form asp-action="Vigentes" method="get" class="row g-3 align-items-center">
+                <div class="col-auto"><label class="col-form-label fw-bold">Fecha Inicio:</label></div>
+                <div class="col-auto"><input type="date" name="inicio" class="form-control" required /></div>
+                <div class="col-auto"><label class="col-form-label fw-bold">Fecha Fin:</label></div>
+                <div class="col-auto"><input type="date" name="fin" class="form-control" required /></div>
+                <div class="col-auto"><button type="submit" class="btn btn-success">Ver Reservas Vigentes</button></div>
+            </form>
+        </div>
+    }
+
+    @if (ViewBag.MostrarFormDias == true)
+    {
+        <div class="card mb-3 p-3 bg-light">
+            <form asp-action="TerminanEnXDias" method="get" class="row g-3 align-items-center">
+                <div class="col-auto"><label class="col-form-label fw-bold">Cantidad de días:</label></div>
+                <div class="col-auto"><input type="number" name="dias" class="form-control" placeholder="Ej: 30" required min="1" /></div>
+                <div class="col-auto"><button type="submit" class="btn btn-success">Ver Reservas</button></div>
+            </form>
+        </div>
+    }
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Listado de Reservas</h2>
+        <h2 class="text-primary">
+            @if (ViewBag.FiltroActivo != null)
+            {
+                <text>Reservas - @ViewBag.FiltroActivo</text>
+            }
+            else
+            {
+                <text>Listado de Reservas</text>
+            }
+        </h2>
         <a asp-controller="Reserva" asp-action="Create" class="btn btn-primary shadow-sm">
             Crear Nueva Reserva
         </a>
@@ -88,6 +131,7 @@
                             </td>
                             <td>
                                 <a asp-action="Edit" asp-route-id="@r.IdReserva" class="btn btn-warning btn-sm">Editar</a>
+                                <a asp-controller="Pago" asp-action="PorReserva" asp-route-id="@r.IdReserva" class="btn btn-info btn-sm">Pagos</a>
                                 <form asp-action="Eliminar" asp-route-id="@r.IdReserva" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres eliminar esta reserva?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                 </form>

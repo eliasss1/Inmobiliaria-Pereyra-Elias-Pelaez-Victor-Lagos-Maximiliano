@@ -1,0 +1,39 @@
+@model Inmobiliaria.Models.Pago
+
+<h2>Detalles del Pago</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">ID</dt>
+        <dd class="col-sm-9">@Model.IdPago</dd>
+
+        <dt class="col-sm-3">Concepto</dt>
+        <dd class="col-sm-9">@Model.Concepto</dd>
+
+        <dt class="col-sm-3">FechaPago</dt>
+        <dd class="col-sm-9">@Model.FechaPago.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Importe</dt>
+        <dd class="col-sm-9">@Model.Importe</dd>
+
+        <dt class="col-sm-3">Estado</dt>
+        <dd class="col-sm-9">@Model.Estado</dd>
+
+        <dt class="col-sm-3">ID de Reserva</dt>
+        <dd class="col-sm-9">@Model.IdReserva</dd>
+        @if (User.IsInRole("Administrador"))
+        {
+            <dt class="col-sm-3">Creado Por (Usuario Id)</dt>
+            <dd class="col-sm-9">@Model.IdUsuarioCreador</dd>
+            @if(Model.IdUsuarioAnulador != null)
+            {
+                <dt class="col-sm-3">Anulado Por (Usuario Id)</dt>
+                <dd class="col-sm-9">@Model.IdUsuarioAnulador</dd>
+            }
+        }
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.IdPago" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>
