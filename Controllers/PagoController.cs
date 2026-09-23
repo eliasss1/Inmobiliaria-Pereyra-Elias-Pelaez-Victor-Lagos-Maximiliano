@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using Inmobiliaria.Models;
 using System;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Inmobiliaria.Controllers
 {
@@ -12,9 +13,11 @@ namespace Inmobiliaria.Controllers
     {
         private readonly IRepositorioPago repositorio;
         private readonly ILogger<PagoController> logger;
+        private readonly IRepositorioReserva repoReserva;
 
-        public PagoController(IRepositorioPago repo, ILogger<PagoController> logger)
+        public PagoController(IRepositorioPago repo, ILogger<PagoController> logger, IRepositorioReserva rr)
         {
+            this.repoReserva = rr;
             this.repositorio = repo;
             this.logger = logger;
         }
@@ -47,7 +50,11 @@ namespace Inmobiliaria.Controllers
         {
             var pago = new Pago { FechaPago = DateTime.Now };
             if (idReserva.HasValue) pago.IdReserva = idReserva.Value;
-            
+
+            var ListaReserva = repoReserva.ObtenerTodos();
+            ViewBag.Reservas = new SelectList(ListaReserva, "IdReserva", "IdReserva", idReserva);
+
+
             return View(pago);
         }
 
@@ -69,6 +76,10 @@ namespace Inmobiliaria.Controllers
                     TempData["Mensaje"] = "Pago registrado correctamente";
                     return RedirectToAction(nameof(Index));
                 }
+
+                var listaReservas = repoReserva.ObtenerTodos();
+                ViewBag.Reservas = new SelectList(listaReservas, "IdReserva", "IdReserva", entidad.IdReserva);
+
                 return View(entidad);
             }
             catch (Exception ex)

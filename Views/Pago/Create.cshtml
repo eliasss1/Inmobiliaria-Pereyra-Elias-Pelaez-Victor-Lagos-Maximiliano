@@ -1,0 +1,55 @@
+@model Inmobiliaria.Models.Pago
+
+
+<div class="container d-flex justify-content-center align-items-center">
+    
+    <form asp-controller="Pago" asp-action="Create" method="post" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow">
+
+        <h1 style="font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: -0.02em;">Crear Pago</h1>
+        <div class="w-50">
+            <label>Concepto</label>
+            <input asp-for="Concepto" class="form-control" />
+        </div>
+        
+        <div class="w-50">
+            <label>Fecha de Pago</label>
+            <input asp-for="FechaPago" class="form-control" />
+        </div>
+
+        <div class="w-50">
+            <label>Importe</label>
+            <input asp-for="Importe" class="form-control" />
+        </div>
+
+        <div class="w-50">
+            <label>Estado</label>
+            <input asp-for="Estado" class="form-control" />
+        </div>
+
+        <input type="hidden" asp-for="IdPago" class="form-control" />
+
+        <div class="w-50">
+            <label>Id Reserva</label>
+            <select id="Select" asp-for="IdReserva" asp-items="ViewBag.Reservas" class="form-select">
+                <option value="">Seleccione Reserva</option>
+            </select>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-controller="Pago" asp-action="Index" class="btn btn-secondary">Volver</a>
+            <button type="submit" class="btn btn-primary">Crear</button>
+        </div>
+        
+
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#Select').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Seleccione una Reserva",
+            allowClear: true
+        });
+
+    });
+</script>

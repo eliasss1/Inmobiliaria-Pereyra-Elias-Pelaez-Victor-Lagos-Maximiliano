@@ -4,53 +4,47 @@
     ViewData["Title"] = "Crear Propietario";
 }
 
-<div class="container mt-4">
-    <h2>Nuevo Propietario</h2>
-    <hr />
+<div class="container d-flex justify-content-center align-items-center">
     
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create" method="post">
-                
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Nombre" class="control-label"></label>
-                    <input asp-for="Nombre" class="form-control" />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Apellido" class="control-label"></label>
-                    <input asp-for="Apellido" class="form-control" />
-                    <span asp-validation-for="Apellido" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Dni" class="control-label"></label>
-                    <input asp-for="Dni" class="form-control" />
-                    <span asp-validation-for="Dni" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Telefono" class="control-label"></label>
-                    <input asp-for="Telefono" class="form-control" />
-                    <span asp-validation-for="Telefono" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-4">
-                    <label asp-for="Email" class="control-label"></label>
-                    <input asp-for="Email" class="form-control" type="email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="Guardar" class="btn btn-success" />
-                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
-                </div>
-            </form>
+    <form class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow" asp-controller="Propietario" asp-action="Create" method="post">
+        
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <h1 style="font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: -0.02em;">Crear Nuevo Propietario</h1>
+        <div class="form-group w-50 mb-3">
+            <label asp-for="Nombre" class="control-label"></label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
-    </div>
+
+        <div class="form-group w-50 mb-3">
+            <label asp-for="Apellido" class="control-label"></label>
+            <input asp-for="Apellido" class="form-control" />
+            <span asp-validation-for="Apellido" class="text-danger"></span>
+        </div>
+
+        <div class="form-group w-50  mb-3">
+            <label asp-for="Dni" class="control-label"></label>
+            <input asp-for="Dni" class="form-control" />
+            <span asp-validation-for="Dni" class="text-danger"></span>
+        </div>
+
+        <div class="form-group  w-50  mb-3">
+            <label asp-for="Telefono" class="control-label"></label>
+            <input asp-for="Telefono" class="form-control" />
+            <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <div class="form-group w-50   mb-4">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" type="email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group d-flex justify-content-end gap-2">
+            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+            <input type="submit" value="Guardar" class="btn btn-success" />
+        </div>
+    </form>
 </div>
 
 @section Scripts {
