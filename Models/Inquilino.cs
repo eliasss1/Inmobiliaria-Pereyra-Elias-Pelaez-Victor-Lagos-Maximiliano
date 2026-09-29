@@ -21,5 +21,7 @@ public class Inquilino
     
     [Required, EmailAddress]
     public string Email {get; set;} = "";
+    public string NombreCompleto => $"{Nombre} {Apellido} - DNI: {Dni}";
     public override string ToString() => $"{Nombre} {Apellido}";
 }
+

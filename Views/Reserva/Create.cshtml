@@ -7,7 +7,7 @@
         
         <div class="w-50  mb-3">
             <label>Inquilino</label>
-            <select asp-for="IdInquilino" class="form-control" asp-items="ViewBag.Inquilinos">
+            <select asp-for="IdInquilino" class="form-control select2-inquilino" asp-items="ViewBag.Inquilinos">
                 <option value="">-- Seleccione un Inquilino --</option>
             </select>
             <span asp-validation-for="IdInquilino" class="text-danger"></span>
@@ -15,7 +15,7 @@
         
         <div class="w-50  mb-3">
             <label>Inmueble</label>
-            <select asp-for="IdInmueble" class="form-control" asp-items="ViewBag.Inmuebles">
+            <select asp-for="IdInmueble" class="form-control select2-inmueble" asp-items="ViewBag.Inmuebles">
                 <option value="">-- Seleccione un Inmueble --</option>
             </select>
             <span asp-validation-for="IdInmueble" class="text-danger"></span>

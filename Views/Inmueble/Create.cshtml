@@ -1,6 +1,6 @@
 @model Inmobiliaria.Models.Inmueble
 <div class="container d-flex justify-content-center align-items-center">
-    <form asp-controller="Inmueble" asp-action="Create" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow"  method="post">
+    <form asp-controller="Inmueble" asp-action="Create" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow"  method="post" enctype="multipart/form-data">
         
         <input type="hidden" asp-for="IdPropietario" />
         <h1 style="font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: -0.02em;">Crear un nuevo Inmueble</h1>
@@ -30,12 +30,17 @@
         </div>
         
         
-        <div class="w-50">
+                <div class="w-50">
             <label>Tipo de Inmueble</label>
             
             <select asp-for="IdTipoInmueble" class="form-control" asp-items="ViewBag.Tipos">
                 <option value="">-- Seleccione un Tipo --</option>
             </select>
+        </div>
+        <div class="w-50 mt-3">
+            <label>Im&aacute;genes del Inmueble</label>
+            <input type="file" name="imagenesFiles" multiple class="form-control" accept="image/*" />
+            <small class="text-muted">Podes seleccionar m&uacute;ltiples im&aacute;genes a la vez.</small>
         </div>
 
         <div class="d-flex justify-content-end mt-3 gap-2">

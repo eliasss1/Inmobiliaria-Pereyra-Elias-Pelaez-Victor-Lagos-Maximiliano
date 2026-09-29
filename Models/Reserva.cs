@@ -42,7 +42,8 @@ public class Reserva {
 
     public DateTime? FechaRealTerminacion { get; set; } 
     public int Estado { get; set; } = 1; // 1: Vigente, 2: Finalizada,  3: Terminada Anticipadamente
-    public int? IdUsuarioTerminacion { get; set; } 
+    public int? IdUsuarioTerminacion { get; set; }
+    public string DetalleCompleto => InmuebleAsociado != null && InquilinoAsociado != null ? $"Reserva #{IdReserva} - {InmuebleAsociado.Direccion} ({InquilinoAsociado.Nombre} {InquilinoAsociado.Apellido})" : $"Reserva #{IdReserva}";
     public Usuario? UsuarioTerminacion { get; set; } 
 
 }

@@ -13,12 +13,14 @@ namespace Inmobiliaria.Controllers
         private readonly IRepositorioInmueble repositorio;
         private readonly IConfiguration config;
         private readonly ILogger<InmuebleController> logger;
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment env;
 
-        public InmuebleController(IRepositorioInmueble repo, IConfiguration config, ILogger<InmuebleController> logger)
+        public InmuebleController(IRepositorioInmueble repo, IConfiguration config, ILogger<InmuebleController> logger, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             this.repositorio = repo;
             this.config = config;
             this.logger = logger;
+            this.env = env;
         }
 
         [Route("[controller]/Index")]
@@ -119,15 +121,15 @@ namespace Inmobiliaria.Controllers
             }
         }
         [Authorize]
-        public ActionResult Details(int id)
+                public ActionResult Details(int id)
         {
             var entidad = repositorio.ObtenerPorId(id);
-            
             if (entidad == null)
             {
                 return RedirectToAction(nameof(Index));
             }
-            
+            var repoImg = new RepositorioInmuebleImagen(config);
+            ViewBag.Imagenes = repoImg.ObtenerPorInmueble(id);
             return View(entidad);
         }
 
@@ -188,21 +190,19 @@ namespace Inmobiliaria.Controllers
         }
 
         [Authorize]
-        public IActionResult Edit(int id)
+                public IActionResult Edit(int id)
         {
             try
             {
                 var entidad = repositorio.ObtenerPorId(id);
                 if (entidad == null)
-                    return NotFound();
-
-                
+                {
+                    return RedirectToAction(nameof(Index));
+                }
                 var repoTipos = new RepositorioTipoInmueble(config);
-                var listaTipos = repoTipos.ObtenerTodos();
-                
-                
-                ViewBag.Tipos = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(listaTipos, "IdTipoInmueble", "Nombre", entidad.IdTipoInmueble);
-
+                ViewBag.Tipos = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(repoTipos.ObtenerTodos(), "IdTipoInmueble", "Nombre", entidad.IdTipoInmueble);
+                var repoImg = new RepositorioInmuebleImagen(config);
+                ViewBag.Imagenes = repoImg.ObtenerPorInmueble(id);
                 return View(entidad);
             }
             catch (Exception ex)
@@ -215,18 +215,53 @@ namespace Inmobiliaria.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Inmueble entidad)
+                public ActionResult Edit(int id, Inmueble entidad, System.Collections.Generic.List<Microsoft.AspNetCore.Http.IFormFile> imagenesFiles)
         {
             if (!ModelState.IsValid)
             {
                 var repoTipos = new RepositorioTipoInmueble(config);
                 ViewBag.Tipos = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(repoTipos.ObtenerTodos(), "IdTipoInmueble", "Nombre", entidad.IdTipoInmueble);
+                var repoImg = new RepositorioInmuebleImagen(config);
+                ViewBag.Imagenes = repoImg.ObtenerPorInmueble(id);
                 return View(entidad);
             }
             try
             {
                 repositorio.Modificacion(entidad); 
                 
+                if (imagenesFiles != null && imagenesFiles.Count > 0)
+                {
+                    var repoImg = new RepositorioInmuebleImagen(config);
+                    string pathDir = System.IO.Path.Combine(env.WebRootPath, "uploads", "inmuebles");
+                    if (!System.IO.Directory.Exists(pathDir)) System.IO.Directory.CreateDirectory(pathDir);
+
+                    bool primeraImagen = string.IsNullOrEmpty(entidad.ImagenPortada);
+
+                    foreach (var file in imagenesFiles)
+                    {
+                        if (file.Length > 0)
+                        {
+                            string fileName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(file.FileName);
+                            string pathRel = "/uploads/inmuebles/" + fileName;
+                            string pathFisico = System.IO.Path.Combine(pathDir, fileName);
+
+                            using (var stream = new System.IO.FileStream(pathFisico, System.IO.FileMode.Create))
+                            {
+                                file.CopyTo(stream);
+                            }
+
+                            if (primeraImagen)
+                            {
+                                entidad.ImagenPortada = pathRel;
+                                repositorio.Modificacion(entidad);
+                                primeraImagen = false;
+                            }
+
+                            repoImg.Alta(new InmuebleImagen { IdInmueble = id, Url = pathRel });
+                        }
+                    }
+                }
+
                 TempData["Mensaje"] = "Datos guardados correctamente";
                 return RedirectToAction(nameof(Index));
             }
@@ -272,3 +307,7 @@ namespace Inmobiliaria.Controllers
         }
     }
 }
+
+
+
+

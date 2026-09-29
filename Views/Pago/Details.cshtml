@@ -1,5 +1,5 @@
 @model Inmobiliaria.Models.Pago
-
+@inject Inmobiliaria.Models.IRepositorioUsuario RepoUsuario
 <h2>Detalles del Pago</h2>
 
 <div>
@@ -21,14 +21,16 @@
 
         <dt class="col-sm-3">ID de Reserva</dt>
         <dd class="col-sm-9">@Model.IdReserva</dd>
+        
         @if (User.IsInRole("Administrador"))
         {
-            <dt class="col-sm-3">Creado Por (Usuario Id)</dt>
-            <dd class="col-sm-9">@Model.IdUsuarioCreador</dd>
-            @if(Model.IdUsuarioAnulador != null)
+            <dt class="col-sm-3">Creado Por</dt>
+            <dd class="col-sm-9">@(RepoUsuario.ObtenerPorId(Model.IdUsuarioCreador)?.Nombre) @(RepoUsuario.ObtenerPorId(Model.IdUsuarioCreador)?.Apellido)</dd>
+            
+            @if(Model.IdUsuarioAnulador.HasValue)
             {
-                <dt class="col-sm-3">Anulado Por (Usuario Id)</dt>
-                <dd class="col-sm-9">@Model.IdUsuarioAnulador</dd>
+                <dt class="col-sm-3">Anulado Por</dt>
+                <dd class="col-sm-9">@(RepoUsuario.ObtenerPorId(Model.IdUsuarioAnulador.Value)?.Nombre) @(RepoUsuario.ObtenerPorId(Model.IdUsuarioAnulador.Value)?.Apellido)</dd>
             }
         }
     </dl>

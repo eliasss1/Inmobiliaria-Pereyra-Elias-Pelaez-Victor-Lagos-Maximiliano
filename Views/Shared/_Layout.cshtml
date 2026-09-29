@@ -118,6 +118,35 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+                $(document).ready(function() {
+            $('select.form-control:not(.select2-inquilino):not(.select2-inmueble)').select2({ width: '100%' });
+
+            $('.select2-inquilino').select2({
+                width: '100%',
+                ajax: {
+                    url: '/Reserva/BuscarInquilinos',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { q: params.term }; },
+                    processResults: function (data) { return { results: data }; }
+                }
+            });
+
+            $('.select2-inmueble').select2({
+                width: '100%',
+                ajax: {
+                    url: '/Reserva/BuscarInmuebles',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { q: params.term }; },
+                    processResults: function (data) { return { results: data }; }
+                }
+            });
+        });
+        });
+    </script>
 </body>
 
 <style>
@@ -157,3 +186,7 @@
 </style>
 
 </html>
+
+
+
+

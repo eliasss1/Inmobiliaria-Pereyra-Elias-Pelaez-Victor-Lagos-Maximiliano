@@ -28,7 +28,7 @@
 
         <div class="w-50">
             <label>Id Reserva</label>
-            <select id="Select" asp-for="IdReserva" asp-items="ViewBag.Reservas" class="form-select">
+            <select class="form-select select2-reserva" asp-for="IdReserva" asp-items="ViewBag.Reservas" class="form-select">
                 <option value="">Seleccione Reserva</option>
             </select>
         </div>
@@ -43,11 +43,17 @@
 
 <script>
     $(document).ready(function () {
-        $('#Select').select2({
-            theme: 'bootstrap-5',
+        $('.select2-reserva').select2({
+            width: '100%',
             placeholder: "Seleccione una Reserva",
-            allowClear: true
+            allowClear: true,
+            ajax: {
+                url: '/Pago/BuscarReservas',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) { return { q: params.term }; },
+                processResults: function (data) { return { results: data }; }
+            }
         });
-
     });
 </script>

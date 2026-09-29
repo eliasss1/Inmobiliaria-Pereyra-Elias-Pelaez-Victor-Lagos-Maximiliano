@@ -46,13 +46,22 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+                [HttpGet]
+        public IActionResult BuscarReservas(string q)
+        {
+            var reservas = string.IsNullOrWhiteSpace(q) 
+                ? repoReserva.ObtenerLista(1, 10) 
+                : repoReserva.Buscar(q).Take(10);
+            return Json(reservas.Select(x => new { id = x.IdReserva, text = x.DetalleCompleto }));
+        }
+
         public ActionResult Create(int? idReserva)
         {
             var pago = new Pago { FechaPago = DateTime.Now };
             if (idReserva.HasValue) pago.IdReserva = idReserva.Value;
 
             var ListaReserva = repoReserva.ObtenerTodos();
-            ViewBag.Reservas = new SelectList(ListaReserva, "IdReserva", "IdReserva", idReserva);
+            ViewBag.Reservas = new SelectList(ListaReserva, "IdReserva", "DetalleCompleto", idReserva);
 
 
             return View(pago);
@@ -77,8 +86,12 @@ namespace Inmobiliaria.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                var listaReservas = repoReserva.ObtenerTodos();
-                ViewBag.Reservas = new SelectList(listaReservas, "IdReserva", "IdReserva", entidad.IdReserva);
+                                var reservas = new List<Reserva>();
+                if (entidad.IdReserva > 0) {
+                    var res = repoReserva.ObtenerPorId(entidad.IdReserva);
+                    if (res != null) reservas.Add(res);
+                }
+                ViewBag.Reservas = new SelectList(reservas, "IdReserva", "DetalleCompleto", entidad.IdReserva);
 
                 return View(entidad);
             }
@@ -246,3 +259,4 @@ namespace Inmobiliaria.Controllers
         }
     }
 }
+

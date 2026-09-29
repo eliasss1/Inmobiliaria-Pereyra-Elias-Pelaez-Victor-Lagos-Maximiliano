@@ -1,5 +1,5 @@
 @model Inmobiliaria.Models.Reserva
-
+@inject Inmobiliaria.Models.IRepositorioUsuario RepoUsuario
 <h2>Detalles de la Reserva</h2>
 
 <div>
@@ -28,11 +28,17 @@
         <dt class="col-sm-3">Id Inmueble</dt>
         <dd class="col-sm-9">@Model.IdInmueble</dd>
 
-        <dt class="col-sm-3">Creado Por (Usuario Id)</dt>
-        <dd class="col-sm-9">@Model.IdUsuarioCreador</dd>
+        @if (User.IsInRole("Administrador"))
+        {
+            <dt class="col-sm-3">Creado Por</dt>
+            <dd class="col-sm-9">@(RepoUsuario.ObtenerPorId(Model.IdUsuarioCreador)?.Nombre) @(RepoUsuario.ObtenerPorId(Model.IdUsuarioCreador)?.Apellido)</dd>
 
-        <dt class="col-sm-3">Terminado Por (Usuario Id)</dt>
-        <dd class="col-sm-9">@Model.IdUsuarioTerminador</dd>
+            @if (Model.IdUsuarioTerminador.HasValue)
+            {
+                <dt class="col-sm-3">Terminado Por</dt>
+                <dd class="col-sm-9">@(RepoUsuario.ObtenerPorId(Model.IdUsuarioTerminador.Value)?.Nombre) @(RepoUsuario.ObtenerPorId(Model.IdUsuarioTerminador.Value)?.Apellido)</dd>
+            }
+        }
     </dl>
 </div>
 <div>

@@ -25,6 +25,7 @@ public class Inmueble
     public bool Estado { get; set; } = true; 
 
     public string? ImagenPortada { get; set; }
+    public IList<InmuebleImagen> Imagenes { get; set; } = new List<InmuebleImagen>();
 
     [Required]
     [Display(Name = "Tipo de Inmueble")]
@@ -41,6 +42,9 @@ public class Inmueble
     public Propietario? Dueño { get; set; }
 
     public override string ToString() => $"{Direccion} - Cupo: {Cupo}";
+    public string DetalleCompleto => $"{Direccion} (Cupo: {Cupo})";
 
     public decimal PorcentajeSeña { get; set; }
 }
+
+

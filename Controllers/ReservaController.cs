@@ -203,11 +203,38 @@ namespace Inmobiliaria.Controllers
                     }                  
                 }
         }
-        private void SetViewBag(Reserva? entidad = null)
+                [HttpGet]
+        public IActionResult BuscarInquilinos(string q)
+        {
+            var inquilinos = string.IsNullOrWhiteSpace(q) 
+                ? repoInquilino.ObtenerLista(1, 10) 
+                : repoInquilino.Buscar(q).Take(10);
+            return Json(inquilinos.Select(x => new { id = x.IdInquilino, text = x.NombreCompleto }));
+        }
+
+        [HttpGet]
+        public IActionResult BuscarInmuebles(string q)
+        {
+            var inmuebles = string.IsNullOrWhiteSpace(q) 
+                ? repoInmueble.ObtenerLista(1, 10) 
+                : repoInmueble.Buscar(q).Take(10);
+            return Json(inmuebles.Select(x => new { id = x.IdInmueble, text = x.DetalleCompleto }));
+        }
+                private void SetViewBag(Reserva? entidad = null)
         {   
-            ViewBag.Inquilinos = new SelectList(repoInquilino.ObtenerTodos(), "IdInquilino", "Dni", entidad?.IdInquilino);
+            var inquilinos = new List<Inquilino>();
+            if (entidad?.IdInquilino > 0) {
+                var inq = repoInquilino.ObtenerPorId(entidad.IdInquilino);
+                if (inq != null) inquilinos.Add(inq);
+            }
+            ViewBag.Inquilinos = new SelectList(inquilinos, "IdInquilino", "NombreCompleto", entidad?.IdInquilino);
             
-            ViewBag.Inmuebles = new SelectList(repoInmueble.ObtenerTodos(), "IdInmueble", "IdInmueble", entidad?.IdInmueble);
+            var inmuebles = new List<Inmueble>();
+            if (entidad?.IdInmueble > 0) {
+                var inm = repoInmueble.ObtenerPorId(entidad.IdInmueble);
+                if (inm != null) inmuebles.Add(inm);
+            }
+            ViewBag.Inmuebles = new SelectList(inmuebles, "IdInmueble", "DetalleCompleto", entidad?.IdInmueble);
         }
 
         [Authorize(Roles = "Administrador")]
@@ -258,6 +285,38 @@ namespace Inmobiliaria.Controllers
             return View(entidad);
         }
 
+                [HttpGet]
+        public IActionResult FinalizarAnticipado(int id)
+        {
+            var reserva = repoReserva.ObtenerPorId(id);
+            if (reserva == null) return NotFound();
+            
+            DateTime hoy = DateTime.Today;
+            DateTime terminacion = hoy > reserva.FechaHasta ? reserva.FechaHasta : hoy;
+            if (terminacion < reserva.FechaDesde) terminacion = reserva.FechaDesde;
+
+            TimeSpan duracionTotal = reserva.FechaHasta - reserva.FechaDesde;
+            TimeSpan duracionCumplida = terminacion - reserva.FechaDesde;
+            
+            decimal porcentajeRestante = 0.25m;
+            if (duracionCumplida.TotalDays < duracionTotal.TotalDays / 2.0)
+            {
+                porcentajeRestante = 0.50m;
+            }
+
+            int diasRestantes = (reserva.FechaHasta - terminacion).Days;
+            decimal montoMulta = 0;
+            if (diasRestantes > 0)
+            {
+                montoMulta = diasRestantes * reserva.MontoPorDia * porcentajeRestante;
+            }
+            
+            ViewBag.MontoMulta = montoMulta;
+            ViewBag.FechaTerminacion = terminacion.ToString("yyyy-MM-dd");
+            return View(reserva);
+        }
+
+        [HttpPost]
         public IActionResult FinalizarAnticipado(int idReserva, DateTime fechaTerminacion, decimal montoMulta, bool pagoEfectuado) 
         { 
             if (!pagoEfectuado) 
@@ -337,6 +396,12 @@ namespace Inmobiliaria.Controllers
         }
     }
 }
+
+
+
+
+
+
 
 
 

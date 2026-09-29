@@ -130,7 +130,11 @@
                                 }
                             </td>
                             <td>
-                                <a asp-action="Edit" asp-route-id="@r.IdReserva" class="btn btn-warning btn-sm">Editar</a>
+                                                                <a asp-action="Edit" asp-route-id="@r.IdReserva" class="btn btn-warning btn-sm">Editar</a>
+                                @if (r.Estado == 1) {
+                                    <a asp-action="Renovar" asp-route-id="@r.IdReserva" class="btn btn-success btn-sm">Renovar</a>
+                                    <a asp-action="FinalizarAnticipado" asp-route-id="@r.IdReserva" class="btn btn-dark btn-sm">Finalizar</a>
+                                }
                                 <a asp-controller="Pago" asp-action="PorReserva" asp-route-id="@r.IdReserva" class="btn btn-info btn-sm">Pagos</a>
                                 <form asp-action="Eliminar" asp-route-id="@r.IdReserva" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres eliminar esta reserva?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>

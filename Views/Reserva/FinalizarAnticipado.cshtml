@@ -1,0 +1,38 @@
+@model Inmobiliaria.Models.Reserva
+@{
+    ViewData["Title"] = "Finalizar Anticipadamente";
+}
+<div class="container d-flex justify-content-center align-items-center">
+    <form asp-action="FinalizarAnticipado" method="post" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow">
+        <h1>Finalizar Reserva Anticipadamente</h1>
+        <p>Inmueble: @Model.InmuebleAsociado?.Direccion</p>
+        <p>Inquilino: @Model.InquilinoAsociado?.Nombre @Model.InquilinoAsociado?.Apellido</p>
+        
+        <input type="hidden" name="idReserva" value="@Model.IdReserva" />
+
+        <div class="mb-3">
+            <label>Fecha de Terminaci&oacute;n Efectiva</label>
+            <input name="fechaTerminacion" type="date" class="form-control" value="@ViewBag.FechaTerminacion" readonly />
+        </div>
+        <div class="mb-3">
+            <label>Monto de la Multa</label>
+            <input name="montoMulta" type="number" step="0.01" class="form-control" value="@ViewBag.MontoMulta" readonly />
+        </div>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="pagoEfectuado" value="true" id="pagoEfectuado">
+            <label class="form-check-label" for="pagoEfectuado">
+                Confirmo que el inquilino ha abonado el monto de la multa en este momento
+            </label>
+        </div>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @Html.ValidationSummary(false)
+            </div>
+        }
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-danger">Terminar Contrato y Registrar Pago</button>
+        </div>
+    </form>
+</div>

@@ -85,12 +85,10 @@ dotnet run
 El sistema estará disponible típicamente en http://localhost:5000 o https://localhost:5001.
 
 🔐 Acceso al Sistema
-El script SQL genera un usuario administrador por defecto. Sin embargo, como el sistema utiliza hashing para las contraseñas, se recomienda registrar el primer usuario desde la pantalla de "Registrarse" en el inicio de la aplicación para que la contraseña se encripte correctamente en la base de datos.
-
-Una vez creado tu primer usuario (que por defecto se creará con el rol Empleado), puedes cambiarle el rol a Administrador directamente en la base de datos mediante la siguiente consulta SQL para tener acceso total:
-
-SQL
-UPDATE Usuario SET Rol = 'Administrador' WHERE Email = 'tu_correo@ejemplo.com';
+El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:
+- Email: admin@inmobiliaria.com
+- Clave: 123
+- Rol: Administrador
 👥 Equipo de Desarrollo
 Pereyra
 
@@ -101,3 +99,4 @@ Peláez Víctor
 Lagos Maximiliano
 
 <img width="5198" height="6050" alt="Inmueble Herencia Ecosystem-2026-08-20-202152" src="https://github.com/user-attachments/assets/e0a514e3-ca61-4f2a-b644-1cb861286802" />
+
