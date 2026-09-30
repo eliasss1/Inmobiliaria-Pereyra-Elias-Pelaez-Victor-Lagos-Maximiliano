@@ -79,11 +79,12 @@ public int Baja(int id, int idUsuarioAnulador)
         using(MySqlConnection conexion = new MySqlConnection(connectionString))
         {
             string query = @"UPDATE Pago 
-                            SET Concepto = @Concepto 
+                            SET Concepto = @Concepto, Estado = @Estado
                             WHERE IdPago = @IdPago";
             using (MySqlCommand comando = new MySqlCommand(query, conexion))
             {
                 comando.Parameters.AddWithValue("@Concepto", p.Concepto);
+                comando.Parameters.AddWithValue("@Estado", p.Estado);
                 comando.Parameters.AddWithValue("@IdPago", p.IdPago);
                 conexion.Open();
                 res = comando.ExecuteNonQuery();

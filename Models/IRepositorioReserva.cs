@@ -8,4 +8,5 @@ public interface IRepositorioReserva : IRepositorio<Reserva>
     bool RegistrarTerminacionAnticipadaConPago(int idReserva, DateTime fechaTerminacion, decimal montoMulta, int idUsuario);
     IList<Reserva> ObtenerVigentes(DateTime? inicio, DateTime? fin);
     IList<Reserva> ObtenerTerminanEnXDias(int dias);
+    int Baja(int id, int idUsuarioAnulador);
 }

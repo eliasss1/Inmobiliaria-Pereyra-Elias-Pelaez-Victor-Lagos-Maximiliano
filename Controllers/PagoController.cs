@@ -117,16 +117,32 @@ namespace Inmobiliaria.Controllers
             }
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Pago entidad)
         {
+            var esAdministrador = User.IsInRole("Administrador");
             ModelState.Remove(nameof(entidad.IdUsuarioCreador));
             ModelState.Remove(nameof(entidad.ReservaAsociada));
             ModelState.Remove(nameof(entidad.FechaPago));
             ModelState.Remove(nameof(entidad.Importe));
-            if (!ModelState.IsValid) return View(entidad);
-            
+            ModelState.Remove(nameof(entidad.IdUsuarioAnulador));
+            ModelState.Remove(nameof(entidad.IdReserva));
+            if (!esAdministrador)
+            {
+                ModelState.Remove(nameof(entidad.Estado));
+            }
+            else if (entidad.Estado != "Activo" && entidad.Estado != "Anulado")
+            {
+                ModelState.AddModelError(nameof(entidad.Estado), "El estado seleccionado no es válido.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                TempData["TeLaMandaste"] = "Revisa los datos ingresados y vuelve a intentarlo.";
+                return View(entidad);
+            }
             try
             {
                 var pagoOriginal = repositorio.ObtenerPorId(id);
@@ -134,21 +150,23 @@ namespace Inmobiliaria.Controllers
                 
                 pagoOriginal.Concepto = entidad.Concepto;
                 
-                // Si el estado cambia a Anulado desde la edición, podríamos querer registrar quién lo anuló, 
-                // pero por ahora solo actualizamos el estado.
-                if (entidad.Estado == "Anulado" && pagoOriginal.Estado != "Anulado")
+                if (esAdministrador && entidad.Estado == "Anulado" && pagoOriginal.Estado != "Anulado")
                 {
                     var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("Id");
-                    if (int.TryParse(idClaim, out int idUsuarioAnulador))
+                    if (!int.TryParse(idClaim, out int idUsuarioAnulador))
                     {
-                        pagoOriginal.IdUsuarioAnulador = idUsuarioAnulador;
+                        return Forbid();
                     }
+                    pagoOriginal.IdUsuarioAnulador = idUsuarioAnulador;
                 }
-                else if (entidad.Estado == "Activo" && pagoOriginal.Estado == "Anulado")
+                else if (esAdministrador && entidad.Estado == "Activo" && pagoOriginal.Estado == "Anulado")
                 {
                     pagoOriginal.IdUsuarioAnulador = null;
                 }
-                pagoOriginal.Estado = entidad.Estado;
+                if (esAdministrador)
+                {
+                    pagoOriginal.Estado = entidad.Estado;
+                }
 
                 repositorio.Modificacion(pagoOriginal);
                 TempData["Mensaje"] = "Pago modificado correctamente";
@@ -161,7 +179,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         [HttpGet]
         public ActionResult Eliminar(int id)
         {

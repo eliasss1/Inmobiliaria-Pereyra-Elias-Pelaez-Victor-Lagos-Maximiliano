@@ -109,60 +109,58 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         }
     }
 
-    public int Baja(int id)
-{
-    int res = -1;
-
-    using (MySqlConnection conexion = new MySqlConnection(connectionString))
+    public int Baja(int id, int idUsuarioAnulador)
     {
-        try
+        int res = -1;
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
-            conexion.Open();
-
-            int idInmueble = 0;
-            string querySelect = "SELECT IdInmueble FROM Reserva WHERE IdReserva = @idReserva";
-            
-            using (MySqlCommand cmdSelect = new MySqlCommand(querySelect, conexion))
+            try
             {
-                cmdSelect.Parameters.AddWithValue("@idReserva", id);
-                var result = cmdSelect.ExecuteScalar();
-                if (result != null)
+                conexion.Open();
+                // 1. Liberamos el inmueble (Estado = TRUE o 1)
+                int idInmueble = 0;
+                string querySelect = "SELECT IdInmueble FROM Reserva WHERE IdReserva = @idReserva";
+                using (MySqlCommand cmdSelect = new MySqlCommand(querySelect, conexion))
                 {
-                    idInmueble = Convert.ToInt32(result);
+                    cmdSelect.Parameters.AddWithValue("@idReserva", id);
+                    var result = cmdSelect.ExecuteScalar();
+                    if (result != null)
+                    {
+                        idInmueble = Convert.ToInt32(result);
+                    }
+                }
+                if (idInmueble > 0)
+                {
+                    string queryUpdateInm = "UPDATE Inmueble SET Estado = 1 WHERE IdInmueble = @IdInmueble";
+                    using (MySqlCommand cmdUpdateInm = new MySqlCommand(queryUpdateInm, conexion))
+                    {
+                        cmdUpdateInm.Parameters.AddWithValue("@IdInmueble", idInmueble);
+                        cmdUpdateInm.ExecuteNonQuery();
+                    }
+                    // 2. Anulamos la reserva cambiando el estado a 4 y guardando quién lo hizo
+                    string queryAnular = @"UPDATE Reserva 
+                                            SET Estado = 4, IdUsuarioTerminador = @IdAnulador 
+                                            WHERE IdReserva = @idReserva";
+                    using (MySqlCommand cmdAnular = new MySqlCommand(queryAnular, conexion))
+                    {
+                        cmdAnular.Parameters.AddWithValue("@IdAnulador", idUsuarioAnulador);
+                        cmdAnular.Parameters.AddWithValue("@idReserva", id);
+                        res = cmdAnular.ExecuteNonQuery();
+                    }
                 }
             }
-
-            if (idInmueble > 0)
+            catch(Exception ex)
             {
-                string queryUpdate = "UPDATE Inmueble SET Estado = TRUE WHERE IdInmueble = @IdInmueble";
-                
-                using (MySqlCommand cmdUpdate = new MySqlCommand(queryUpdate, conexion))
-                {
-                    cmdUpdate.Parameters.AddWithValue("@IdInmueble", idInmueble);
-                    cmdUpdate.ExecuteNonQuery();
-                }
-
-                string queryDelete = "DELETE FROM Reserva WHERE IdReserva = @idReserva";
-                
-                using (MySqlCommand cmdDelete = new MySqlCommand(queryDelete, conexion))
-                {
-                    cmdDelete.Parameters.AddWithValue("@idReserva", id);
-                    res = cmdDelete.ExecuteNonQuery();
-                }
+                Console.WriteLine($"Error al anular reserva: {ex.Message}");
             }
         }
-        catch(Exception ex)
-        {
-            Console.WriteLine($"Error al eliminar reserva: {ex.Message}");
-        }
-        finally
-        {
-            conexion.Close();
-        }
+        return res;
     }
-    return res;
-}
 
+    public int Baja(int id)
+    {
+        throw new NotSupportedException("Para anular una reserva es obligatorio usar la sobrecarga Baja(int id, int idUsuarioAnulador) para registrar la auditoria.");
+    }
     public int Modificacion(Reserva p)
     {
         int res = -1;
@@ -303,7 +301,8 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         {
             try
             {
-                string query = @"SELECT r.IdReserva, r.FechaDesde, r.FechaHasta, r.MontoPorDia, 
+                // AGREGAMOS r.Estado a la consulta
+                string query = @"SELECT r.IdReserva, r.FechaDesde, r.FechaHasta, r.MontoPorDia, r.Estado,
                                 r.FechaEfectivaTerminacion, r.IdInquilino, r.IdInmueble, 
                                 r.IdUsuarioCreador, r.IdUsuarioTerminador,
                                 i.Nombre AS InqNombre, i.Apellido AS InqApellido, i.Dni AS InqDni, m.IdInmueble AS InmId, m.Direccion AS InmDireccion
@@ -326,6 +325,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                             FechaDesde = reader.GetDateTime("FechaDesde"),
                             FechaHasta = reader.GetDateTime("FechaHasta"),
                             MontoPorDia = reader.GetDecimal("MontoPorDia"),
+                            Estado = reader.GetInt32("Estado"), // AGREGAMOS EL ESTADO AQUI
                             FechaEfectivaTerminacion = reader.IsDBNull(reader.GetOrdinal("FechaEfectivaTerminacion")) ? null : reader.GetDateTime("FechaEfectivaTerminacion"),
                             IdInquilino = reader.GetInt32("IdInquilino"),
                             IdInmueble = reader.GetInt32("IdInmueble"),
@@ -349,10 +349,6 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             {
                 Console.WriteLine($"Error al obtener lista de reservas: {ex.Message}");
             }
-            finally
-            {
-                conexion.Close();
-            }
         }
         return res;
     }
@@ -360,48 +356,43 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     public Reserva? ObtenerPorId(int id)
     {
         Reserva? res = null;
-
-    using (MySqlConnection conexion = new MySqlConnection(connectionString))
-    {
-        try
+        using (MySqlConnection conexion = new MySqlConnection(connectionString))
         {
-            string query = @"SELECT IdReserva, FechaDesde, FechaHasta, MontoPorDia, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador 
-            FROM Reserva 
-            WHERE IdReserva = @IdReserva";
-
-            using (MySqlCommand comando = new MySqlCommand(query, conexion))
+            try
             {
-                comando.Parameters.AddWithValue("@IdReserva", id);
-                conexion.Open();
-                var reader = comando.ExecuteReader();
-                if (reader.Read())
+                // AGREGAMOS Estado a la consulta
+                string query = @"SELECT IdReserva, FechaDesde, FechaHasta, MontoPorDia, Estado, FechaEfectivaTerminacion, IdInquilino, IdInmueble, IdUsuarioCreador, IdUsuarioTerminador 
+                FROM Reserva 
+                WHERE IdReserva = @IdReserva";
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
                 {
-                    res = new Reserva
+                    comando.Parameters.AddWithValue("@IdReserva", id);
+                    conexion.Open();
+                    var reader = comando.ExecuteReader();
+                    if (reader.Read())
                     {
-                        IdReserva = reader.GetInt32(nameof(Reserva.IdReserva)),
-                        FechaDesde = reader.GetDateTime(nameof(Reserva.FechaDesde)),
-                        FechaHasta = reader.GetDateTime(nameof(Reserva.FechaHasta)),
-                        MontoPorDia = reader.GetDecimal(nameof(Reserva.MontoPorDia)),
-                        FechaEfectivaTerminacion = reader.IsDBNull(nameof(Reserva.FechaEfectivaTerminacion)) ? null : reader.GetDateTime(nameof(Reserva.FechaEfectivaTerminacion)),
-                        IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
-                        IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
-                        IdUsuarioCreador = reader.GetInt32(nameof(Reserva.IdUsuarioCreador)),
-                        IdUsuarioTerminador = reader.IsDBNull(nameof(Reserva.IdUsuarioTerminador)) ? null : reader.GetInt32(nameof(Reserva.IdUsuarioTerminador))
-                    };
+                        res = new Reserva
+                        {
+                            IdReserva = reader.GetInt32("IdReserva"),
+                            FechaDesde = reader.GetDateTime("FechaDesde"),
+                            FechaHasta = reader.GetDateTime("FechaHasta"),
+                            MontoPorDia = reader.GetDecimal("MontoPorDia"),
+                            Estado = reader.GetInt32("Estado"), // AGREGAMOS EL ESTADO AQUI
+                            FechaEfectivaTerminacion = reader.IsDBNull(reader.GetOrdinal("FechaEfectivaTerminacion")) ? null : reader.GetDateTime("FechaEfectivaTerminacion"),
+                            IdInquilino = reader.GetInt32("IdInquilino"),
+                            IdInmueble = reader.GetInt32("IdInmueble"),
+                            IdUsuarioCreador = reader.GetInt32("IdUsuarioCreador"),
+                            IdUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("IdUsuarioTerminador")) ? null : reader.GetInt32("IdUsuarioTerminador")
+                        };
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener reserva por ID: {ex.Message}");
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al obtener reserva por ID: {ex.Message}");
-        }
-        finally
-        {
-            conexion.Close();
-        }
-    }
-
-    return res;
+        return res;
     }
     public bool ExisteSolapamiento(Reserva reserva) 
     {
@@ -430,52 +421,51 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     }
     
     public bool RegistrarTerminacionAnticipadaConPago(int idReserva, DateTime fechaTerminacion, decimal montoMulta, int idUsuario) {
-            bool exito = false; 
-            using(MySqlConnection conexion = new MySqlConnection(connectionString)) 
+    bool exito = false; 
+    using(MySqlConnection conexion = new MySqlConnection(connectionString)) 
+    { 
+        conexion.Open();
+        using (var transaction = conexion.BeginTransaction()) 
+        { 
+            try 
             { 
-            conexion.Open();
-                using (var transaction = conexion.BeginTransaction()) 
+                string sqlPago = @"INSERT INTO Pago (IdReserva, Concepto, FechaPago, Importe, Estado, IdUsuarioCreador) 
+                                    VALUES (@IdReserva, @Concepto, @FechaPago, @Importe, 'Activo', @IdUsuarioCreador);"; 
+                using (var cmdPago = new MySqlCommand(sqlPago, conexion, transaction)) 
                 { 
-                    try 
-                    { 
-                    string sqlPago = @"INSERT INTO pago (IdReserva, Concepto, FechaPago, Importe, Estado, IdUsuarioCreador) 
-                    VALUES (@IdReserva, @Concepto, @FechaPago, @Importe, 'Activo', @IdUsuarioCreador);"; 
-                    using (var cmdPago = new MySqlCommand(sqlPago, conexion, transaction)) 
-                    { 
-                        cmdPago.Parameters.AddWithValue("@IdReserva", idReserva); 
-                        cmdPago.Parameters.AddWithValue("@Concepto", "Multa por terminación anticipada"); 
-                        cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now); 
-                        cmdPago.Parameters.AddWithValue("@Importe", montoMulta); 
-                        cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", idUsuario); 
-                        cmdPago.ExecuteNonQuery(); } // (Estado = 3: Terminada Anticipada) 
-                        string sqlReserva = @"UPDATE reserva 
-                        SET FechaRealTerminacion = 
-                        @FechaTerminacion, 
-                            Estado = 3, 
-                            IdUsuarioTerminacion = @IdUsuario 
-                            WHERE IdReserva = @IdReserva;"; 
-                        using (var cmdReserva = new MySqlCommand(sqlReserva, conexion, transaction)) 
-                        {
-                            cmdReserva.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion); 
-                            cmdReserva.Parameters.AddWithValue("@IdUsuario", idUsuario); 
-                            cmdReserva.Parameters.AddWithValue("@IdReserva", idReserva); 
-                            cmdReserva.ExecuteNonQuery(); 
-                        }
-                    transaction.Commit(); 
-                    exito = true; 
-                    }
-                    catch (Exception) 
-                    {  
-                    transaction.Rollback(); throw; 
-                    } 
-                    finally 
-                    { conexion.Close(); 
-                    } 
+                    cmdPago.Parameters.AddWithValue("@IdReserva", idReserva); 
+                    cmdPago.Parameters.AddWithValue("@Concepto", "Multa por terminación anticipada"); 
+                    cmdPago.Parameters.AddWithValue("@FechaPago", DateTime.Now); 
+                    cmdPago.Parameters.AddWithValue("@Importe", montoMulta); 
+                    cmdPago.Parameters.AddWithValue("@IdUsuarioCreador", idUsuario); 
+                    cmdPago.ExecuteNonQuery(); 
                 } 
-            } 
-            return exito; 
-    } 
 
+                
+                string sqlReserva = @"UPDATE Reserva 
+                                    SET FechaEfectivaTerminacion = @FechaTerminacion, 
+                                            Estado = 3, 
+                                            IdUsuarioTerminador = @IdUsuario 
+                                            WHERE IdReserva = @IdReserva;"; 
+                using (var cmdReserva = new MySqlCommand(sqlReserva, conexion, transaction)) 
+                {
+                    cmdReserva.Parameters.AddWithValue("@FechaTerminacion", fechaTerminacion); 
+                    cmdReserva.Parameters.AddWithValue("@IdUsuario", idUsuario); 
+                    cmdReserva.Parameters.AddWithValue("@IdReserva", idReserva); 
+                    cmdReserva.ExecuteNonQuery(); 
+                }
+                
+                transaction.Commit(); 
+                exito = true; 
+            }
+            catch (Exception) 
+            {  
+                transaction.Rollback(); throw; 
+            } 
+        } 
+    } 
+    return exito; 
+}
     public IList<Reserva> Buscar(string busqueda)
 {
     var lista = new List<Reserva>();
@@ -538,7 +528,7 @@ public IList<Reserva> ObtenerVigentes(DateTime? inicio, DateTime? fin)
                     INNER JOIN Inmueble inm ON r.IdInmueble = inm.IdInmueble
                     INNER JOIN Inquilino inq ON r.IdInquilino = inq.IdInquilino
                     WHERE r.Estado = 1 AND 
-                          (r.FechaDesde <= @fin AND r.FechaHasta >= @inicio)";
+                            (r.FechaDesde <= @fin AND r.FechaHasta >= @inicio)";
 
         using (MySqlCommand comando = new MySqlCommand(sql, conexion))
         {
