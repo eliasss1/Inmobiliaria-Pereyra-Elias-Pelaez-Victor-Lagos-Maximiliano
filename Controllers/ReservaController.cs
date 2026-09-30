@@ -255,22 +255,27 @@ namespace Inmobiliaria.Controllers
 
         }
 
-        [Authorize(Roles = "Administrador")]
-        [HttpPost, ActionName("Eliminar")]
-        [ValidateAntiForgeryToken]
-        public IActionResult EliminarConfirmacion(int id, Reserva entidad)
-        {
-            try
-            {
-                repoReserva.Baja(id);
-                TempData["Mensaje"] = "Se elimino correctamente";
-                return RedirectToAction(nameof(Index));
-            }catch(Exception ex)
-            {
-                logger.LogError(ex, "No se pudo eliminar la reserva");
-                throw;
-            }
-        }
+[Authorize(Roles = "Administrador")]
+[HttpPost, ActionName("Eliminar")]
+[ValidateAntiForgeryToken]
+public IActionResult EliminarConfirmacion(int id)
+{
+    try
+    {
+        // Obtenemos el ID del administrador que está anulando la reserva
+        int idUsuarioLogueado = int.Parse(User.FindFirstValue("Id") ?? "0");
+        
+        repoReserva.Baja(id, idUsuarioLogueado);
+        TempData["Mensaje"] = "La reserva fue anulada correctamente.";
+        return RedirectToAction(nameof(Index));
+    }
+    catch(Exception ex)
+    {
+        logger.LogError(ex, "No se pudo anular la reserva");
+        TempData["Error"] = "Ocurrió un error al intentar anular la reserva.";
+        return RedirectToAction(nameof(Index));
+    }
+}
 
         [Authorize]
         public ActionResult Details(int id)
