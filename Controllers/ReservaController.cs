@@ -399,6 +399,17 @@ public IActionResult EliminarConfirmacion(int id)
             TempData["Mensaje"] = $"Reserva extendida exitosamente. Se ha generado un nuevo alquiler (Reserva #{nuevoId})."; 
             return RedirectToAction(nameof(Index)); 
         }
+    
+        [HttpGet]
+        public IActionResult ObtenerPrecioInmueble(int id)
+        {
+            var inmueble = repoInmueble.ObtenerPorId(id);
+            if (inmueble != null)
+            {
+                return Json(new { precio = inmueble.PrecioPorDia });
+            }
+            return Json(new { precio = 0 });
+        }
     }
 }
 
