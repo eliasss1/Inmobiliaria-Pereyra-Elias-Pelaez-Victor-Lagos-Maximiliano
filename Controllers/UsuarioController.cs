@@ -12,11 +12,13 @@ public class UsuarioController : Controller
     private readonly IRepositorioUsuario repo;
     private readonly IWebHostEnvironment env;
 
-    public UsuarioController(IRepositorioUsuario _repo, IWebHostEnvironment _env)
-{
-    repo = _repo;
-    env = _env;
-}
+    private readonly ILogger<UsuarioController> Logger;
+    public UsuarioController(IRepositorioUsuario _repo, IWebHostEnvironment _env, ILogger<UsuarioController> logger)
+    {
+        repo = _repo;
+        env = _env;
+        Logger = logger;
+    }
 
     public ActionResult Login()
     {
@@ -188,6 +190,16 @@ public class UsuarioController : Controller
     {
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        /*Logger.LogWarning(
+        "Perfil POST recibido: idFormulario={IdFormulario}, idSesion={IdSesion}, nombre={Nombre}, apellido={Apellido}, email={Email}, archivo={Archivo}, bytes={Bytes}",
+        e.IdUsuario,
+        userId,
+        e.Nombre,
+        e.Apellido,
+        avatarFile?.FileName,
+        avatarFile?.Length);*/
+
         e.IdUsuario = int.Parse(userId);
 
         ModelState.Remove(nameof(e.Clave));
@@ -215,38 +227,80 @@ public class UsuarioController : Controller
                 var usuarioAnterior = repo.ObtenerPorId(e.IdUsuario);
                 e.Avatar = usuarioAnterior.Avatar;
             }
+            
             repo.Modificacion(e);
             return RedirectToAction(nameof(Perfil));
+        }
+        else
+        {
+            Console.WriteLine("Error en la validación del modelo");
         }
         return View(e);
     }
 
     [Authorize]
+    public IActionResult CambiarContraseña()
+    {
+        return View();
+    }
+
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult CambiarContraseña(Usuario e)
+    public IActionResult CambiarContraseña(CambiarClaveViewModel viewModel)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        e.IdUsuario = int.Parse(userId);
-        ModelState.Remove(nameof(e.Nombre));
-        ModelState.Remove(nameof(e.Apellido));
-        ModelState.Remove(nameof(e.Email));
-        ModelState.Remove(nameof(e.Rol));
-        ModelState.Remove(nameof(e.Avatar));
-        if (ModelState.IsValid)
+
+        if (!ModelState.IsValid)
         {
-            var usuario = repo.ObtenerPorId(e.IdUsuario);
-            string claveHasheada = SeguridadHelper.HashearClave(e.Clave);
-            if (usuario.Clave == claveHasheada)
+            TempData["Error"] = "Revisa los datos ingresados e inténtalo nuevamente.";
+            return View(viewModel);
+        }
+
+        if (string.Equals(viewModel.ClaveActual, viewModel.ClaveNueva, StringComparison.Ordinal))
+        {
+            TempData["SinCambios"] = "La nueva contraseña no puede ser igual a la actual";
+            return View(viewModel);
+        }
+
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var claveAlmacenada = repo.ObtenerContraPorId(userId);
+            if (string.IsNullOrEmpty(claveAlmacenada))
             {
-                ViewBag.Mensaje = "La nueva contraseña no puede ser igual a la actual";
-                return View(e);
+                Logger.LogWarning("No se encontró un hash de contraseña para el usuario {UserId}", userId);
+                TempData["Error"] = "No se pudo verificar la contraseña. Inténtalo nuevamente.";
+                return View(viewModel);
             }
-            usuario.Clave = claveHasheada;
-            repo.ModificarContraseña(usuario);
-            ViewBag.Mensaje = "Contraseña actualizada correctamente";
+
+            var claveActualHasheada = SeguridadHelper.HashearClave(viewModel.ClaveActual);
+            if (!string.Equals(claveActualHasheada, claveAlmacenada, StringComparison.Ordinal))
+            {
+                TempData["NoCoincideClave"] = "La contraseña actual no coincide.";
+                return View(viewModel);
+            }
+
+            var claveNuevaHasheada = SeguridadHelper.HashearClave(viewModel.ClaveNueva);
+            var filasActualizadas = repo.ModificarContraseña(userId, claveNuevaHasheada);
+            if (filasActualizadas != 1)
+            {
+                Logger.LogWarning("La actualización de contraseña afectó {Rows} filas para el usuario {UserId}", filasActualizadas, userId);
+                TempData["Error"] = "No se pudo actualizar la contraseña. Inténtalo nuevamente.";
+                return View(viewModel);
+            }
+
+            TempData["MensajeExito"] = "¡Contraseña actualizada correctamente!";
             return RedirectToAction(nameof(Perfil));
         }
-        return View(e);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error al cambiar la contraseña del usuario {UserId}", userId);
+            TempData["Error"] = "Ocurrió un error al actualizar la contraseña. Inténtalo nuevamente.";
+            return View(viewModel);
+        }
     }
 }

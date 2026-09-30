@@ -1,0 +1,53 @@
+@model Inmobiliaria.Models.CambiarClaveViewModel
+
+@{
+    ViewData["Title"] = "CambiarContraseña";
+}
+
+@if(TempData["NoCoincideClave"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+        <strong>¡Que Bajon!</strong> @TempData["NoCoincideClave"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if(TempData["SinCambios"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+        <strong>¡Que Bajon!</strong> @TempData["SinCambios"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if(TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+        <strong>¡Que Bajon!</strong> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<div class="container d-flex justify-content-center align-items-center">
+    <form asp-controller="Usuario" asp-action="CambiarContraseña" method="post" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow">
+
+        <h1 style="font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: -0.02em;">Cambiar Contraseña</h1>
+        
+        <div class="w-50">
+            <label for="ContraseñaActual" class="form-label">Contraseña Actual</label>
+            <input type="password" class="form-control" id="ContraseñaActual" asp-for="ClaveActual" required>
+            <span asp-validation-for="ClaveActual" class="text-danger"></span>
+        </div>
+        
+        <div class="w-50">
+            <label for="NuevaContraseña" class="form-label">Nueva Contraseña</label>
+            <input type="password" class="form-control" id="NuevaContraseña" asp-for="ClaveNueva" required>
+            <span asp-validation-for="ClaveNueva" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <a asp-action="Perfil" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
+        </div>
+        
+    </form>
+</div>

@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS TipoInmueble (
     Nombre VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE Inmueble (
+CREATE TABLE IF NOT EXISTS Inmueble (
     IdInmueble INT AUTO_INCREMENT PRIMARY KEY,
     Direccion VARCHAR(255) NOT NULL,
     Cupo INT NOT NULL,
@@ -118,8 +118,8 @@ INSERT INTO TipoInmueble (Nombre) VALUES
 ('Departamento'),
 ('Monoambiente');
 
-INSERT INTO Inmueble (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, PorcentajeSeña, Estado, ImagenPortada, IdTipoInmueble, IdPropietario) VALUES
-('Calle Falsa 123', 3, 120, 120, 1000, 0.2, TRUE, 'casa.jpg', 1, 1),
-('Avenida Falsa 456', 2, 80, 80, 6000, 0.15, TRUE, 'departamento.jpg', 2, 2),
-('Calle Falsa 789', 1, 50, 50, 3000, 0.1, TRUE, 'monoambiente.jpg', 3, 3);
+INSERT INTO Inmueble (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, PorcentajeSeña, Estado, IdTipoInmueble, IdPropietario) VALUES
+('Calle Falsa 123', 3, 120, 120, 1000, 0.2, TRUE, 1, 1),
+('Avenida Falsa 456', 2, 80, 80, 6000, 0.15, TRUE, 2, 2),
+('Calle Falsa 789', 1, 50, 50, 3000, 0.1, TRUE, 3, 3);
 

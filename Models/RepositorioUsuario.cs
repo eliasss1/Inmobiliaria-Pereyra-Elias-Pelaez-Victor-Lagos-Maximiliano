@@ -113,37 +113,29 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         }
     }
 
-    public int ModificarContraseña(Usuario e)
+    public int ModificarContraseña(int idUsuario, string claveHasheada)
     {
-        int res = -1;
-        using (MySqlConnection conexion = new MySqlConnection(connectionString))
-        {
-            try
-            {
-                string query = @"UPDATE Usuario 
-                SET Clave = @Clave
-                WHERE IdUsuario = @IdUsuario";
+        using var conexion = new MySqlConnection(connectionString);
+        const string query = @"UPDATE Usuario
+            SET Clave = @Clave
+            WHERE IdUsuario = @IdUsuario";
+        using var comando = new MySqlCommand(query, conexion);
+        comando.Parameters.Add("@IdUsuario", MySqlDbType.Int32).Value = idUsuario;
+        comando.Parameters.Add("@Clave", MySqlDbType.VarChar).Value = claveHasheada;
+        conexion.Open();
+        return comando.ExecuteNonQuery();
+    }
 
-                using (MySqlCommand comando = new MySqlCommand(query, conexion))
-                {
-                    comando.CommandType = CommandType.Text;
-                    comando.Parameters.AddWithValue("@IdUsuario", e.IdUsuario);
-                    conexion.Open();
-                    res = comando.ExecuteNonQuery();
-                    Console.WriteLine("Modificación de contraseña de usuario completada, cerrando la conexión.");
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error al modificar contraseña de usuario: {ex.Message}");
-            }
-            finally
-            {
-                conexion.Close();
-            }
-            return res;
-        }
-
+    public string? ObtenerContraPorId(int id)
+    {
+        using var conexion = new MySqlConnection(connectionString);
+        const string query = @"SELECT Clave
+            FROM Usuario
+            WHERE IdUsuario = @IdUsuario";
+        using var comando = new MySqlCommand(query, conexion);
+        comando.Parameters.Add("@IdUsuario", MySqlDbType.Int32).Value = id;
+        conexion.Open();
+        return comando.ExecuteScalar() as string;
     }
 
     public int ObtenerCantidad()

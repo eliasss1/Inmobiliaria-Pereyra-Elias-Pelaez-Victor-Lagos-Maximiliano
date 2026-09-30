@@ -3,6 +3,15 @@
 @{
     ViewData["Title"] = "Perfil";
 }
+
+@if (TempData["MensajeExito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+        <strong>¡Éxito!</strong> @TempData["MensajeExito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="d-flex justify-content-center">
     <div class="card p-1 align-items-center justify-content-center" style="min-width:800px; width:auto; height: 350px">
         <div id="infoNormal" class="d-flex justify-content-center align-items-center">
@@ -27,7 +36,7 @@
         </div>
         <form id="infoParaEditar" method="post"  enctype="multipart/form-data" asp-controller="Usuario" asp-action="Perfil" class="d-flex justify-content-center align-items-center d-none">
             <label for="avatarFile" class="burbuja-foto m-5 overflow-hidden d-flex justify-content-center align-items-center" style="cursor: pointer; position: relative;">
-                <img id="previewAvatar" src="@(string.IsNullOrEmpty(Model.Avatar) ? "/img/mr-musculo.png" : Model.Avatar)" class="w-100 h-100" style="object-fit: cover;" alt="Avatar" />
+                <img id="previewAvatar" src="@Model.Avatar"class="w-100 h-100" style="object-fit: cover;" alt="Avatar" />
 
                 <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50 text-white" style="opacity: 0; transition: 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
                     <i class="bi bi-camera fs-1"></i>
@@ -35,73 +44,37 @@
             </label>
             
             
-            <input type="file" name="avatarFile" id="avatarFile" accept="image/*" class="d-none" onchange="previewImage(event)">
+            <input type="file" name="AvatarFile" id="avatarFile" accept="image/*" class="d-none" onchange="previewImage(event)">
             <div>
                 <div class="d-flex gap-1">
                     <h3 id="h3-nombre" contenteditable="true" style="outline: none;">@Model.Nombre</h3>
-                    <input id="input-nombre" type="hidden" name="Nombre" value="@Model.Nombre"/>
+                    <input id="input-nombre" type="hidden" asp-for="Nombre"/>
 
                     <h3 id="h3-apellido" contenteditable="true" style="outline: none;">@Model.Apellido <i class="bi bi-pencil"></i></h3>
                     
-                    <input id="input-apellido" type="hidden" name="Apellido" value="@Model.Apellido"/>
+                    <input id="input-apellido" type="hidden" asp-for="Apellido"/>
 
                 </div>
 
-                <input id="input-id" type="hidden" name="Id" value="@Model.IdUsuario"/>
-                <input id="input-rol" type="hidden" name="Rol" value="@Model.Rol"/>
+                <input id="input-id" type="hidden" asp-for="IdUsuario"/>
+                <input id="input-rol" type="hidden" asp-for="Rol"/>
 
                 <h6><strong>Email</strong></h6>
                 <p id="p-email" contenteditable="true" style="outline: none;">@Model.Email <i class="bi bi-pencil"></i></p>
                 
-                <input id="input-email" type="hidden" name="Email" value="@Model.Email"/>
+                <input id="input-email" type="hidden" asp-for="Email"/>
 
-                <a class="text-primary" data-bs-toggle="modal" data-bs-target="#modalContraseña">Editar Contraseña</a>
+                <a class="text-primary" asp-action="CambiarContraseña">Editar Contraseña</a>
             </div>
             <div class="h-100 ps-4 me-4" style="padding-top: 32px">
                 <button id="boton-guardar" type="submit" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-save"> Guardar</i>
                 </button>
-                <button id="boton-cancelar" type="submit" class="btn btn-sm btn-outline-danger">
+                <a asp-controller="Usuario" asp-action="Perfil" id="boton-cancelar" class="btn btn-sm btn-outline-danger">
                     <i class="bi bi-x">Cancelar</i>
-                </button>
+                </a>
             </div>
-            
         </form>
-    </div>
-</div>
-
-<div class="modal fade" id="modalContraseña" tabindex="-1" aria-labelledby="modalContraseñaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalContraseñaLabel">Cambiar Contraseña</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            
-            <form asp-controller="Usuario" asp-action="CambiarContraseña" method="post">
-                <div class="modal-body">
-                    
-                    <input type="hidden" name="IdUsuario" value="@Model.IdUsuario" />
-
-                    <div class="mb-3">
-                        <label for="ContraseñaActual" class="form-label">Contraseña Actual</label>
-                        <input type="password" class="form-control" id="ContraseñaActual" name="ContraseñaActual" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="NuevaContraseña" class="form-label">Nueva Contraseña</label>
-                        <input type="password" class="form-control" id="NuevaContraseña" name="NuevaContraseña" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="ConfirmarContraseña" class="form-label">Confirmar Nueva Contraseña</label>
-                        <input type="password" class="form-control" id="ConfirmarContraseña" name="ConfirmarContraseña" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Actualizar Contraseña</button>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 
@@ -127,7 +100,7 @@
     const infoEditar = document.getElementById("infoParaEditar");
     const btnGuardar = document.getElementById("boton-guardar");
     const btnEditar = document.getElementById("boton-editar");
-    const btnCancelar = document.getElementById("boton-cancelar");
+
     const avatarInput = document.getElementById("avatarFile");
 
     const nombreEdit = document.getElementById("h3-nombre");
@@ -160,18 +133,13 @@
         avatarChanged = false;
     });
 
-    btnCancelar.addEventListener("click", function () {
-        infoNormal.classList.remove("d-none");
-        infoEditar.classList.add("d-none");
-        btnGuardar.disabled = true;
-        avatarChanged = false;
-        avatarInput.value = "";
-    });
-
     document.addEventListener("DOMContentLoaded", function () {
         nombreOriginal = nombreEdit.innerText.trim();
         apellOriginal = apellidoEdit.innerText.trim();
         emailOriginal = emailEdit.innerText.trim();
+
+
+        
 
         nombreEdit.addEventListener("blur", function () {
             nombreInput.value = nombreEdit.innerText.trim();
@@ -211,13 +179,6 @@
             avatarChanged = true;
             actualizarEstadoGuardar();
         });
-    });
-
-    btnGuardar.addEventListener("click", function () {
-        infoNormal.classList.remove("d-none");
-        infoEditar.classList.add("d-none");
-        btnGuardar.disabled = true;
-        avatarChanged = false;
     });
 
     function previewImage(event) {
