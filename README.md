@@ -87,7 +87,7 @@ El sistema estará disponible típicamente en http://localhost:5000 o https://lo
 🔐 Acceso al Sistema
 El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:
 - Email: admin@inmobiliaria.com
-- Clave: 123
+- Clave: admin123
 - Rol: Administrador
 👥 Equipo de Desarrollo
 Pereyra
