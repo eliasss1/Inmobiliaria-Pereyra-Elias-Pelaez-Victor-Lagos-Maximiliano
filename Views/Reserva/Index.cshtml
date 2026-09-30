@@ -81,9 +81,9 @@
         <table class="table table-striped table-hover align-middle border">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
+                    
                     <th>Inmueble</th>
-                    <th>Inquilino</th>
+                    <th>DNI Inquilino</th>
                     <th>Desde</th>
                     <th>Hasta</th>
                     <th>Monto/Dia</th>
@@ -105,9 +105,9 @@
                     @foreach (var r in Model)
                     {
                         <tr>
-                            <td class="fw-bold">@r.IdReserva</td>
+                            
                             <td>@r.InmuebleAsociado?.Direccion</td>
-                            <td>@r.InquilinoAsociado?.Nombre @r.InquilinoAsociado?.Apellido</td>
+                            <td>@r.InquilinoAsociado?.Dni</td>
                             <td>@r.FechaDesde.ToShortDateString()</td>
                             <td>@r.FechaHasta.ToShortDateString()</td>
                             <td>$@r.MontoPorDia.ToString("N2")</td>
@@ -164,3 +164,4 @@
         </div>
     }
 </div>
+

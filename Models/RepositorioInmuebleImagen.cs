@@ -11,23 +11,10 @@ public class RepositorioInmuebleImagen
     public RepositorioInmuebleImagen(IConfiguration configuration)
     {
         connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
-        CrearTablaSiNoExiste();
+        
     }
 
-    private void CrearTablaSiNoExiste()
-    {
-        using var conexion = new MySqlConnection(connectionString);
-        conexion.Open();
-        var sql = @"
-            CREATE TABLE IF NOT EXISTS InmuebleImagen (
-                IdImagen INT AUTO_INCREMENT PRIMARY KEY,
-                IdInmueble INT NOT NULL,
-                Url VARCHAR(255) NOT NULL,
-                FOREIGN KEY (IdInmueble) REFERENCES Inmueble(IdInmueble) ON DELETE CASCADE
-            );";
-        using var cmd = new MySqlCommand(sql, conexion);
-        cmd.ExecuteNonQuery();
-    }
+    
 
     public void Alta(InmuebleImagen imagen)
     {
@@ -91,3 +78,4 @@ public class RepositorioInmuebleImagen
         return null;
     }
 }
+

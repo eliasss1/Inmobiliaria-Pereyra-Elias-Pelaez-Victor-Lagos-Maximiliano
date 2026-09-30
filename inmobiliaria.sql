@@ -92,6 +92,13 @@ CREATE TABLE IF NOT EXISTS Pago (
     FOREIGN KEY (IdUsuarioAnulador) REFERENCES Usuario(IdUsuario) ON DELETE RESTRICT
 );
 
+CREATE TABLE IF NOT EXISTS InmuebleImagen (
+    IdImagen INT AUTO_INCREMENT PRIMARY KEY,
+    IdInmueble INT NOT NULL,
+    Url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (IdInmueble) REFERENCES Inmueble(IdInmueble) ON DELETE CASCADE
+);
+
 -- DATOS DE PRUEBA
 INSERT INTO Propietario (Nombre, Apellido, Dni, Telefono, Email) VALUES
 ('Juan', 'Perez', '11222333', '2664111111', 'juan.perez@email.com'),
@@ -115,3 +122,4 @@ INSERT INTO Inmueble (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, Porcenta
 ('Calle Falsa 123', 3, 120, 120, 1000, 0.2, TRUE, 'casa.jpg', 1, 1),
 ('Avenida Falsa 456', 2, 80, 80, 6000, 0.15, TRUE, 'departamento.jpg', 2, 2),
 ('Calle Falsa 789', 1, 50, 50, 3000, 0.1, TRUE, 'monoambiente.jpg', 3, 3);
+
