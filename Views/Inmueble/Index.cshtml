@@ -72,7 +72,6 @@
         <table class="table table-striped table-hover align-middle border">
             <thead class="table-dark">
                 <tr>
-                    
                     <th>Imagen</th>
                     <th>Dirección</th>
                     <th>Tipo</th>
@@ -80,6 +79,7 @@
                     <th>Precio/Día</th>
                     <th>Estado</th>
                     <th>DNI Propietario</th>
+                    <th>Porcentaje Seña</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -120,6 +120,7 @@
                                 }
                             </td>
                             <td>@(RepoPropietario.ObtenerPorId(i.IdPropietario)?.Dni)</td>
+                            <td>@i.PorcentajeSeña</td>
                             <td>
                                 <a asp-action="Edit" asp-route-id="@i.IdInmueble" class="btn btn-warning btn-sm">Editar</a>
                                 @if(User.IsInRole("Administrador")){

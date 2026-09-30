@@ -136,9 +136,12 @@
                                     <a asp-action="FinalizarAnticipado" asp-route-id="@r.IdReserva" class="btn btn-dark btn-sm">Finalizar</a>
                                 }
                                 <a asp-controller="Pago" asp-action="PorReserva" asp-route-id="@r.IdReserva" class="btn btn-info btn-sm">Pagos</a>
-                                <form asp-action="Eliminar" asp-route-id="@r.IdReserva" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres eliminar esta reserva?');">
-                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                                </form>
+                                @if (User.IsInRole( "Administrador"))
+                                {
+                                    <form asp-action="Eliminar" asp-route-id="@r.IdReserva" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres eliminar esta reserva?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                    </form>
+                                }
                             </td>
                         </tr>
                     }

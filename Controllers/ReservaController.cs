@@ -181,7 +181,7 @@ namespace Inmobiliaria.Controllers
                         }
                         if (inmueble != null && repoReserva.ExisteSolapamiento(entidad)) 
                         {
-                            ModelState.AddModelError("", "El inmueble seleccionado ya se encuentra reservado en el rango de fechas elegido."); 
+                            ModelState.AddModelError("FechaDesde", "El inmueble seleccionado ya se encuentra reservado en el rango de fechas elegido."); 
                         } 
                         if (!ModelState.IsValid)
                         { 
