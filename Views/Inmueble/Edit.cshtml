@@ -3,7 +3,7 @@
 <div class="container">
     <h2 class="mt-4">Editar Inmueble</h2>
     
-    <form asp-controller="Inmueble" asp-action="Edit" class="d-flex flex-column justify-content-center m-2 p-5 gap-3 bg-light border rounded" method="post" enctype="multipart/form-data">
+    <form asp-controller="Inmueble" asp-action="Edit" class="d-flex flex-column justify-content-center m-2 p-5 gap-3 border rounded" method="post" enctype="multipart/form-data">
         
         <input type="hidden" asp-for="IdInmueble" />
         <input type="hidden" asp-for="IdPropietario" />
@@ -52,6 +52,19 @@
             <div class="col-md-6">
                 <label class="fw-bold">Longitud</label>
                 <input asp-for="Longitud" class="form-control" type="number" step="any" />
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <label class="fw-bold">Cambiar imagen de portada</label>
+                <input type="file" name="portadaFile" class="form-control" accept="image/*" />
+                @if (!string.IsNullOrEmpty(Model.ImagenPortada))
+                {
+                    <div class="mt-2">
+                        <img src="@Model.ImagenPortada" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
+                    </div>
+                }
             </div>
         </div>
 

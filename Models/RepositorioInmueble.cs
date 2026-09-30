@@ -17,28 +17,43 @@ public int Alta(Inmueble entidad)
     int res = -1;
     using (var connection = new MySqlConnection(connectionString))
     {
-        string sql = @"INSERT INTO Inmueble 
+        try
+        {
+            string sql = @"INSERT INTO Inmueble 
                     (Direccion, Cupo, Latitud, Longitud, PrecioPorDia, PorcentajeSeña, Estado, ImagenPortada, IdTipoInmueble, IdPropietario) 
                     VALUES (@direccion, @cupo, @latitud, @longitud, @precio, @porcentajeSeña, @estado, @imagen, @idTipo, @idPropietario); 
                     SELECT LAST_INSERT_ID();";
         
-        using (var command = new MySqlCommand(sql, connection))
-        {
-            command.Parameters.AddWithValue("@direccion", entidad.Direccion);
-            command.Parameters.AddWithValue("@cupo", entidad.Cupo);
-            command.Parameters.AddWithValue("@latitud", entidad.Latitud);
-            command.Parameters.AddWithValue("@longitud", entidad.Longitud);
-            command.Parameters.AddWithValue("@precio", entidad.PrecioPorDia);
-            command.Parameters.AddWithValue("@porcentajeSeña", entidad.PorcentajeSeña);
-            command.Parameters.AddWithValue("@estado", entidad.Estado);
-            command.Parameters.AddWithValue("@imagen", entidad.ImagenPortada ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@idTipo", entidad.IdTipoInmueble);
-            command.Parameters.AddWithValue("@idPropietario", entidad.IdPropietario);
-            
-            connection.Open();
-            res = Convert.ToInt32(command.ExecuteScalar());
-            entidad.IdInmueble = res;
-        }
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@direccion", entidad.Direccion);
+                command.Parameters.AddWithValue("@cupo", entidad.Cupo);
+                command.Parameters.AddWithValue("@latitud", entidad.Latitud);
+                command.Parameters.AddWithValue("@longitud", entidad.Longitud);
+                command.Parameters.AddWithValue("@precio", entidad.PrecioPorDia);
+                command.Parameters.AddWithValue("@porcentajeSeña", entidad.PorcentajeSeña);
+                command.Parameters.AddWithValue("@estado", entidad.Estado);
+                command.Parameters.AddWithValue("@imagen", entidad.ImagenPortada ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@idTipo", entidad.IdTipoInmueble);
+                command.Parameters.AddWithValue("@idPropietario", entidad.IdPropietario);
+                
+                connection.Open();
+                res = Convert.ToInt32(command.ExecuteScalar());
+
+                entidad.IdInmueble = res;
+
+                Console.WriteLine($"Inmueble creado: [ID: {entidad.IdInmueble}, Imagen: {entidad.ImagenPortada ?? "nulo"}]");
+            }
+            }
+            catch(Exception Ex)
+            {
+                Console.WriteLine($"Error al crear un inmueble: {Ex.Message}");
+            }
+            finally
+            {
+                connection.Close();
+            }
+        
     }
     return res;
 }
@@ -97,8 +112,8 @@ public int Alta(Inmueble entidad)
             command.Parameters.AddWithValue("@idTipo", entidad.IdTipoInmueble);
             command.Parameters.AddWithValue("@idPropietario", entidad.IdPropietario);
             command.Parameters.AddWithValue("@id", entidad.IdInmueble);
-            
             connection.Open();
+            //Console.WriteLine(sql);
             res = command.ExecuteNonQuery();
         }
     }

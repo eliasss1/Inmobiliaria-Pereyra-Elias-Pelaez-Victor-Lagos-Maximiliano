@@ -28,29 +28,50 @@
                 <dt class="col-sm-3">Im&aacute;genes</dt>
         <dd class="col-sm-9">
             @{ var imagenes = ViewBag.Imagenes as IList<Inmobiliaria.Models.InmuebleImagen>; }
-            @if(imagenes != null && imagenes.Count > 0)
+            @if (!string.IsNullOrEmpty(Model.ImagenPortada) || (imagenes != null && imagenes.Count > 0))
             {
-                <div id="carouselInmueble" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px;">
-                    <div class="carousel-inner rounded shadow-sm">
-                        @for (int i = 0; i < imagenes.Count; i++)
+                var imagenesTotales = new List<string>();
+                if (!string.IsNullOrEmpty(Model.ImagenPortada))
+                {
+                    imagenesTotales.Add(Model.ImagenPortada);
+                }
+                if (imagenes != null)
+                {
+                    foreach (var img in imagenes)
+                    {
+                        if (!string.IsNullOrEmpty(img.Url) && !imagenesTotales.Contains(img.Url))
                         {
-                            <div class="carousel-item @(i == 0 ? "active" : "")">
-                                <img src="@imagenes[i].Url" class="d-block w-100" style="height: 300px; object-fit: cover;" alt="Imagen inmueble">
-                            </div>
+                            imagenesTotales.Add(img.Url);
+                        }
+                    }
+                }
+
+                if (imagenesTotales.Count > 0)
+                {
+                    <div id="carouselInmueble" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px;">
+                        <div class="carousel-inner rounded shadow-sm">
+                            @for (int i = 0; i < imagenesTotales.Count; i++)
+                            {
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@imagenesTotales[i]" class="d-block w-100" style="height: 300px; object-fit: cover;" alt="Imagen inmueble">
+                                </div>
+                            }
+                        </div>
+                        @if (imagenesTotales.Count > 1) {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselInmueble" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselInmueble" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
                         }
                     </div>
-                    @if (imagenes.Count > 1) {
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselInmueble" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselInmueble" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                    }
-                </div>
-            } else {
+                }
+            }
+            else
+            {
                 <span class="text-muted">No hay im&aacute;genes adicionales.</span>
             }
         </dd>

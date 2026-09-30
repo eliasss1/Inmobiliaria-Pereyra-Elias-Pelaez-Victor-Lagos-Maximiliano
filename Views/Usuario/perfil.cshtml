@@ -128,49 +128,57 @@
     const btnGuardar = document.getElementById("boton-guardar");
     const btnEditar = document.getElementById("boton-editar");
     const btnCancelar = document.getElementById("boton-cancelar");
+    const avatarInput = document.getElementById("avatarFile");
 
     const nombreEdit = document.getElementById("h3-nombre");
     const apellidoEdit = document.getElementById("h3-apellido");
     const emailEdit = document.getElementById("p-email");
-    
 
     const nombreInput = document.getElementById("input-nombre");
     const apellidoInput = document.getElementById("input-apellido");
     const emailInput = document.getElementById("input-email");
-    
 
-    
+    let nombreOriginal = "";
+    let apellOriginal = "";
+    let emailOriginal = "";
+    let avatarChanged = false;
+
+    function actualizarEstadoGuardar() {
+        const cambios =
+            nombreEdit.innerText.trim() !== nombreOriginal ||
+            apellidoEdit.innerText.trim() !== apellOriginal ||
+            emailEdit.innerText.trim() !== emailOriginal ||
+            avatarChanged;
+
+        btnGuardar.disabled = !cambios;
+    }
 
     btnEditar.addEventListener("click", function () {
-            infoNormal.classList.add("d-none");
-            infoEditar.classList.remove("d-none");
-            btnGuardar.disabled = true;
+        infoNormal.classList.add("d-none");
+        infoEditar.classList.remove("d-none");
+        btnGuardar.disabled = true;
+        avatarChanged = false;
     });
 
     btnCancelar.addEventListener("click", function () {
         infoNormal.classList.remove("d-none");
         infoEditar.classList.add("d-none");
+        btnGuardar.disabled = true;
+        avatarChanged = false;
+        avatarInput.value = "";
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-
-        const nombreOriginal = nombreEdit.innerText;
-        const apellOriginal = apellidoEdit.innerText;
-        const emailOriginal = emailEdit.innerText;
-
+        nombreOriginal = nombreEdit.innerText.trim();
+        apellOriginal = apellidoEdit.innerText.trim();
+        emailOriginal = emailEdit.innerText.trim();
 
         nombreEdit.addEventListener("blur", function () {
             nombreInput.value = nombreEdit.innerText.trim();
-
-            if(validarCambios(nombreOriginal, apellOriginal, emailOriginal)){
-                btnGuardar.disabled = false;
-            }else{
-                btnGuardar.disabled = true;
-            }
-
+            actualizarEstadoGuardar();
         });
         nombreEdit.addEventListener("keydown", function (e) {
-            if (e.key === "Enter"){
+            if (e.key === "Enter") {
                 e.preventDefault();
                 nombreEdit.blur();
             }
@@ -178,16 +186,10 @@
 
         apellidoEdit.addEventListener("blur", function () {
             apellidoInput.value = apellidoEdit.innerText.trim();
-
-            if(validarCambios(nombreOriginal, apellOriginal, emailOriginal)){
-                btnGuardar.disabled = false;
-            }else{
-                btnGuardar.disabled = true;
-            }
-
+            actualizarEstadoGuardar();
         });
         apellidoEdit.addEventListener("keydown", function (e) {
-            if (e.key === "Enter"){
+            if (e.key === "Enter") {
                 e.preventDefault();
                 apellidoEdit.blur();
             }
@@ -195,43 +197,28 @@
 
         emailEdit.addEventListener("blur", function () {
             emailInput.value = emailEdit.innerText.trim();
-
-            if(validarCambios(nombreOriginal, apellOriginal, emailOriginal)){
-                btnGuardar.disabled = false;
-            }else{
-                btnGuardar.disabled = true;
-            }
-
+            actualizarEstadoGuardar();
         });
         emailEdit.addEventListener("keydown", function (e) {
-            if (e.key === "Enter"){
+            if (e.key === "Enter") {
                 e.preventDefault();
                 emailEdit.blur();
             }
         });
 
+        avatarInput.addEventListener("change", function (event) {
+            previewImage(event);
+            avatarChanged = true;
+            actualizarEstadoGuardar();
+        });
     });
 
     btnGuardar.addEventListener("click", function () {
         infoNormal.classList.remove("d-none");
         infoEditar.classList.add("d-none");
+        btnGuardar.disabled = true;
+        avatarChanged = false;
     });
-
-    
-
-    function validarCambios(n, a, e) {
-        let cambios = false;
-
-        const nombreActual = nombreEdit.innerText.trim();
-        const apellidoActual = apellidoEdit.innerText.trim();
-        const emailActual  = emailEdit.innerText.trim();
-
-        if(nombreActual !== n || apellidoActual !== a || emailActual !== e){
-            cambios = true;
-        }
-
-        return cambios;
-    }
 
     function previewImage(event) {
         const reader = new FileReader();
@@ -239,7 +226,7 @@
             const preview = document.getElementById('previewAvatar');
             preview.src = reader.result;
         }
-        if(event.target.files[0]){
+        if (event.target.files[0]) {
             reader.readAsDataURL(event.target.files[0]);
         }
     }
