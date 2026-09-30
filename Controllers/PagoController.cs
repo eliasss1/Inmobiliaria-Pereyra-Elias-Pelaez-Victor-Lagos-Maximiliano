@@ -196,7 +196,7 @@ namespace Inmobiliaria.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public ActionResult EliminarConfirmado(int id)
