@@ -2,7 +2,13 @@
 > **TP integral ULP 2026** | 📞 Contacto: 2664884044
 
 Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Core MVC. Permite la administración de propietarios, inmuebles, inquilinos, reservas y pagos, con un estricto control de roles y disponibilidad.
-
+LO MAS IMPORTANTE QUE ME GUSTARIA DESTACRA ES LO SIGUIENTE:
+- Un inmueble se crea solo desde el propietario, y desde ver inmuebles en el index de propietario. Llegando desde este lugar se pueden listar informes de unicamente ESE propietario.
+- Las reservas se pueden eliminar por un Admin pero estas quedan registradas pero sin interactivilidad
+- Los usuarios solo se pueden crear DESDE GESTION USUARIOS, siendo solo accesible por el ADMIN.
+- El comando dotnet watch se crashea cuando se sube una imagen y no supe como solucionarlo
+- Los detalles de las entidades Reserva y Pago permanecen ocultos para cualquier empleado, al igual que el boton eliminar en todas las entidades...
+- Los demas detalles de las demas entidades supuse que son demasiado importantes para el empleado poder verlas, asique los deje a su disposicion.
 ---
 
 <details>
