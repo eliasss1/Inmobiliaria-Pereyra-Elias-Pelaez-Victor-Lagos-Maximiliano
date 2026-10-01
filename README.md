@@ -19,8 +19,8 @@ Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Co
     * Asignación por rangos de fechas.
     * Validación automática de solapamiento para evitar doble reserva.
     * Auditoría del empleado que generó el contrato.
-  * **Control de Pagos:** Registro de transacciones y baja lógica (anulación) exclusiva para administradores.
-  * **Interfaz Gráfica:** Responsivo, Bootstrap 5, soporte Claro/Oscuro.
+  * **Control de Pagos:** Registro de transacciones y baja lógica (Baja) exclusiva para administradores, y anulacion normal disponible para Usuarios.
+  * **Interfaz Gráfica:** Bootstrap 5, soporte Claro/Oscuro.
 
 </details>
 
@@ -36,30 +36,7 @@ Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Co
 </details>
 
 <details>
-  <summary><strong>⚙️ Instalación y Configuración</strong></summary>
-  <br>
-
-  **1. Requisitos Previos**
-  * .NET SDK 10.0 o superior.
-  * Servidor MySQL/MariaDB.
-  * IDE (Visual Studio 2022, VS Code o Rider).
-
-  **2. Clonar el repositorio**
-  
-  git clone <URL_DEL_REPOSITORIO>
-  cd Inmobiliaria_Pereyra_Elias_Pelaez_Victor_Lagos_Maximiliano
-
-  **3. Configurar la Base de Datos**
-  
-  Ejecuta el script inmobiliaria.sql en tu gestor (phpMyAdmin, DBeaver, etc.) para crear la base de datos inmobiliaria_db y cargar los datos iniciales.
-  
-  **4. Cadena de Conexión**
-  
-  Abre appsettings.json y verifica tus credenciales:
-<details>
-    
-<details>
-  <summary>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</summary>
+  <summary><strong>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</strong></summary>
   <br>
   
   **El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:**
