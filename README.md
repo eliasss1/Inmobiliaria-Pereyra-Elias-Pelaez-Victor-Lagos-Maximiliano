@@ -1,94 +1,73 @@
-# Inmobiliaria-Pereyra-Elias-Pelaez-Victor-Lagos-Maximiliano
-TP integral ULP 2026.
+# 🏡 Inmobiliaria: Pereyra, Elías, Peláez & Lagos
+> **TP integral ULP 2026** | 📞 Contacto: 2664884044
 
-[!NOTE]
-NUMERO DE CONTACTO PARA EL INFORME DE REVISION CRUZADA: 2664884044
+Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Core MVC. Permite la administración de propietarios, inmuebles, inquilinos, reservas y pagos, con un estricto control de roles y disponibilidad.
 
-🚀 Características Principales
-Gestión de Usuarios y Roles: Autenticación basada en cookies. Dos roles definidos (Administrador y Empleado) con restricciones de acceso a las distintas vistas y acciones (por ejemplo, solo el administrador puede eliminar registros o anular pagos).
+---
 
-Administración de Entidades Básicas (ABM/CRUD):
+<details>
+  <summary><strong>🚀 Características Principales</strong></summary>
+  <br>
 
-Propietarios: Registro y gestión de los dueños de los inmuebles.
+  * **Gestión de Usuarios y Roles:** Autenticación por cookies. Roles de *Administrador* (acceso total, eliminación, anulación) y *Empleado* (gestión operativa).
+  * **Administración de Entidades (CRUD):**
+    * **Propietarios:** Dueños de los inmuebles.
+    * **Inquilinos:** Clientes que alquilan.
+    * **Tipos de Inmuebles:** Categorización (Casa, Depto, etc.).
+    * **Inmuebles:** Capacidad, coordenadas, precio por día y estado.
+  * **Sistema de Reservas:**
+    * Asignación por rangos de fechas.
+    * Validación automática de solapamiento para evitar doble reserva.
+    * Auditoría del empleado que generó el contrato.
+  * **Control de Pagos:** Registro de transacciones y baja lógica (anulación) exclusiva para administradores.
+  * **Interfaz Gráfica:** Responsivo, Bootstrap 5, soporte Claro/Oscuro.
 
-Inquilinos: Registro de los clientes que alquilan las propiedades.
+</details>
 
-Tipos de Inmuebles: Categorización de propiedades (Casa, Departamento, Monoambiente, etc.).
+<details>
+  <summary><strong>🛠️ Tecnologías Utilizadas</strong></summary>
+  <br>
 
-Gestión de Inmuebles: Registro de propiedades asociadas a un dueño y un tipo, incluyendo capacidad (cupo), coordenadas (latitud/longitud), precio por día y estado de disponibilidad.
+  * **Backend:** C# con .NET 10.0 (ASP.NET Core MVC).
+  * **Base de Datos:** MySQL / MariaDB (ADO.NET puro vía MySqlConnector).
+  * **Patrón de Diseño:** Modelo-Vista-Controlador (MVC) y Patrón Repositorio.
+  * **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5, Bootstrap Icons.
 
-Sistema de Reservas Temporales:
+</details>
 
-Asignación de un inquilino a un inmueble por un rango de fechas.
+<details>
+  <summary><strong>⚙️ Instalación y Configuración</strong></summary>
+  <br>
 
-Cálculo automático de la disponibilidad (validación contra solapamiento de fechas para evitar doble reserva).
+  **1. Requisitos Previos**
+  * .NET SDK 10.0 o superior.
+  * Servidor MySQL/MariaDB.
+  * IDE (Visual Studio 2022, VS Code o Rider).
 
-Registro del empleado que generó la reserva.
+  **2. Clonar el repositorio**
+  
+  git clone <URL_DEL_REPOSITORIO>
+  cd Inmobiliaria_Pereyra_Elias_Pelaez_Victor_Lagos_Maximiliano
 
-Control de Pagos:
+  **3. Configurar la Base de Datos**
+  
+  Ejecuta el script inmobiliaria.sql en tu gestor (phpMyAdmin, DBeaver, etc.) para crear la base de datos inmobiliaria_db y cargar los datos iniciales.
+  
+  **4. Cadena de Conexión**
+  
+  Abre appsettings.json y verifica tus credenciales:
+<details>
+    
+<details>
+  <summary>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</summary>
+  <br>
+  
+  **El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:**
+  * Email: admin@inmobiliaria.com
+  * Clave: admin123
+  * Rol: Administrador
+</details>
 
-Registro de transacciones económicas asociadas a cada reserva.
-
-Sistema de anulación (baja lógica) exclusivo para administradores, guardando auditoría de quién anuló el pago.
-
-Interfaz Gráfica: Diseño responsivo utilizando Bootstrap 5, con soporte para modo Claro/Oscuro (Dark Mode).
-
-🛠️ Tecnologías Utilizadas
-Framework: .NET 10.0 (ASP.NET Core MVC)
-
-Lenguaje: C#
-
-Base de Datos: MySQL / MariaDB
-
-Acceso a Datos: ADO.NET puro a través de MySqlConnector (Patrón Repositorio)
-
-Frontend: HTML5, CSS3, JavaScript, Bootstrap 5, Bootstrap Icons
-
-Arquitectura: Modelo-Vista-Controlador (MVC)
-
-⚙️ Requisitos Previos
-.NET SDK 10.0 o superior.
-
-Servidor MySQL o MariaDB corriendo localmente o en un servidor remoto.
-
-Visual Studio 2022, VS Code, o Rider.
-
-🔧 Instalación y Configuración
-1. Clonar el repositorio
-
-Bash
-git clone <URL_DEL_REPOSITORIO>
-cd Inmobiliaria_Pereyra_Elias_Pelaez_Victor_Lagos_Maximiliano
-2. Configurar la Base de Datos
-
-Abre tu gestor de base de datos preferido (phpMyAdmin, DBeaver, MySQL Workbench, etc.).
-
-Ejecuta el script SQL incluido en el proyecto (inmobiliaria.sql) para crear la base de datos inmobiliaria_db, sus tablas y cargar los datos de prueba iniciales.
-
-3. Configurar la cadena de conexión
-
-Abre el archivo appsettings.json.
-
-Verifica que los credenciales de DefaultConnection coincidan con la configuración de tu servidor MySQL local (usuario, contraseña y puerto):
-
-JSON
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost; port=3306; Database=inmobiliaria_db; User ID=root; Password=;"
-}
-4. Ejecutar el proyecto
-
-Desde la terminal, en la raíz del proyecto, ejecuta:
-
-Bash
-dotnet build
-dotnet run
-El sistema estará disponible típicamente en http://localhost:5000 o https://localhost:5001.
-
-🔐 Acceso al Sistema
-El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:
-- Email: admin@inmobiliaria.com
-- Clave: admin123
-- Rol: Administrador
 👥 Equipo de Desarrollo
 Pereyra
 
