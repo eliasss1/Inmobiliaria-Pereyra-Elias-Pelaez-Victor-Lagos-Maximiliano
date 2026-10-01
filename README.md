@@ -36,29 +36,6 @@ Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Co
 </details>
 
 <details>
-  <summary><strong>⚙️ Instalación y Configuración</strong></summary>
-  <br>
-
-  **1. Requisitos Previos**
-  * .NET SDK 10.0 o superior.
-  * Servidor MySQL/MariaDB.
-  * IDE (Visual Studio 2022, VS Code o Rider).
-
-  **2. Clonar el repositorio**
-  
-  git clone <URL_DEL_REPOSITORIO>
-  cd Inmobiliaria_Pereyra_Elias_Pelaez_Victor_Lagos_Maximiliano
-
-  **3. Configurar la Base de Datos**
-  
-  Ejecuta el script inmobiliaria.sql en tu gestor (phpMyAdmin, DBeaver, etc.) para crear la base de datos inmobiliaria_db y cargar los datos iniciales.
-  
-  **4. Cadena de Conexión**
-  
-  Abre appsettings.json y verifica tus credenciales:
-<details>
-    
-<details>
   <summary><strong>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</strong></summary>
   <br>
   
