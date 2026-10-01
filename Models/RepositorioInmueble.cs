@@ -78,6 +78,7 @@ public int Alta(Inmueble entidad)
             }catch(Exception ex)
             {
                 Console.WriteLine($"Error al eliminar inmueble: {ex.Message}");
+                throw;
             }
             finally
             {

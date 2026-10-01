@@ -170,9 +170,29 @@ public class UsuarioController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult ConfirmarEliminar(int id)
     {
-        repo.Baja(id);
-        TempData["Mensaje"] = "Usuario eliminado exitosamente.";
-        return RedirectToAction(nameof(Index));
+        try
+        {
+            repo.Baja(id);
+            TempData["Mensaje"] = "Usuario eliminado exitosamente.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (MySqlConnector.MySqlException ex)
+        {
+            if (ex.Number == 1451)
+            {
+                TempData["Error"] = "No se puede eliminar el usuario porque tiene datos asociados.";
+            }
+            else
+            {
+                TempData["Error"] = "Ocurrió un error en la base de datos al intentar eliminar.";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = "Ocurrió un error inesperado al intentar eliminar.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     [Authorize]

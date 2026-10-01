@@ -45,15 +45,28 @@ namespace Inmobiliaria.Models
 			int res = -1;
 			using (MySqlConnection connection = new MySqlConnection(connectionString))
 			{
-				string sql = "DELETE FROM Propietario WHERE IdPropietario = @id";
-				using (MySqlCommand command = new MySqlCommand(sql, connection))
+				try
 				{
-					command.CommandType = CommandType.Text;
-					command.Parameters.AddWithValue("@id", id);
-					connection.Open();
-					res = command.ExecuteNonQuery();
+					string sql = "DELETE FROM Propietario WHERE IdPropietario = @id";
+					using (MySqlCommand command = new MySqlCommand(sql, connection))
+					{
+						command.CommandType = CommandType.Text;
+						command.Parameters.AddWithValue("@id", id);
+						connection.Open();
+						res = command.ExecuteNonQuery();
+						
+					}
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"ERROR AL DAR DE BAJA UN PROPIETARIO {ex.Message}");
+					throw;
+				}
+				finally
+				{
 					connection.Close();
 				}
+				
 			}
 			return res;
 		}

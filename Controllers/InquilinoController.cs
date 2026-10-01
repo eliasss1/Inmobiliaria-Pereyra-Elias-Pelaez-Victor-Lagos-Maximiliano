@@ -184,10 +184,23 @@ namespace Inmobiliaria.Controllers
 				TempData["Mensaje"] = "Eliminación realizada correctamente";
 				return RedirectToAction(nameof(Index));
 			}
+			catch (MySqlConnector.MySqlException ex)
+			{
+				if (ex.Number == 1451)
+				{
+					TempData["Error"] = "No se puede eliminar el inquilino porque tiene datos asociados.";
+				}
+				else
+				{
+					TempData["Error"] = "Ocurrió un error en la base de datos al intentar eliminar.";
+				}
+				return RedirectToAction(nameof(Index));
+			}
 			catch (Exception ex)
 			{
 				logger.LogError(ex, "Error en Eliminar");
-				throw;
+				TempData["Error"] = "Ocurrió un error inesperado al intentar eliminar.";
+				return RedirectToAction(nameof(Index));
 			}
 		}
 		

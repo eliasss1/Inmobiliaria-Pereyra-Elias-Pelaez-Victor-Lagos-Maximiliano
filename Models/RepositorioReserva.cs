@@ -152,6 +152,8 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             catch(Exception ex)
             {
                 Console.WriteLine($"Error al anular reserva: {ex.Message}");
+                //ESTO PODRIA CAUSAR PROBLEMAS SI EL CONTROLADOR NO LO MANEJA BIEN, ASIQUE MAXI SI TE SALTA ERROR YA SABES
+                throw;
             }
         }
         return res;

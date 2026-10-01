@@ -66,6 +66,7 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
                 }
             } catch (Exception ex) {
                 Console.WriteLine($"Error al eliminar usuario: {ex.Message}");
+                throw;
             }
             finally {
                 conexion.Close();   
