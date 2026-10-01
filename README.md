@@ -19,8 +19,8 @@ Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Co
     * Asignación por rangos de fechas.
     * Validación automática de solapamiento para evitar doble reserva.
     * Auditoría del empleado que generó el contrato.
-  * **Control de Pagos:** Registro de transacciones y baja lógica (anulación) exclusiva para administradores.
-  * **Interfaz Gráfica:** Responsivo, Bootstrap 5, soporte Claro/Oscuro.
+  * **Control de Pagos:** Registro de transacciones y baja lógica (Baja) exclusiva para administradores, y anulacion normal disponible para Usuarios.
+  * **Interfaz Gráfica:** Bootstrap 5, soporte Claro/Oscuro.
 
 </details>
 
