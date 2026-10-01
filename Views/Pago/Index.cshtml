@@ -47,11 +47,11 @@
                 <table class="table table-hover table-striped mb-0 align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th class="ps-4">Multa</th>
+                            <th class="ps-4">Importe</th>
                             <th>Concepto</th>
                             <th>Fecha de Pago</th>
                             <th>Estado</th>
-                            <th>ID Reserva</th>
+                            <th>Reserva</th>
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
@@ -73,7 +73,7 @@
                                     <td>@item.Concepto</td>
                                     <td>@item.FechaPago.ToShortDateString()</td>
                                     <td>@item.Estado</td>
-                                    <td>@item.IdReserva</td>
+                                    <td>Reserva de @(item.ReservaAsociada?.InquilinoAsociado?.Nombre) en @(item.ReservaAsociada?.InmuebleAsociado?.Direccion)</td>
                                     <td class="text-center pe-4">
                                         <div class="btn-group btn-group-sm gap-1" role="group">
                                             <a asp-controller="Pago" asp-action="Edit" asp-route-id="@item.IdPago" class="btn btn-warning text-white" title="Editar">

@@ -139,8 +139,14 @@ public int Baja(int id, int idUsuarioAnulador)
         {
             try
             {
-                string query = @"SELECT * 
-                FROM Pago
+                string query = @"SELECT p.*, 
+                                r.IdInquilino, r.IdInmueble, 
+                                i.Nombre AS InqNombre, i.Apellido AS InqApellido,
+                                m.Direccion AS InmDireccion
+                FROM Pago p
+                INNER JOIN Reserva r ON p.IdReserva = r.IdReserva
+                INNER JOIN Inquilino i ON r.IdInquilino = i.IdInquilino
+                INNER JOIN Inmueble m ON r.IdInmueble = m.IdInmueble
                 LIMIT @tamPagina OFFSET @offset";
 
                 using (MySqlCommand comando = new MySqlCommand(query, conexion))
@@ -161,7 +167,20 @@ public int Baja(int id, int idUsuarioAnulador)
                             Estado = reader.GetString(nameof(p.Estado)),
                             IdReserva = reader.GetInt32(nameof(p.IdReserva)),
                             IdUsuarioCreador = reader.GetInt32(nameof(p.IdUsuarioCreador)),
-                            IdUsuarioAnulador = reader.IsDBNull(nameof(p.IdUsuarioAnulador)) ? null : reader.GetInt32(nameof(p.IdUsuarioAnulador))
+                            IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal(nameof(p.IdUsuarioAnulador))) ? null : reader.GetInt32(nameof(p.IdUsuarioAnulador)),
+                            ReservaAsociada = new Reserva 
+                            {
+                                IdReserva = reader.GetInt32(nameof(p.IdReserva)),
+                                InquilinoAsociado = new Inquilino 
+                                {
+                                    Nombre = reader.GetString("InqNombre"),
+                                    Apellido = reader.GetString("InqApellido")
+                                },
+                                InmuebleAsociado = new Inmueble 
+                                {
+                                    Direccion = reader.GetString("InmDireccion")
+                                }
+                            }
                         };
                         res.Add(p); 
                     }
@@ -230,7 +249,15 @@ public int Baja(int id, int idUsuarioAnulador)
         var res = new List<Pago>();
         using(MySqlConnection conexion = new MySqlConnection(connectionString))
         {
-            string query = "SELECT * FROM Pago WHERE IdReserva = @idReserva";
+            string query = @"SELECT p.*, 
+                            r.IdInquilino, r.IdInmueble, 
+                            i.Nombre AS InqNombre, i.Apellido AS InqApellido,
+                            m.Direccion AS InmDireccion
+            FROM Pago p
+            INNER JOIN Reserva r ON p.IdReserva = r.IdReserva
+            INNER JOIN Inquilino i ON r.IdInquilino = i.IdInquilino
+            INNER JOIN Inmueble m ON r.IdInmueble = m.IdInmueble
+            WHERE p.IdReserva = @idReserva";
             using (MySqlCommand comando = new MySqlCommand(query, conexion))
             {
                 comando.Parameters.AddWithValue("@idReserva", idReserva);
@@ -246,7 +273,20 @@ public int Baja(int id, int idUsuarioAnulador)
                         Estado = reader.GetString(nameof(Pago.Estado)),
                         IdReserva = reader.GetInt32(nameof(Pago.IdReserva)),
                         IdUsuarioCreador = reader.GetInt32(nameof(Pago.IdUsuarioCreador)),
-                        IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal(nameof(Pago.IdUsuarioAnulador))) ? null : reader.GetInt32(nameof(Pago.IdUsuarioAnulador))
+                        IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal(nameof(Pago.IdUsuarioAnulador))) ? null : reader.GetInt32(nameof(Pago.IdUsuarioAnulador)),
+                        ReservaAsociada = new Reserva 
+                        {
+                            IdReserva = reader.GetInt32(nameof(Pago.IdReserva)),
+                            InquilinoAsociado = new Inquilino 
+                            {
+                                Nombre = reader.GetString("InqNombre"),
+                                Apellido = reader.GetString("InqApellido")
+                            },
+                            InmuebleAsociado = new Inmueble 
+                            {
+                                Direccion = reader.GetString("InmDireccion")
+                            }
+                        }
                     });
                 }
             }
