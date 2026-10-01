@@ -17,10 +17,10 @@
                 Informes
             </button>
             <ul class="dropdown-menu" aria-labelledby="informesInmuebles">
-                <li><a class="dropdown-item" asp-action="PorDisponibilidad">Filtrar por Disponibilidad</a></li>
-                <li><a class="dropdown-item" asp-action="MasReservados">Más reservados (últimos 365 días)</a></li>
-                <li><a class="dropdown-item" asp-action="SinReservas">Sin reservas (últimos X días)</a></li>
-                <li><a class="dropdown-item" asp-action="LibresEntreFechas">Libres entre fechas</a></li>
+                <li><a class="dropdown-item" asp-action="PorDisponibilidad" asp-route-idPropietario="@ViewBag.IdPropietario">Filtrar por Disponibilidad</a></li>
+                <li><a class="dropdown-item" asp-action="MasReservados" asp-route-idPropietario="@ViewBag.IdPropietario">Más reservados (últimos 365 días)</a></li>
+                <li><a class="dropdown-item" asp-action="SinReservas" asp-route-idPropietario="@ViewBag.IdPropietario">Sin reservas (últimos X días)</a></li>
+                <li><a class="dropdown-item" asp-action="LibresEntreFechas" asp-route-idPropietario="@ViewBag.IdPropietario">Libres entre fechas</a></li>
             </ul>
         </div>
     </form>
@@ -28,7 +28,7 @@
     @if (ViewBag.MostrarFormFechas == true)
     {
         <div class="card mb-3 p-3 bg-light">
-            <form asp-action="LibresEntreFechas" method="get" class="row g-3 align-items-center">
+            <form asp-action="LibresEntreFechas" asp-route-idPropietario="@ViewBag.IdPropietario" method="get" class="row g-3 align-items-center">
                 <div class="col-auto">
                     <label class="col-form-label fw-bold">Fecha Inicio:</label>
                 </div>
@@ -156,6 +156,7 @@
         </div>
     }
 </div>
+
 
 
 

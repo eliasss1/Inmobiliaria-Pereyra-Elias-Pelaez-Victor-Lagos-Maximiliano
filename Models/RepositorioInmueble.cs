@@ -125,7 +125,7 @@ public int Alta(Inmueble entidad)
     int res = 0;
     using (var connection = new MySqlConnection(connectionString))
     {
-        string sql = "SELECT COUNT(*) FROM Inmueble";
+        string sql = @"SELECT COUNT(*) FROM Inmueble";
         using (var command = new MySqlCommand(sql, connection))
         {
             connection.Open();
@@ -398,164 +398,237 @@ public IList<Inmueble> Buscar(string busqueda)
     return lista;
 }
 
-public IList<Inmueble> ObtenerPorDisponibilidad(bool estado)
-{
-    var lista = new List<Inmueble>();
-    using (MySqlConnection conexion = new MySqlConnection(connectionString))
-    {
-        string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
-                            i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
-                            p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
-                            t.Nombre AS TipoNombre,
-                            i.PorcentajeSeña
-                    FROM Inmueble i
-                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
-                    INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    WHERE i.Estado = @estado";
-
-        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        public IList<Inmueble> ObtenerPorDisponibilidad(bool estado, int? idPropietario = null)
         {
-            comando.Parameters.AddWithValue("@estado", estado);
-            conexion.Open();
-            using (MySqlDataReader reader = comando.ExecuteReader())
+            var lista = new List<Inmueble>();
+            using (MySqlConnection conexion = new MySqlConnection(connectionString))
             {
-                while (reader.Read())
+                string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
+                                    i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
+                                    p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
+                                    t.Nombre AS TipoNombre,
+                                    i.PorcentajeSeña
+                            FROM Inmueble i
+                            INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
+                            INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
+                            WHERE i.Estado = @estado";
+                
+                if (idPropietario.HasValue) sql += " AND i.IdPropietario = @idPropietario";
+
+                using (MySqlCommand comando = new MySqlCommand(sql, conexion))
                 {
-                    lista.Add(MapearInmueble(reader));
+                    comando.Parameters.AddWithValue("@estado", estado);
+                    if (idPropietario.HasValue) comando.Parameters.AddWithValue("@idPropietario", idPropietario.Value);
+
+                    conexion.Open();
+                    using (MySqlDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("IdInmueble"),
+                                Direccion = reader.GetString("Direccion"),
+                                Cupo = reader.GetInt32("Cupo"),
+                                Latitud = reader.IsDBNull(reader.GetOrdinal("Latitud")) ? 0 : reader.GetDouble("Latitud"),
+                                Longitud = reader.IsDBNull(reader.GetOrdinal("Longitud")) ? 0 : reader.GetDouble("Longitud"),
+                                PrecioPorDia = reader.GetDecimal("PrecioPorDia"),
+                                Estado = reader.GetBoolean("Estado"),
+                                ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString("ImagenPortada"),
+                                IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                                IdPropietario = reader.GetInt32("IdPropietario"),
+                                PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
+                                Dueño = new Propietario { Nombre = reader.GetString("PropietarioNombre"), Apellido = reader.GetString("PropietarioApellido") },
+                                Tipo = new TipoInmueble { Nombre = reader.GetString("TipoNombre") }
+                            });
+                        }
+                    }
                 }
             }
+            return lista;
         }
-    }
-    return lista;
-}
 
-public IList<Inmueble> ObtenerMasReservados()
-{
-    var lista = new List<Inmueble>();
-    using (MySqlConnection conexion = new MySqlConnection(connectionString))
-    {
-        string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
-                            i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
-                            p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
-                            t.Nombre AS TipoNombre,
-                            i.PorcentajeSeña,
-                            COUNT(r.IdReserva) as CantidadReservas
-                    FROM Inmueble i
-                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
-                    INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    INNER JOIN Reserva r ON i.IdInmueble = r.IdInmueble
-                    WHERE r.FechaDesde >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
-                    GROUP BY i.IdInmueble
-                    ORDER BY CantidadReservas DESC";
-
-        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        public IList<Inmueble> ObtenerMasReservados(int? idPropietario = null)
         {
-            conexion.Open();
-            using (MySqlDataReader reader = comando.ExecuteReader())
+            var lista = new List<Inmueble>();
+            using (MySqlConnection conexion = new MySqlConnection(connectionString))
             {
-                while (reader.Read())
+                string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
+                                    i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
+                                    p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
+                                    t.Nombre AS TipoNombre,
+                                    i.PorcentajeSeña,
+                                    COUNT(r.IdReserva) as CantidadReservas
+                            FROM Inmueble i
+                            INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
+                            INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
+                            INNER JOIN Reserva r ON i.IdInmueble = r.IdInmueble
+                            WHERE r.FechaDesde >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)";
+                
+                if (idPropietario.HasValue) sql += " AND i.IdPropietario = @idPropietario";
+                sql += " GROUP BY i.IdInmueble ORDER BY CantidadReservas DESC";
+
+                using (MySqlCommand comando = new MySqlCommand(sql, conexion))
                 {
-                    lista.Add(MapearInmueble(reader));
+                    if (idPropietario.HasValue) comando.Parameters.AddWithValue("@idPropietario", idPropietario.Value);
+                    conexion.Open();
+                    using (MySqlDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("IdInmueble"),
+                                Direccion = reader.GetString("Direccion"),
+                                Cupo = reader.GetInt32("Cupo"),
+                                Latitud = reader.IsDBNull(reader.GetOrdinal("Latitud")) ? 0 : reader.GetDouble("Latitud"),
+                                Longitud = reader.IsDBNull(reader.GetOrdinal("Longitud")) ? 0 : reader.GetDouble("Longitud"),
+                                PrecioPorDia = reader.GetDecimal("PrecioPorDia"),
+                                Estado = reader.GetBoolean("Estado"),
+                                ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString("ImagenPortada"),
+                                IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                                IdPropietario = reader.GetInt32("IdPropietario"),
+                                PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
+                                Dueño = new Propietario { Nombre = reader.GetString("PropietarioNombre"), Apellido = reader.GetString("PropietarioApellido") },
+                                Tipo = new TipoInmueble { Nombre = reader.GetString("TipoNombre") }
+                            });
+                        }
+                    }
                 }
             }
+            return lista;
         }
-    }
-    return lista;
-}
 
-public IList<Inmueble> ObtenerSinReservas(int dias)
-{
-    var lista = new List<Inmueble>();
-    using (MySqlConnection conexion = new MySqlConnection(connectionString))
-    {
-        string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
-                            i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
-                            p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
-                            t.Nombre AS TipoNombre,
-                            i.PorcentajeSeña
-                    FROM Inmueble i
-                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
-                    INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    WHERE i.IdInmueble NOT IN (
-                        SELECT IdInmueble FROM Reserva 
-                        WHERE FechaHasta >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
-                    )";
-
-        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        public IList<Inmueble> ObtenerSinReservas(int dias, int? idPropietario = null)
         {
-            comando.Parameters.AddWithValue("@dias", dias);
-            conexion.Open();
-            using (MySqlDataReader reader = comando.ExecuteReader())
+            var lista = new List<Inmueble>();
+            using (MySqlConnection conexion = new MySqlConnection(connectionString))
             {
-                while (reader.Read())
+                string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
+                                    i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
+                                    p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
+                                    t.Nombre AS TipoNombre,
+                                    i.PorcentajeSeña
+                            FROM Inmueble i
+                            INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
+                            INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
+                            WHERE i.IdInmueble NOT IN (
+                                SELECT IdInmueble FROM Reserva 
+                                WHERE FechaHasta >= DATE_SUB(CURDATE(), INTERVAL @dias DAY)
+                            )";
+                
+                if (idPropietario.HasValue) sql += " AND i.IdPropietario = @idPropietario";
+
+                using (MySqlCommand comando = new MySqlCommand(sql, conexion))
                 {
-                    lista.Add(MapearInmueble(reader));
+                    comando.Parameters.AddWithValue("@dias", dias);
+                    if (idPropietario.HasValue) comando.Parameters.AddWithValue("@idPropietario", idPropietario.Value);
+                    conexion.Open();
+                    using (MySqlDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("IdInmueble"),
+                                Direccion = reader.GetString("Direccion"),
+                                Cupo = reader.GetInt32("Cupo"),
+                                Latitud = reader.IsDBNull(reader.GetOrdinal("Latitud")) ? 0 : reader.GetDouble("Latitud"),
+                                Longitud = reader.IsDBNull(reader.GetOrdinal("Longitud")) ? 0 : reader.GetDouble("Longitud"),
+                                PrecioPorDia = reader.GetDecimal("PrecioPorDia"),
+                                Estado = reader.GetBoolean("Estado"),
+                                ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString("ImagenPortada"),
+                                IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                                IdPropietario = reader.GetInt32("IdPropietario"),
+                                PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
+                                Dueño = new Propietario { Nombre = reader.GetString("PropietarioNombre"), Apellido = reader.GetString("PropietarioApellido") },
+                                Tipo = new TipoInmueble { Nombre = reader.GetString("TipoNombre") }
+                            });
+                        }
+                    }
                 }
             }
+            return lista;
         }
-    }
-    return lista;
-}
 
-public IList<Inmueble> ObtenerLibresEntreFechas(DateTime inicio, DateTime fin)
-{
-    var lista = new List<Inmueble>();
-    using (MySqlConnection conexion = new MySqlConnection(connectionString))
-    {
-        string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
-                            i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
-                            p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
-                            t.Nombre AS TipoNombre,
-                            i.PorcentajeSeña
-                    FROM Inmueble i
-                    INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
-                    INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
-                    WHERE i.Estado = 1 AND i.IdInmueble NOT IN (
-                        SELECT IdInmueble FROM Reserva 
-                        WHERE (FechaDesde <= @fin AND FechaHasta >= @inicio) AND Estado = 1
-                    )";
-
-        using (MySqlCommand comando = new MySqlCommand(sql, conexion))
+        public IList<Inmueble> ObtenerLibresEntreFechas(DateTime inicio, DateTime fin, int? idPropietario = null)
         {
-            comando.Parameters.AddWithValue("@inicio", inicio);
-            comando.Parameters.AddWithValue("@fin", fin);
-            conexion.Open();
-            using (MySqlDataReader reader = comando.ExecuteReader())
+            var lista = new List<Inmueble>();
+            using (MySqlConnection conexion = new MySqlConnection(connectionString))
             {
-                while (reader.Read())
+                string sql = @"SELECT i.IdInmueble, i.Direccion, i.Cupo, i.Latitud, i.Longitud, 
+                                    i.PrecioPorDia, i.Estado, i.ImagenPortada, i.IdTipoInmueble, i.IdPropietario,
+                                    p.Nombre AS PropietarioNombre, p.Apellido AS PropietarioApellido,
+                                    t.Nombre AS TipoNombre,
+                                    i.PorcentajeSeña
+                            FROM Inmueble i
+                            INNER JOIN Propietario p ON i.IdPropietario = p.IdPropietario
+                            INNER JOIN TipoInmueble t ON i.IdTipoInmueble = t.IdTipoInmueble
+                            WHERE i.Estado = 1 AND i.IdInmueble NOT IN (
+                                SELECT IdInmueble FROM Reserva 
+                                WHERE (FechaDesde <= @fin AND FechaHasta >= @inicio) AND Estado = 1
+                            )";
+                
+                if (idPropietario.HasValue) sql += " AND i.IdPropietario = @idPropietario";
+
+                using (MySqlCommand comando = new MySqlCommand(sql, conexion))
                 {
-                    lista.Add(MapearInmueble(reader));
+                    comando.Parameters.AddWithValue("@inicio", inicio);
+                    comando.Parameters.AddWithValue("@fin", fin);
+                    if (idPropietario.HasValue) comando.Parameters.AddWithValue("@idPropietario", idPropietario.Value);
+
+                    conexion.Open();
+                    using (MySqlDataReader reader = comando.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new Inmueble
+                            {
+                                IdInmueble = reader.GetInt32("IdInmueble"),
+                                Direccion = reader.GetString("Direccion"),
+                                Cupo = reader.GetInt32("Cupo"),
+                                Latitud = reader.IsDBNull(reader.GetOrdinal("Latitud")) ? 0 : reader.GetDouble("Latitud"),
+                                Longitud = reader.IsDBNull(reader.GetOrdinal("Longitud")) ? 0 : reader.GetDouble("Longitud"),
+                                PrecioPorDia = reader.GetDecimal("PrecioPorDia"),
+                                Estado = reader.GetBoolean("Estado"),
+                                ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString("ImagenPortada"),
+                                IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                                IdPropietario = reader.GetInt32("IdPropietario"),
+                                PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
+                                Dueño = new Propietario { Nombre = reader.GetString("PropietarioNombre"), Apellido = reader.GetString("PropietarioApellido") },
+                                Tipo = new TipoInmueble { Nombre = reader.GetString("TipoNombre") }
+                            });
+                        }
+                    }
                 }
             }
+            return lista;
+        }
+
+        private Inmueble MapearInmueble(MySqlDataReader reader)
+        {
+            return new Inmueble
+            {
+                IdInmueble = reader.GetInt32("IdInmueble"),
+                Direccion = reader.GetString("Direccion"),
+                Cupo = reader.GetInt32("Cupo"),
+                Latitud = reader.IsDBNull(reader.GetOrdinal("Latitud")) ? 0 : reader.GetDouble("Latitud"),
+                Longitud = reader.IsDBNull(reader.GetOrdinal("Longitud")) ? 0 : reader.GetDouble("Longitud"),
+                PrecioPorDia = reader.GetDecimal("PrecioPorDia"),
+                PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
+                Estado = reader.GetBoolean("Estado"),
+                ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString("ImagenPortada"),
+                IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
+                IdPropietario = reader.GetInt32("IdPropietario"),
+                Dueño = new Propietario 
+                {
+                    Nombre = reader.GetString("PropietarioNombre"),
+                    Apellido = reader.GetString("PropietarioApellido")
+                },
+                Tipo = new TipoInmueble
+                {
+                    Nombre = reader.GetString("TipoNombre") 
+                }
+            };
         }
     }
-    return lista;
-}
-
-private Inmueble MapearInmueble(MySqlDataReader reader)
-{
-    return new Inmueble
-    {
-        IdInmueble = reader.GetInt32("IdInmueble"),
-        Direccion = reader.GetString("Direccion"),
-        Cupo = reader.GetInt32("Cupo"),
-        Latitud = reader.GetDouble("Latitud"),
-        Longitud = reader.GetDouble("Longitud"),
-        PrecioPorDia = reader.GetDecimal("PrecioPorDia"),
-        PorcentajeSeña = reader.GetDecimal("PorcentajeSeña"),
-        Estado = reader.GetBoolean("Estado"),
-        ImagenPortada = reader.IsDBNull(reader.GetOrdinal("ImagenPortada")) ? null : reader.GetString("ImagenPortada"),
-        IdTipoInmueble = reader.GetInt32("IdTipoInmueble"),
-        IdPropietario = reader.GetInt32("IdPropietario"),
-        Dueño = new Propietario 
-        {
-            Nombre = reader.GetString("PropietarioNombre"),
-            Apellido = reader.GetString("PropietarioApellido")
-        },
-        Tipo = new TipoInmueble
-        {
-            Nombre = reader.GetString("TipoNombre") 
-        }
-    };
-}
-}

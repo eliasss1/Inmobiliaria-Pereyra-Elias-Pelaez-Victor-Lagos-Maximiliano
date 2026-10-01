@@ -102,34 +102,37 @@ namespace Inmobiliaria.Controllers
     }
 
         [Route("[controller]/PorDisponibilidad")]
-        public ActionResult PorDisponibilidad(bool estado = true)
+        public ActionResult PorDisponibilidad(bool estado = true, int? idPropietario = null)
         {
-            var lista = repositorio.ObtenerPorDisponibilidad(estado);
+            var lista = repositorio.ObtenerPorDisponibilidad(estado, idPropietario);
+            if (idPropietario.HasValue) ViewBag.IdPropietario = idPropietario.Value;
             ViewBag.FiltroActivo = $"Disponibilidad: {(estado ? "Activos" : "Inactivos")}";
             ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
             return View("Index", lista);
         }
 
         [Route("[controller]/MasReservados")]
-        public ActionResult MasReservados()
+        public ActionResult MasReservados(int? idPropietario = null)
         {
-            var lista = repositorio.ObtenerMasReservados();
+            var lista = repositorio.ObtenerMasReservados(idPropietario);
+            if (idPropietario.HasValue) ViewBag.IdPropietario = idPropietario.Value;
             ViewBag.FiltroActivo = "Más reservados (Últimos 365 días)";
             ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
             return View("Index", lista);
         }
 
         [Route("[controller]/SinReservas")]
-        public ActionResult SinReservas(int dias = 30)
+        public ActionResult SinReservas(int dias = 30, int? idPropietario = null)
         {
-            var lista = repositorio.ObtenerSinReservas(dias);
+            var lista = repositorio.ObtenerSinReservas(dias, idPropietario);
+            if (idPropietario.HasValue) ViewBag.IdPropietario = idPropietario.Value;
             ViewBag.FiltroActivo = $"Sin reservas en los últimos {dias} días";
             ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
             return View("Index", lista);
         }
 
         [Route("[controller]/LibresEntreFechas")]
-        public ActionResult LibresEntreFechas(DateTime? inicio, DateTime? fin)
+        public ActionResult LibresEntreFechas(DateTime? inicio, DateTime? fin, int? idPropietario = null)
         {
             if (!inicio.HasValue || !fin.HasValue)
             {
@@ -138,7 +141,8 @@ namespace Inmobiliaria.Controllers
                 return View("Index", new List<Inmueble>());
             }
             
-            var lista = repositorio.ObtenerLibresEntreFechas(inicio.Value, fin.Value);
+            var lista = repositorio.ObtenerLibresEntreFechas(inicio.Value, fin.Value, idPropietario);
+            if (idPropietario.HasValue) ViewBag.IdPropietario = idPropietario.Value;
             ViewBag.FiltroActivo = $"Libres entre {inicio.Value.ToShortDateString()} y {fin.Value.ToShortDateString()}";
             ViewBag.Pagina = 1; ViewBag.TotalPaginas = 1;
             return View("Index", lista);
@@ -360,6 +364,7 @@ namespace Inmobiliaria.Controllers
         }
     }
 }
+
 
 
 
