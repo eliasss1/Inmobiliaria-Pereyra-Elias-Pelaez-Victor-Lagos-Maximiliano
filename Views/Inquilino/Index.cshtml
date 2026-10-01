@@ -84,11 +84,16 @@
                                             <a asp-controller="Inquilino" asp-action="Details" asp-route-id="@item.IdInquilino" class="btn btn-info text-white" title="Ver Detalles">
                                                 Detalles
                                             </a>
-                                            <form asp-controller="Inquilino" asp-action="Eliminar" asp-route-id="@item.IdInquilino" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres borrar este inquilino?');">
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="bi bi-trash"></i> Borrar
-                                                </button>
-                                            </form>
+                                            @if (User.IsInRole("Administrador"))
+                                            {
+                                                
+                                                <form asp-controller="Inquilino" asp-action="Eliminar" asp-route-id="@item.IdInquilino" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres borrar este inquilino?');">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="bi bi-trash"></i> Borrar
+                                                    </button>
+                                                </form>
+                                            }
+                                            
                                         </div>
                                     </td>
                                 </tr>

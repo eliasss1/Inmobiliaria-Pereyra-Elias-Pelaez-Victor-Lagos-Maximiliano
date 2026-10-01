@@ -123,9 +123,8 @@
                             <td>@i.PorcentajeSeña</td>
                             <td>
                                 <a asp-action="Edit" asp-route-id="@i.IdInmueble" class="btn btn-warning btn-sm">Editar</a>
+                                <a asp-action="Details" asp-route-id="@i.IdInmueble" class="btn btn-info btn-sm">Detalles</a>
                                 @if(User.IsInRole("Administrador")){
-                                    <a asp-action="Details" asp-route-id="@i.IdInmueble" class="btn btn-info btn-sm">Detalles</a>
-                                
                                     <form asp-action="Eliminar" asp-route-id="@i.IdInmueble" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que queres eliminar este inmueble?');">
                                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                     </form>
