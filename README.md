@@ -59,7 +59,7 @@ Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Co
 <details>
     
 <details>
-  <summary>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</summary>
+  <summary><strong>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</strong></summary>
   <br>
   
   **El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:**
