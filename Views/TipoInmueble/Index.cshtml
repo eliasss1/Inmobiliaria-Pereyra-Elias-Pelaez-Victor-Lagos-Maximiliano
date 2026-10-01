@@ -37,7 +37,6 @@
                         <a asp-action="Details" asp-route-id="@item.IdTipoInmueble" class="btn btn-sm btn-info">Detalles</a>
                         @if (User.IsInRole("Administrador"))
                         {
-                            
                             <a asp-action="Eliminar" asp-route-id="@item.IdTipoInmueble" class="btn btn-sm btn-danger">Eliminar</a>
                         }
                         
