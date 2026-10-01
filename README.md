@@ -45,18 +45,30 @@ Sistema integral de gestión de alquileres temporales desarrollado en ASP.NET Co
   * IDE (Visual Studio 2022, VS Code o Rider).
 
   **2. Clonar el repositorio**
-  ```bash
+  
   git clone <URL_DEL_REPOSITORIO>
   cd Inmobiliaria_Pereyra_Elias_Pelaez_Victor_Lagos_Maximiliano
 
-#🔐 Acceso al Sistema
-El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:
-- Email: admin@inmobiliaria.com
-- Clave: admin123
-- Rol: Administrador
+  **3. Configurar la Base de Datos**
+  
+  Ejecuta el script inmobiliaria.sql en tu gestor (phpMyAdmin, DBeaver, etc.) para crear la base de datos inmobiliaria_db y cargar los datos iniciales.
+  
+  **4. Cadena de Conexión**
+  
+  Abre appsettings.json y verifica tus credenciales:
+<details>
+    
+<details>
+  <summary>🔐 Acceso al Sistema (LO MAS IMPORTANTE)</summary>
+  <br>
+  
+  **El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:**
+  * Email: admin@inmobiliaria.com
+  * Clave: admin123
+  * Rol: Administrador
+</details>
 
-
-#👥 Equipo de Desarrollo
+👥 Equipo de Desarrollo
 Pereyra
 
 Elías
