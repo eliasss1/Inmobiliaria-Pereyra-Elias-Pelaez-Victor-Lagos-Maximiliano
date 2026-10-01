@@ -1,4 +1,5 @@
 @model IEnumerable<Inmobiliaria.Models.Usuario>
+@using Inmobiliaria.Extension
 
 @{
     ViewData["Title"] = "Gestión de Usuarios";
@@ -48,7 +49,10 @@
                             </td>
                             <td>
                                 <a asp-action="Edit" asp-route-id="@u.IdUsuario" class="btn btn-warning btn-sm">Editar</a>
-                                <a asp-action="Eliminar" asp-route-id="@u.IdUsuario" class="btn btn-danger btn-sm">Eliminar</a>
+                                @if(u.IdUsuario != User.GetUserId())
+                                {
+                                    <a asp-action="Eliminar" asp-route-id="@u.IdUsuario" class="btn btn-danger btn-sm">Eliminar</a>
+                                }
                             </td>
                         </tr>
                     }

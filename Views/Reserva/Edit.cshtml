@@ -1,56 +1,59 @@
 @model Inmobiliaria.Models.Reserva
 
-<h2>Editar Reserva</h2>
 
-<form asp-action="Edit">
-    <input type="hidden" asp-for="IdReserva" />
-    <input type="hidden" asp-for="IdUsuarioCreador" />
-    <input type="hidden" asp-for="IdUsuarioTerminador" />
+<div class="container d-flex justify-content-center align-items-center">
+    <form asp-controller="Reserva" asp-action="Edit" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow"  method="post">
+        <h2>Editar Reserva</h2>
+        <input type="hidden" asp-for="IdReserva" />
+        <input type="hidden" asp-for="IdUsuarioCreador" />
+        <input type="hidden" asp-for="IdUsuarioTerminador" />
 
-    <div class="form-group">
-        <label asp-for="FechaDesde" class="control-label">Fecha Inicio</label>
-        <input asp-for="FechaDesde" class="form-control" type="date" />
-        <span asp-validation-for="FechaDesde" class="text-danger"></span>
-    </div>
+        <div class="form-group w-50">
+            <label asp-for="FechaDesde" class="control-label">Fecha Inicio</label>
+            <input asp-for="FechaDesde" class="form-control" type="date" />
+            <span asp-validation-for="FechaDesde" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="FechaHasta" class="control-label">Fecha Fin</label>
-        <input asp-for="FechaHasta" class="form-control" type="date" />
-        <span asp-validation-for="FechaHasta" class="text-danger"></span>
-    </div>
+        <div class="form-group w-50">
+            <label asp-for="FechaHasta" class="control-label">Fecha Fin</label>
+            <input asp-for="FechaHasta" class="form-control" type="date" />
+            <span asp-validation-for="FechaHasta" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group w-50">
+            <label asp-for="MontoPorDia" class="control-label">Monto Por Dia</label>
+            <input asp-for="MontoPorDia" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="MontoPorDia" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group w-50">
+            <label asp-for="FechaEfectivaTerminacion" class="control-label">Fecha Efectiva Terminacion</label>
+            <input asp-for="FechaEfectivaTerminacion" class="form-control" type="date" />
+            <span asp-validation-for="FechaEfectivaTerminacion" class="text-danger"></span>
+        </div>
+        @*
+        <div class="form-group">
+            <label asp-for="Multa" class="control-label">Multa</label>
+            <input asp-for="Multa" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="Multa" class="text-danger"></span>
+        </div>*@
 
-    <div class="form-group">
-        <label asp-for="MontoPorDia" class="control-label">Monto Por Dia</label>
-        <input asp-for="MontoPorDia" class="form-control" type="number" step="0.01" />
-        <span asp-validation-for="MontoPorDia" class="text-danger"></span>
-    </div>
+        <div class="form-group w-50">
+            <label asp-for="IdInquilino" class="control-label">Inquilino</label>
+            <select asp-for="IdInquilino" class="form-control select2-inquilino" asp-items="ViewBag.Inquilinos"></select>
+            <span asp-validation-for="IdInquilino" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="FechaEfectivaTerminacion" class="control-label">Fecha Efectiva Terminacion</label>
-        <input asp-for="FechaEfectivaTerminacion" class="form-control" type="date" />
-        <span asp-validation-for="FechaEfectivaTerminacion" class="text-danger"></span>
-    </div>
+        <div class="form-group w-50">
+            <label asp-for="IdInmueble" class="control-label">Inmueble</label>
+            <select asp-for="IdInmueble" class="form-control select2-inmueble" asp-items="ViewBag.Inmuebles"></select>
+            <span asp-validation-for="IdInmueble" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="Multa" class="control-label">Multa</label>
-        <input asp-for="Multa" class="form-control" type="number" step="0.01" />
-        <span asp-validation-for="Multa" class="text-danger"></span>
-    </div>
+        <div class="form-group mt-3 d-flex justify-content-end gap-1">
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Volver</a>
+        </div>
+    </form>
+</div>
 
-    <div class="form-group">
-        <label asp-for="IdInquilino" class="control-label">Inquilino</label>
-        <select asp-for="IdInquilino" class="form-control select2-inquilino" asp-items="ViewBag.Inquilinos"></select>
-        <span asp-validation-for="IdInquilino" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="IdInmueble" class="control-label">Inmueble</label>
-        <select asp-for="IdInmueble" class="form-control select2-inmueble" asp-items="ViewBag.Inmuebles"></select>
-        <span asp-validation-for="IdInmueble" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mt-3">
-        <input type="submit" value="Guardar" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Volver</a>
-    </div>
-</form>

@@ -11,46 +11,40 @@
     </div>
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-warning text-dark">
-            <h3 class="mb-0">Editar datos del Pago @Model.IdPago</h3>
+<div class="container d-flex justify-content-center align-items-center">
+    <form asp-controller="Pago" asp-action="Edit" class="form-gor2 d-flex flex-column justify-content-start m-2 p-5 gap-2 shadow" method="post">
+        <h3 class="mb-0">Editar datos del Pago @Model.IdPago</h3>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <input type="hidden" asp-for="IdPago" />
+
+        
+        <div class="form-group w-50">
+            <label asp-for="Concepto" class="form-label fw-bold"></label>
+            <input asp-for="Concepto" class="form-control" />
+            <span asp-validation-for="Concepto" class="text-danger"></span>
         </div>
-        <div class="card-body">
-            <form asp-action="Edit" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <input type="hidden" asp-for="IdPago" />
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Concepto" class="form-label fw-bold"></label>
-                        <input asp-for="Concepto" class="form-control" />
-                        <span asp-validation-for="Concepto" class="text-danger"></span>
-                    </div>
+        @if (User.IsInRole("Administrador"))
+            {
+                <div class="form-group w-50">
+                    <label asp-for="Estado" class="form-label fw-bold"></label>
+                    <select asp-for="Estado" class="form-select">
+                        <option value="Activo">Activo</option>
+                        <option value="Anulado">Anulado</option>
+                    </select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
                 </div>
+            }
 
-                <div class="row">
-                    @if (User.IsInRole("Administrador"))
-                        {
-                            <div class="col-md-4 mb-3">
-                                <label asp-for="Estado" class="form-label fw-bold"></label>
-                                <select asp-for="Estado" class="form-select">
-                                    <option value="Activo">Activo</option>
-                                    <option value="Anulado">Anulado</option>
-                                </select>
-                                <span asp-validation-for="Estado" class="text-danger"></span>
-                            </div>
-                        }
-                </div>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <a asp-action="Index" class="btn btn-secondary me-2">Cancelar</a>
-                    <button type="submit" class="btn btn-warning fw-bold">Guardar Cambios</button>
-                </div>
-            </form>
+        <div class="d-flex justify-content-end mt-4">
+            <a asp-action="Index" class="btn btn-secondary me-2">Cancelar</a>
+            <button type="submit" class="btn btn-primary fw-bold">Guardar Cambios</button>
         </div>
-    </div>
+    </form>
+
 </div>
 
 @section Scripts {

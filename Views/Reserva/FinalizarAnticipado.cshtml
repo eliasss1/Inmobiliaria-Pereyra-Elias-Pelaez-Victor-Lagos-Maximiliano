@@ -11,12 +11,12 @@
         <input type="hidden" name="idReserva" value="@Model.IdReserva" />
 
         <div class="mb-3">
-            <label>Fecha de Terminaci&oacute;n Efectiva</label>
+            <label>Fecha de Terminacion Efectiva</label>
             <input name="fechaTerminacion" type="date" class="form-control" value="@ViewBag.FechaTerminacion" readonly />
         </div>
         <div class="mb-3">
             <label>Monto de la Multa</label>
-            <input name="montoMulta" type="number" step="0.01" class="form-control" value="@ViewBag.MontoMulta" readonly />
+            <input name="montoMulta" type="number" step="0.01" class="form-control" value="@(((decimal)ViewBag.MontoMulta).ToString(System.Globalization.CultureInfo.InvariantCulture))" readonly />
         </div>
         <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" name="pagoEfectuado" value="true" id="pagoEfectuado">
@@ -36,3 +36,4 @@
         </div>
     </form>
 </div>
+

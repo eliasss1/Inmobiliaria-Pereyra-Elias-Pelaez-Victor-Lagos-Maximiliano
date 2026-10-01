@@ -124,9 +124,22 @@ namespace Inmobiliaria.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    repoReserva.Modificacion(entidad); 
+                    //Esto nose porque lo cree jajaja, si para que quiero confirmar que existe el inmueble si ya esta creado en la base de datos, porque sino el 
+                    // modelstate hubiera dado false, no es asi lector anonimo? xd.
+                    Inmueble? inmueble = repoInmueble.ObtenerPorId(entidad.IdInmueble);
 
-                    return RedirectToAction(nameof(Index));
+                    if (repoReserva.ExisteSolapamiento(entidad)) 
+                    {
+                        ModelState.AddModelError("FechaDesde", "El inmueble seleccionado ya se encuentra reservado en el rango de fechas elegido.");
+                        SetViewBag(entidad);
+                        return View(entidad);
+                    }
+                    else
+                    {
+                        repoReserva.Modificacion(entidad); 
+
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
 
                 SetViewBag(entidad);
@@ -255,27 +268,27 @@ namespace Inmobiliaria.Controllers
 
         }
 
-[Authorize(Roles = "Administrador")]
-[HttpPost, ActionName("Eliminar")]
-[ValidateAntiForgeryToken]
-public IActionResult EliminarConfirmacion(int id)
-{
-    try
-    {
-        // Obtenemos el ID del administrador que está anulando la reserva
-        int idUsuarioLogueado = int.Parse(User.FindFirstValue("Id") ?? "0");
-        
-        repoReserva.Baja(id, idUsuarioLogueado);
-        TempData["Mensaje"] = "La reserva fue anulada correctamente.";
-        return RedirectToAction(nameof(Index));
-    }
-    catch(Exception ex)
-    {
-        logger.LogError(ex, "No se pudo anular la reserva");
-        TempData["Error"] = "Ocurrió un error al intentar anular la reserva.";
-        return RedirectToAction(nameof(Index));
-    }
-}
+        [Authorize(Roles = "Administrador")]
+        [HttpPost, ActionName("Eliminar")]
+        [ValidateAntiForgeryToken]
+        public IActionResult EliminarConfirmacion(int id)
+        {
+            try
+            {
+                // Obtenemos el ID del administrador que está anulando la reserva
+                int idUsuarioLogueado = int.Parse(User.FindFirstValue("Id") ?? "0");
+                
+                repoReserva.Baja(id, idUsuarioLogueado);
+                TempData["Mensaje"] = "La reserva fue anulada correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "No se pudo anular la reserva");
+                TempData["Error"] = "Ocurrió un error al intentar anular la reserva.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
 
         [Authorize]
         public ActionResult Details(int id)
@@ -290,7 +303,7 @@ public IActionResult EliminarConfirmacion(int id)
             return View(entidad);
         }
 
-                [HttpGet]
+        [HttpGet]
         public IActionResult FinalizarAnticipado(int id)
         {
             var reserva = repoReserva.ObtenerPorId(id);
@@ -349,7 +362,7 @@ public IActionResult EliminarConfirmacion(int id)
             ViewBag.MontoMulta = montoMulta;
             return View(reservaOriginal); 
         }
-    [HttpGet] 
+        [HttpGet] 
         public IActionResult Renovar(int id) 
         { 
             var reservaOriginal = repoReserva.ObtenerPorId(id);
@@ -369,8 +382,8 @@ public IActionResult EliminarConfirmacion(int id)
                 ViewBag.ReservaOriginal = reservaOriginal; 
                 return View(nuevaReserva); 
         } 
-    [HttpPost]
-    [ValidateAntiForgeryToken] 
+        [HttpPost]
+        [ValidateAntiForgeryToken] 
         public IActionResult Renovar(Reserva nuevaReserva) 
         {
             if (nuevaReserva.FechaHasta <= nuevaReserva.FechaDesde) 
@@ -384,7 +397,7 @@ public IActionResult EliminarConfirmacion(int id)
             } 
             if (inmueble != null && repoReserva.ExisteSolapamiento(nuevaReserva)) 
             { 
-                ModelState.AddModelError("", "No se puede extender la reserva: el inmueble ya posee otra reserva confirmada en las fechas seleccionadas."); 
+                ModelState.AddModelError("FechaDesde", "No se puede extender la reserva: el inmueble ya posee otra reserva confirmada en las fechas seleccionadas."); 
             } 
             if (!ModelState.IsValid) 
             {
