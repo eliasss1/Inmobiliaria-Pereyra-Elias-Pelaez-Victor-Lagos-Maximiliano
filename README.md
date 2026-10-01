@@ -2,12 +2,12 @@
 TP integral ULP 2026.
 
 [!NOTE]
-NUMERO DE CONTACTO PARA EL INFORME DE REVISION CRUZADA: 2664884044
+NUMERO DE CONTACTO: 2664884044
 
 🚀 Características Principales
 Gestión de Usuarios y Roles: Autenticación basada en cookies. Dos roles definidos (Administrador y Empleado) con restricciones de acceso a las distintas vistas y acciones (por ejemplo, solo el administrador puede eliminar registros o anular pagos).
 
-Administración de Entidades Básicas (ABM/CRUD):
+#Administración de Entidades Básicas (ABM/CRUD):
 
 Propietarios: Registro y gestión de los dueños de los inmuebles.
 
@@ -33,7 +33,7 @@ Sistema de anulación (baja lógica) exclusivo para administradores, guardando a
 
 Interfaz Gráfica: Diseño responsivo utilizando Bootstrap 5, con soporte para modo Claro/Oscuro (Dark Mode).
 
-🛠️ Tecnologías Utilizadas
+#🛠️ Tecnologías Utilizadas
 Framework: .NET 10.0 (ASP.NET Core MVC)
 
 Lenguaje: C#
@@ -46,14 +46,14 @@ Frontend: HTML5, CSS3, JavaScript, Bootstrap 5, Bootstrap Icons
 
 Arquitectura: Modelo-Vista-Controlador (MVC)
 
-⚙️ Requisitos Previos
+#⚙️ Requisitos Previos
 .NET SDK 10.0 o superior.
 
 Servidor MySQL o MariaDB corriendo localmente o en un servidor remoto.
 
 Visual Studio 2022, VS Code, o Rider.
 
-🔧 Instalación y Configuración
+#🔧 Instalación y Configuración
 1. Clonar el repositorio
 
 Bash
@@ -84,12 +84,14 @@ dotnet build
 dotnet run
 El sistema estará disponible típicamente en http://localhost:5000 o https://localhost:5001.
 
-🔐 Acceso al Sistema
+#🔐 Acceso al Sistema
 El script SQL genera un usuario administrador por defecto para probar el sistema inmediatamente:
 - Email: admin@inmobiliaria.com
 - Clave: admin123
 - Rol: Administrador
-👥 Equipo de Desarrollo
+
+
+#👥 Equipo de Desarrollo
 Pereyra
 
 Elías
